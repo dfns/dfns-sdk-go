@@ -19,3 +19,10 @@
 
 # Go workspace file
 go.work
+
+# .env and .env_*
+.env
+.env_*
+
+# config files
+config.yaml
