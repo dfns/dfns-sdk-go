@@ -41,13 +41,11 @@ import (
 	"github/dfns/dfns-sdk-go/pkg/credentials"
 )
 
-signer := credentials.NewAsymmetricKeySigner(
-		os.Getenv("DFNS_PRIVATE_KEY"),  // Credential private key
-		os.Getenv("DFNS_CRED_ID"), // Credential Id
-		os.Getenv("DFNS_APP_ORIGIN"), // Application's origin, should match the Application registered with Dfns
-		false, // Cross-origin (unused for now)
-		nil, // Hashing algorithm, defaults to SHA256
-	)
+conf := &credentials.AsymmetricKeySignerConfig{
+		PrivateKey: os.Getenv("DFNS_PRIVATE_KEY"), // Credential private key
+		CredId:     os.Getenv("DFNS_CRED_ID"),     // Credential Id
+		AppOrigin:  os.Getenv("DFNS_APP_ORIGIN"),  // Application's origin, should match the Application registered with Dfns
+	}
 ```
 
 - `credential Id`: ID of the Credential registered with the auth token you’re using (Personal Access Token, or Service Account Token). In Dfns dashboard, you can find it next to your token (in `Settings` > `My Access Tokens` or `Settings > Service Accounts`)
@@ -66,7 +64,7 @@ It needs to be authenticated, so `DfnsApiClient` needs to be passed a valid `aut
 
 `DfnsApiClient` also needs to be passed a [CredentialSigner](#credentialsigner), in order to sign requests.
 
-The `DfnsApiClient` provides a single function for creating the client -> `CreateDfnsApiClient`
+The `DfnsApiClient` provides a single function that creates a http client -> `CreateDfnsApiClient`
 The http.Client returned will handle all the authentification process.
 
 When the user performs a `POST, PUT or DELETE` using the client, it will automatically perform a `useraction` process (aka challenge signing).
@@ -89,7 +87,7 @@ signer := ... // a Credential Signer (webauthN or key signer from section above)
 
 // Create a DfnsApiClient instance
 apiOptions, err := api.NewDfnsBaseApiOptions(&api.DfnsBaseApiConfig{
-	AppId:     os.Getenv("DFNS_APP_ID"),    // ID of the Application registered with DFNS
+	AppId:     os.Getenv("DFNS_APP_ID"),     // ID of the Application registered with DFNS
 	AuthToken: os.Getenv("DFNS_AUTH_TOKEN"), // an auth token
 	BaseUrl:   os.Getenv("DFNS_API_URL"),    // base Url of DFNS API
 }, signer)
