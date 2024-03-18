@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	dfnsApi "github.com/dfns/dfns-sdk-go/pkg/dfns-api-client"
 	"github.com/joho/godotenv"
-	"github/dfns/dfns-sdk-go/pkg/credentials"
-	dfnsApi "github/dfns/dfns-sdk-go/pkg/dfns-api-client"
 )
 
 type Wallet struct {

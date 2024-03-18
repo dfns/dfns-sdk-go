@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	dfns_api_client "github.com/dfns/dfns-sdk-go/pkg/dfns-api-client"
 	"github.com/spf13/viper"
-	"github/dfns/dfns-sdk-go/pkg/credentials"
-	dfns_api_client "github/dfns/dfns-sdk-go/pkg/dfns-api-client"
 )
 
 type KeySignerConfig struct {

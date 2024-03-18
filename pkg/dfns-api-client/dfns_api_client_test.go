@@ -11,10 +11,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github/dfns/dfns-sdk-go/pkg/credentials"
 )
 
 func TestPerformSimpleRequest(t *testing.T) {
