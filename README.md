@@ -38,7 +38,7 @@ This functionality is exposed in the `pkg/api` package and implements the `Crede
 ```golang
 import (
   .....
-	"github/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
 )
 
 conf := &credentials.AsymmetricKeySignerConfig{
@@ -79,8 +79,8 @@ _Note: You can include a context directly in your httprequest if you want some c
 ```golang
 import (
   .....
-	api "github/dfns/dfns-sdk-go/pkg/dfns_api_client"
-	"github/dfns/dfns-sdk-go/pkg/credentials"
+	api "github.com/dfns/dfns-sdk-go/pkg/dfns_api_client"
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
 )
 
 signer := ... // a Credential Signer (webauthN or key signer from section above)

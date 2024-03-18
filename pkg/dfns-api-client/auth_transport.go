@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
 )
 
 const (

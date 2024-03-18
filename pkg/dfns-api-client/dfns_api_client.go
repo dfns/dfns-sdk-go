@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/pkg/credentials"
 )
 
 // DfnsApiConfig defines the configuration options for the DFNS API.
