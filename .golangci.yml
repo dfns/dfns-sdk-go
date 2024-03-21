@@ -166,3 +166,5 @@ issues:
     - linters:
         - lll
       source: "^//go:generate "
+  exclude-dirs:
+    - cmd
