@@ -10,13 +10,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"fmt"
 )
 
 type AsymmetricKeySignerConfig struct {
 	PrivateKey  string
-	CredId      string
+	CredID      string
 	AppOrigin   string
 	CrossOrigin *bool
 	Algorithm   *crypto.Hash
@@ -34,7 +33,7 @@ func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySig
 
 // Sign signs the given challenge using the private key and the hashing algorithm specified in the Algorithm field.
 // If the Algorithm field is not set or invalid, it defaults to SHA256.
-func (signer *AsymmetricKeySigner) Sign(challenge string, allowCredentials *AllowCredentials) (*KeyAssertion, error) {
+func (signer *AsymmetricKeySigner) Sign(challenge string, _ *AllowCredentials) (*KeyAssertion, error) {
 	// Determine the hashing algorithm
 	hash := signer.Algorithm
 	if hash == nil {
@@ -43,26 +42,9 @@ func (signer *AsymmetricKeySigner) Sign(challenge string, allowCredentials *Allo
 	}
 
 	// Parse PEM encoded private key
-	block, _ := pem.Decode([]byte(signer.PrivateKey))
-	if block == nil {
-		return nil, errors.New("invalid PrivateKey PEM format")
-	}
-
-	var privateKey interface{}
-	var err error
-	switch block.Type {
-	case "EC PRIVATE KEY":
-		privateKey, err = x509.ParseECPrivateKey(block.Bytes)
-	case "PRIVATE KEY":
-		// ed + rsa_pk8
-		privateKey, err = x509.ParsePKCS8PrivateKey(block.Bytes)
-	case "RSA PRIVATE KEY":
-		privateKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
-	default:
-		return nil, fmt.Errorf("unsupported private key type: %s", block.Type)
-	}
+	privateKey, err := parsePEMPrivateKey(signer.PrivateKey)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't parse PEM format: %w", err)
 	}
 
 	var crossOrigin bool
@@ -85,39 +67,19 @@ func (signer *AsymmetricKeySigner) Sign(challenge string, allowCredentials *Allo
 	// Marshal the clientData object to JSON
 	clientDataJSON, err := json.Marshal(clientData)
 	if err != nil {
-		return nil, fmt.Errorf("error marshaling client data: %v", err)
+		return nil, fmt.Errorf("error marshaling client data: %w", err)
 	}
 
-	// Sign the challenge (or the hash)
-	var signature []byte
-	switch privateKey := privateKey.(type) {
-	case *ecdsa.PrivateKey:
-		h := hash.New()
-		h.Write(clientDataJSON)
-
-		signature, err = ecdsa.SignASN1(rand.Reader, privateKey, h.Sum(nil))
-		if err != nil {
-			return nil, err
-		}
-
-	case *rsa.PrivateKey:
-		h := hash.New()
-		h.Write(clientDataJSON)
-		signature, err = rsa.SignPKCS1v15(rand.Reader, privateKey, *hash, h.Sum(nil))
-		if err != nil {
-			return nil, err
-		}
-	case ed25519.PrivateKey:
-		signature = ed25519.Sign(privateKey, clientDataJSON)
-	default:
-		return nil, fmt.Errorf("unsupported private key type: %T", privateKey)
+	signature, err := signData(privateKey, hash, clientDataJSON)
+	if err != nil {
+		return nil, fmt.Errorf("can't sign data: %w", err)
 	}
 
 	// Construct the key assertion
 	keyAssertion := &KeyAssertion{
 		Kind: KeyCredential,
 		CredentialAssertion: CredentialAssertion{
-			CredId:     signer.CredId,
+			CredID:     signer.CredID,
 			Signature:  base64.RawURLEncoding.EncodeToString(signature),
 			ClientData: base64.RawURLEncoding.EncodeToString(clientDataJSON),
 			Algorithm:  hash.String(),
@@ -125,4 +87,68 @@ func (signer *AsymmetricKeySigner) Sign(challenge string, allowCredentials *Allo
 	}
 
 	return keyAssertion, nil
+}
+
+func parsePEMPrivateKey(privateKey string) (interface{}, error) {
+	// Parse PEM encoded private key
+	block, _ := pem.Decode([]byte(privateKey))
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode PEM block")
+	}
+
+	switch block.Type {
+	case "EC PRIVATE KEY":
+		key, err := x509.ParseECPrivateKey(block.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse EC private key: %w", err)
+		}
+
+		return key, nil
+	case "PRIVATE KEY":
+		// ed + rsa_pk8
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse PKCS8 private key: %w", err)
+		}
+
+		return key, nil
+	case "RSA PRIVATE KEY":
+		key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse PKCS1 private key: %w", err)
+		}
+
+		return key, nil
+	default:
+		return nil, fmt.Errorf("unsupported private key type: %s", block.Type)
+	}
+}
+
+func signData(privateKey interface{}, hash *crypto.Hash, data []byte) ([]byte, error) {
+	switch privateKey := privateKey.(type) {
+	case *ecdsa.PrivateKey:
+		h := hash.New()
+		h.Write(data)
+
+		signature, err := ecdsa.SignASN1(rand.Reader, privateKey, h.Sum(nil))
+		if err != nil {
+			return nil, fmt.Errorf("failed to sign with ECDSA private key: %w", err)
+		}
+
+		return signature, nil
+	case *rsa.PrivateKey:
+		h := hash.New()
+		h.Write(data)
+
+		signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, *hash, h.Sum(nil))
+		if err != nil {
+			return nil, fmt.Errorf("failed to sign with RSA private key: %w", err)
+		}
+
+		return signature, nil
+	case ed25519.PrivateKey:
+		return ed25519.Sign(privateKey, data), nil
+	default:
+		return nil, fmt.Errorf("unsupported private key type: %T", privateKey)
+	}
 }

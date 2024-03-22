@@ -13,7 +13,7 @@ type KeyAssertion struct {
 }
 
 type CredentialAssertion struct {
-	CredId     string `json:"credId"`
+	CredID     string `json:"credId"`
 	ClientData string `json:"clientData"`
 	Signature  string `json:"signature"`
 	Algorithm  string `json:"algorithm"`
