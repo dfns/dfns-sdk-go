@@ -41,5 +41,5 @@ type AllowCredentials struct {
 
 // For not it returns a KeyAssertion. But we can make it more generic afterward
 type ICredentialSigner interface {
-	Sign(challenge string, allowCredential *AllowCredentials) (*KeyAssertion, error)
+	Sign(challenge string, allowCredentials *AllowCredentials) (*KeyAssertion, error)
 }

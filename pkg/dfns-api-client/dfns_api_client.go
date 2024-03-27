@@ -4,7 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/internal/credentials"
+	api "github.com/dfns/dfns-sdk-go/internal/dfns-api-client"
 )
 
 var (
@@ -42,8 +43,13 @@ func NewDfnsAPIOptions(config *DfnsAPIConfig, signer credentials.ICredentialSign
 
 func CreateDfnsAPIClient(options *DfnsAPIOptions) *http.Client {
 	return &http.Client{
-		Transport: &authTransport{
-			DfnsAPIOptions: options,
-		},
+		Transport: api.NewAuthTransport(
+			&api.AuthTransportConfig{
+				AppID:     options.AppID,
+				AuthToken: options.AuthToken,
+				BaseURL:   options.BaseURL,
+				Signer:    options.Signer,
+			},
+		),
 	}
 }

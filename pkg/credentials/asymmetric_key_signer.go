@@ -11,6 +11,8 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+
+	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
 type AsymmetricKeySignerConfig struct {
@@ -33,7 +35,7 @@ func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySig
 
 // Sign signs the given challenge using the private key and the hashing algorithm specified in the Algorithm field.
 // If the Algorithm field is not set or invalid, it defaults to SHA256.
-func (signer *AsymmetricKeySigner) Sign(challenge string, _ *AllowCredentials) (*KeyAssertion, error) {
+func (signer *AsymmetricKeySigner) Sign(challenge string, _ *credentials.AllowCredentials) (*credentials.KeyAssertion, error) {
 	// Determine the hashing algorithm
 	hash := signer.Algorithm
 	if hash == nil {
@@ -76,9 +78,9 @@ func (signer *AsymmetricKeySigner) Sign(challenge string, _ *AllowCredentials) (
 	}
 
 	// Construct the key assertion
-	keyAssertion := &KeyAssertion{
-		Kind: KeyCredential,
-		CredentialAssertion: CredentialAssertion{
+	keyAssertion := &credentials.KeyAssertion{
+		Kind: credentials.KeyCredential,
+		CredentialAssertion: credentials.CredentialAssertion{
 			CredID:     signer.CredID,
 			Signature:  base64.RawURLEncoding.EncodeToString(signature),
 			ClientData: base64.RawURLEncoding.EncodeToString(clientDataJSON),

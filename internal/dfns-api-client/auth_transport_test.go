@@ -13,27 +13,22 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
 func TestPerformSimpleRequest(t *testing.T) {
 	t.Parallel()
 
-	appID := "your-app-id"
 	authToken := "your-auth-token" //nolint:gosec // This is a test
-	baseURL := "https://your.api.endpoint"
 
-	apiOptions := &DfnsAPIOptions{
-		DfnsAPIConfig: &DfnsAPIConfig{
-			AppID:     appID,
-			AuthToken: &authToken,
-			BaseURL:   baseURL,
-		},
-		Signer: nil,
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
 	}
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		checkBasicHeaders(t, r, apiOptions)
+		checkBasicHeaders(t, r, config)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"status": "success"}`))
 	})
@@ -41,7 +36,7 @@ func TestPerformSimpleRequest(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	httpClient := CreateDfnsAPIClient(apiOptions)
+	httpClient := createHttpClient(config)
 
 	req, err := http.NewRequest(http.MethodGet, server.URL+"/some-path", nil)
 	if err != nil {
@@ -92,21 +87,16 @@ func TestPerformSimpleRequest_Error(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			appID := "your-app-id"
 			authToken := "your-auth-token" //nolint:gosec // This is a test
-			baseURL := "https://your.api.endpoint"
 
-			apiOptions := &DfnsAPIOptions{
-				DfnsAPIConfig: &DfnsAPIConfig{
-					AppID:     appID,
-					AuthToken: &authToken,
-					BaseURL:   baseURL,
-				},
-				Signer: nil,
+			config := &AuthTransportConfig{
+				AppID:     "your-app-id",
+				AuthToken: &authToken,
+				BaseURL:   "https://your.api.endpoint",
 			}
 
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				checkBasicHeaders(t, r, apiOptions)
+				checkBasicHeaders(t, r, config)
 				w.WriteHeader(tc.statusCode)
 				_, _ = w.Write([]byte(tc.response))
 			})
@@ -114,7 +104,7 @@ func TestPerformSimpleRequest_Error(t *testing.T) {
 			server := httptest.NewServer(handler)
 			defer server.Close()
 
-			httpClient := CreateDfnsAPIClient(apiOptions)
+			httpClient := createHttpClient(config)
 
 			req, err := http.NewRequest(http.MethodGet, server.URL+"/some-path", nil)
 			if err != nil {
@@ -159,20 +149,15 @@ func TestPerformSimpleRequest_Error(t *testing.T) {
 func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 	t.Parallel()
 
-	appID := "your-app-id"
 	authToken := "your-auth-token" //nolint:gosec // This is a test
-	baseURL := "https://your.api.endpoint"
 
-	apiOptions := &DfnsAPIOptions{
-		DfnsAPIConfig: &DfnsAPIConfig{
-			AppID:     appID,
-			AuthToken: &authToken,
-			BaseURL:   baseURL,
-		},
-		Signer: nil,
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
 	}
 
-	httpClient := CreateDfnsAPIClient(apiOptions)
+	httpClient := createHttpClient(config)
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
@@ -200,8 +185,7 @@ func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 func TestPerformUserActionRequest(t *testing.T) {
 	t.Parallel()
 
-	appID := "appId"
-	authToken := "authToken"
+	authToken := "your-auth-token" //nolint:gosec // This is a test
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 	credID := "credId"
@@ -215,20 +199,12 @@ func TestPerformUserActionRequest(t *testing.T) {
 
 	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
 
-	conf := &credentials.AsymmetricKeySignerConfig{
-		PrivateKey: string(rsaPrivateKeyPEM),
-		CredID:     credID,
-		AppOrigin:  appOrigin,
-	}
+	signer := createRSASigner(string(rsaPrivateKeyPEM), credID, appOrigin)
 
-	signer := credentials.NewAsymmetricKeySigner(conf)
-
-	apiOptions := &DfnsAPIOptions{
-		DfnsAPIConfig: &DfnsAPIConfig{
-			AppID:     appID,
-			AuthToken: &authToken,
-		},
-		Signer: signer,
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		Signer:    signer,
 	}
 
 	body := []byte(`{"network": "eth"}`)
@@ -237,7 +213,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/auth/action/init":
-			checkBasicHeaders(t, r, apiOptions)
+			checkBasicHeaders(t, r, config)
 
 			expectedBody := createUserActionChallengeRequest{
 				UserActionPayload:    string(body),
@@ -263,9 +239,9 @@ func TestPerformUserActionRequest(t *testing.T) {
 			w.Write(respBody)
 
 		case "/auth/action":
-			checkBasicHeaders(t, r, apiOptions)
+			checkBasicHeaders(t, r, config)
 
-			assertion, err := apiOptions.Signer.Sign(challenge, nil)
+			assertion, err := config.Signer.Sign(challenge, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -290,7 +266,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 			w.Write(respBody)
 
 		case "/some-path":
-			checkBasicHeaders(t, r, apiOptions)
+			checkBasicHeaders(t, r, config)
 
 			if r.Header.Get("x-dfns-useraction") != userAction {
 				t.Errorf("Unexpected value for x-dfns-useraction header: expected %s, got %s", userAction, r.Header.Get("x-dfns-useraction"))
@@ -307,9 +283,9 @@ func TestPerformUserActionRequest(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	apiOptions.BaseURL = ts.URL
+	config.BaseURL = ts.URL
 
-	httpClient := CreateDfnsAPIClient(apiOptions)
+	httpClient := createHttpClient(config)
 
 	req, err := http.NewRequest("POST", ts.URL+"/some-path", bytes.NewReader(body))
 	if err != nil {
@@ -340,19 +316,45 @@ func checkJSONRequest[T any](t *testing.T, r *http.Request, expected T) {
 	}
 }
 
-func checkBasicHeaders(t *testing.T, req *http.Request, option *DfnsAPIOptions) {
+func checkBasicHeaders(t *testing.T, req *http.Request, config *AuthTransportConfig) {
 	t.Helper()
 
-	if got, want := req.Header.Get("x-dfns-appid"), option.AppID; got != want {
+	if got, want := req.Header.Get("x-dfns-appid"), config.AppID; got != want {
 		t.Errorf("appid header = %q; want %q", got, want)
 	}
 	if got := req.Header.Get("x-dfns-nonce"); got == "" {
 		t.Error("nonce header is empty")
 	}
-	if got, want := req.Header.Get("authorization"), "Bearer "+*option.AuthToken; got != want {
+	if got, want := req.Header.Get("authorization"), "Bearer "+*config.AuthToken; got != want {
 		t.Errorf("authorization header = %q; want %q", got, want)
 	}
 	if got, want := req.Header.Get("Content-Type"), "application/json"; got != want {
 		t.Errorf("Content-Type header = %q; want %q", got, want)
+	}
+}
+
+func createHttpClient(config *AuthTransportConfig) *http.Client {
+	return &http.Client{
+		Transport: NewAuthTransport(config),
+	}
+}
+
+type simpleRSASigner struct {
+	privateKey string
+	credID     string
+	appOrigin  string
+}
+
+func (s *simpleRSASigner) Sign(challenge string, allowCredentials *credentials.AllowCredentials,
+) (*credentials.KeyAssertion, error) {
+
+	return &credentials.KeyAssertion{}, nil
+}
+
+func createRSASigner(privateKey, credID, appOrigin string) *simpleRSASigner {
+	return &simpleRSASigner{
+		privateKey,
+		credID,
+		appOrigin,
 	}
 }

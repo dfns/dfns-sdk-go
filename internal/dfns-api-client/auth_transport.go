@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
 const (
@@ -20,11 +20,22 @@ const (
 	contentTypeHeader   = "Content-Type"
 )
 
-type authTransport struct {
-	*DfnsAPIOptions
+type AuthTransportConfig struct {
+	AppID     string
+	AuthToken *string
+	BaseURL   string
+	Signer    credentials.ICredentialSigner
 }
 
-func (auth *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+type AuthTransport struct {
+	*AuthTransportConfig
+}
+
+func NewAuthTransport(config *AuthTransportConfig) *AuthTransport {
+	return &AuthTransport{config}
+}
+
+func (auth *AuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	auth.setHeaders(req)
 
 	performUserAction, err := shouldPerformUserAction(req)
@@ -62,21 +73,21 @@ func shouldPerformUserAction(req *http.Request) (bool, error) {
 }
 
 // PerformSimpleRequest performs a simple HTTP request.
-func (auth *authTransport) performSimpleRequest(req *http.Request) (*http.Response, error) {
+func (auth *AuthTransport) performSimpleRequest(req *http.Request) (*http.Response, error) {
 	auth.setHeaders(req)
 
 	return executeRequest(req)
 }
 
 // PerformUserActionRequest performs a user action HTTP request.
-func (auth *authTransport) performUserActionRequest(req *http.Request) error {
+func (auth *AuthTransport) performUserActionRequest(req *http.Request) error {
 	auth.setHeaders(req)
 
 	return auth.executeUserActionRequest(req)
 }
 
 // setHeaders sets the request headers.
-func (auth *authTransport) setHeaders(req *http.Request) {
+func (auth *AuthTransport) setHeaders(req *http.Request) {
 	req.Header.Set(appIDHeader, auth.AppID)
 	req.Header.Set(nonceHeader, generateNonce())
 
@@ -144,7 +155,7 @@ func handleResponseError(response *http.Response) error {
 }
 
 // executeUserActionRequest executes a user action HTTP request.
-func (auth *authTransport) executeUserActionRequest(req *http.Request) error {
+func (auth *AuthTransport) executeUserActionRequest(req *http.Request) error {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		return fmt.Errorf("couldn't read user action request body: %w", err)
@@ -189,7 +200,7 @@ type createUserActionChallengeResponse struct {
 }
 
 // createUserActionChallenge creates the user action challenge.
-func (auth *authTransport) createUserActionChallenge(
+func (auth *AuthTransport) createUserActionChallenge(
 	body, method, path string,
 ) (*createUserActionChallengeResponse, error) {
 	payload := createUserActionChallengeRequest{
@@ -246,7 +257,7 @@ type signUserActionResponse struct {
 }
 
 // signUserActionChallenge signs the user action challenge.
-func (auth *authTransport) signUserActionChallenge(
+func (auth *AuthTransport) signUserActionChallenge(
 	challengeIdentifier string, firstFactor *credentials.KeyAssertion,
 ) (string, error) {
 	payload := signUserActionChallengeRequest{
