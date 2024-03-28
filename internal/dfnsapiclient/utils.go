@@ -1,4 +1,4 @@
-package dfns_api_client
+package dfnsapiclient
 
 import (
 	"encoding/base64"
@@ -8,12 +8,12 @@ import (
 	"github.com/google/uuid"
 )
 
-// Function to generate a UUID. Can be mocked in tests.
+//nolint:gochecknoglobals // Can be mocked in tests
 var generateUUID = func() string {
 	return uuid.New().String()
 }
 
-// Function to get the current time. Can be mocked in tests.
+//nolint:gochecknoglobals // Can be mocked in tests
 var getCurrentTime = func() time.Time {
 	return time.Now().UTC()
 }
@@ -26,10 +26,12 @@ func generateNonce() string {
 		"uuid": uuidStr,
 		"date": dateStr,
 	}
+
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return ""
 	}
+
 	encodedData := base64.URLEncoding.EncodeToString(jsonData)
 
 	return encodedData
