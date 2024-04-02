@@ -38,6 +38,13 @@ linters-settings:
     require-specific: true
   tagalign:
     align: false
+  depguard:
+    rules:
+      main:
+        allow:
+          - $gostd
+          - github.com/dfns/dfns-sdk-go
+          - github.com/google/uuid
 run:
   timeout: 15m
 service:
