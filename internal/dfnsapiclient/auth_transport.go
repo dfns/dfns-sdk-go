@@ -1,7 +1,8 @@
-package dfns_api_client
+package dfnsapiclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,7 +10,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
 const (
@@ -20,11 +21,22 @@ const (
 	contentTypeHeader   = "Content-Type"
 )
 
-type authTransport struct {
-	*DfnsApiOptions
+type AuthTransportConfig struct {
+	AppID     string
+	AuthToken *string
+	BaseURL   string
+	Signer    credentials.ICredentialSigner
 }
 
-func (auth *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+type AuthTransport struct {
+	*AuthTransportConfig
+}
+
+func NewAuthTransport(config *AuthTransportConfig) *AuthTransport {
+	return &AuthTransport{config}
+}
+
+func (auth *AuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	auth.setHeaders(req)
 
 	performUserAction, err := shouldPerformUserAction(req)
@@ -62,22 +74,22 @@ func shouldPerformUserAction(req *http.Request) (bool, error) {
 }
 
 // PerformSimpleRequest performs a simple HTTP request.
-func (auth *authTransport) performSimpleRequest(req *http.Request) (*http.Response, error) {
+func (auth *AuthTransport) performSimpleRequest(req *http.Request) (*http.Response, error) {
 	auth.setHeaders(req)
 
 	return executeRequest(req)
 }
 
 // PerformUserActionRequest performs a user action HTTP request.
-func (auth *authTransport) performUserActionRequest(req *http.Request) error {
+func (auth *AuthTransport) performUserActionRequest(req *http.Request) error {
 	auth.setHeaders(req)
 
 	return auth.executeUserActionRequest(req)
 }
 
 // setHeaders sets the request headers.
-func (auth *authTransport) setHeaders(req *http.Request) {
-	req.Header.Set(appIDHeader, auth.AppId)
+func (auth *AuthTransport) setHeaders(req *http.Request) {
+	req.Header.Set(appIDHeader, auth.AppID)
 	req.Header.Set(nonceHeader, generateNonce())
 
 	if auth.AuthToken != nil {
@@ -90,7 +102,7 @@ func (auth *authTransport) setHeaders(req *http.Request) {
 func executeRequest(req *http.Request) (*http.Response, error) {
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error executing request: %w", err)
 	}
 
 	// Fill Request otherwise it's nil
@@ -111,13 +123,13 @@ func handleResponseError(response *http.Response) error {
 
 	respBody, err := io.ReadAll(response.Body)
 	if err != nil {
-		return fmt.Errorf("failed to read response body: %v", err)
+		return fmt.Errorf("failed to read response body: %w", err)
 	}
 	defer response.Body.Close()
 
 	var body map[string]interface{}
 	if err := json.Unmarshal(respBody, &body); err != nil {
-		return fmt.Errorf("failed to parse response body: %v", err)
+		return fmt.Errorf("failed to parse response body: %w", err)
 	}
 
 	if response.StatusCode == PolicyPendingErrorCode {
@@ -125,6 +137,7 @@ func handleResponseError(response *http.Response) error {
 	}
 
 	var message string
+
 	if errorObj, ok := body["error"].(map[string]interface{}); ok {
 		if errMsg, ok := errorObj["message"].(string); ok {
 			message = errMsg
@@ -143,26 +156,29 @@ func handleResponseError(response *http.Response) error {
 }
 
 // executeUserActionRequest executes a user action HTTP request.
-func (auth *authTransport) executeUserActionRequest(req *http.Request) error {
+func (auth *AuthTransport) executeUserActionRequest(req *http.Request) error {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't read user action request body: %w", err)
 	}
 	defer req.Body.Close()
 
 	req.Body = io.NopCloser(bytes.NewReader(body))
 
-	createUserActionResp, err := auth.createUserActionChallenge(string(body), req.Method, req.URL.Path)
+	createUserActionResp, err := auth.createUserActionChallenge(req.Context(),
+		string(body), req.Method, req.URL.Path)
 	if err != nil {
 		return err
 	}
 
-	assertion, err := auth.Signer.Sign(createUserActionResp.Challenge, createUserActionResp.AllowCredentials)
+	assertion, err := auth.Signer.Sign(createUserActionResp.Challenge,
+		createUserActionResp.AllowCredentials)
 	if err != nil {
-		return err
+		return fmt.Errorf("error signing the user challenge: %w", err)
 	}
 
-	userAction, err := auth.signUserActionChallenge(createUserActionResp.ChallengeIdentifier, assertion)
+	userAction, err := auth.signUserActionChallenge(req.Context(),
+		createUserActionResp.ChallengeIdentifier, assertion)
 	if err != nil {
 		return err
 	}
@@ -172,15 +188,17 @@ func (auth *authTransport) executeUserActionRequest(req *http.Request) error {
 	return nil
 }
 
-// createUserActionChallengeRequest represents the request payload for creating a user action challenge.
+// createUserActionChallengeRequest represents the request payload for creating
+// a user action challenge.
 type createUserActionChallengeRequest struct {
 	UserActionPayload    string `json:"userActionPayload"`
-	UserActionHttpMethod string `json:"userActionHttpMethod"`
-	UserActionHttpPath   string `json:"userActionHttpPath"`
+	UserActionHTTPMethod string `json:"userActionHttpMethod"`
+	UserActionHTTPPath   string `json:"userActionHttpPath"`
 	UserActionServerKind string `json:"userActionServerKind"`
 }
 
-// createUserActionChallengeResponse represents the response format for a user action challenge creation request.
+// createUserActionChallengeResponse represents the response format for a user
+// action challenge creation request.
 type createUserActionChallengeResponse struct {
 	Challenge           string                        `json:"challenge"`
 	ChallengeIdentifier string                        `json:"challengeIdentifier"`
@@ -188,22 +206,25 @@ type createUserActionChallengeResponse struct {
 }
 
 // createUserActionChallenge creates the user action challenge.
-func (auth *authTransport) createUserActionChallenge(body, method, path string) (*createUserActionChallengeResponse, error) {
+func (auth *AuthTransport) createUserActionChallenge(
+	ctx context.Context, body, method, path string,
+) (*createUserActionChallengeResponse, error) {
 	payload := createUserActionChallengeRequest{
 		UserActionPayload:    body,
-		UserActionHttpMethod: method,
-		UserActionHttpPath:   path,
+		UserActionHTTPMethod: method,
+		UserActionHTTPPath:   path,
 		UserActionServerKind: "Api",
 	}
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("Error marshaling JSON: %v", err)
+		return nil, fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", auth.BaseUrl+"/auth/action/init", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
+		auth.BaseURL+"/auth/action/init", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, fmt.Errorf("Error creating request: %v", err)
+		return nil, fmt.Errorf("Error creating request: %w", err)
 	}
 
 	response, err := auth.performSimpleRequest(req)
@@ -213,14 +234,15 @@ func (auth *authTransport) createUserActionChallenge(body, method, path string) 
 
 	respBody, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read body: %v", err)
+		return nil, fmt.Errorf("couldn't read body: %w", err)
 	}
 	defer response.Body.Close()
 
 	var challengeResponse createUserActionChallengeResponse
+
 	err = json.Unmarshal(respBody, &challengeResponse)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't unmarshal challenge response: %w", err)
 	}
 
 	return &createUserActionChallengeResponse{
@@ -236,13 +258,18 @@ type signUserActionChallengeRequest struct {
 	FirstFactor         *credentials.KeyAssertion `json:"firstFactor"`
 }
 
-// signUserActionResponse represents the response format for signing a user action challenge.
+// signUserActionResponse represents the response format for signing a user
+// action challenge.
 type signUserActionResponse struct {
 	UserAction string `json:"userAction"`
 }
 
 // signUserActionChallenge signs the user action challenge.
-func (auth *authTransport) signUserActionChallenge(challengeIdentifier string, firstFactor *credentials.KeyAssertion) (string, error) {
+func (auth *AuthTransport) signUserActionChallenge(
+	ctx context.Context,
+	challengeIdentifier string,
+	firstFactor *credentials.KeyAssertion,
+) (string, error) {
 	payload := signUserActionChallengeRequest{
 		ChallengeIdentifier: challengeIdentifier,
 		FirstFactor:         firstFactor,
@@ -250,12 +277,13 @@ func (auth *authTransport) signUserActionChallenge(challengeIdentifier string, f
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		return "", fmt.Errorf("Error marshaling JSON: %v", err)
+		return "", fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", auth.BaseUrl+"/auth/action", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
+		auth.BaseURL+"/auth/action", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return "", fmt.Errorf("Error creating request: %v", err)
+		return "", fmt.Errorf("Error creating request: %w", err)
 	}
 
 	response, err := auth.performSimpleRequest(req)
@@ -265,14 +293,15 @@ func (auth *authTransport) signUserActionChallenge(challengeIdentifier string, f
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return "", fmt.Errorf("couldn't read body: %v", err)
+		return "", fmt.Errorf("couldn't read body: %w", err)
 	}
 	defer response.Body.Close()
 
 	var signResponse signUserActionResponse
+
 	err = json.Unmarshal(body, &signResponse)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("couldn't unmarshaling user action response: %w", err)
 	}
 
 	return signResponse.UserAction, nil

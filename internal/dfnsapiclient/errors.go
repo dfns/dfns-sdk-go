@@ -1,4 +1,4 @@
-package dfns_api_client
+package dfnsapiclient
 
 import (
 	"encoding/json"
@@ -9,14 +9,14 @@ const PolicyPendingErrorCode = 202
 
 // DfnsError represents an error that occurred during DFNS API requests.
 type DfnsError struct {
-	HttpStatus int                    `json:"httpStatus"`        // HTTP status code
+	HTTPStatus int                    `json:"httpStatus"`        // HTTP status code
 	Message    string                 `json:"message"`           // Error message
 	Context    map[string]interface{} `json:"context,omitempty"` // Additional context
 }
 
 func NewDfnsError(statut int, message string, context map[string]interface{}) *DfnsError {
 	return &DfnsError{
-		HttpStatus: statut,
+		HTTPStatus: statut,
 		Message:    message,
 		Context:    context,
 	}
@@ -27,7 +27,7 @@ func (e *DfnsError) Error() string {
 	// Return JSON representation of the error
 	errJSON, err := json.MarshalIndent(e, "", "  ")
 	if err != nil {
-		return fmt.Sprintf("DFNS-ERROR: %s (status code: %d)", e.Message, e.HttpStatus)
+		return fmt.Sprintf("DFNS-ERROR: %s (status code: %d)", e.Message, e.HTTPStatus)
 	}
 
 	return string(errJSON)
@@ -42,7 +42,7 @@ type PolicyPendingError struct {
 func NewPolicyPendingError(context map[string]interface{}) *PolicyPendingError {
 	return &PolicyPendingError{
 		DfnsError: DfnsError{
-			HttpStatus: PolicyPendingErrorCode,
+			HTTPStatus: PolicyPendingErrorCode,
 			Message:    "Operation triggered a policy pending approval",
 			Context:    context,
 		},

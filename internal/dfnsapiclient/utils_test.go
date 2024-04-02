@@ -1,4 +1,4 @@
-package dfns_api_client
+package dfnsapiclient
 
 import (
 	"encoding/base64"
@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 )
 
+//nolint:paralleltest // generateUUID is modified in other functions
 func TestGenerateNonce(t *testing.T) {
 	// Mock the UUID generation
 	generateUUID = func() string { return "mock-uuid" }
@@ -17,6 +17,7 @@ func TestGenerateNonce(t *testing.T) {
 
 	// Mock the time
 	mockTime := time.Date(2024, time.February, 15, 10, 0, 0, 0, time.UTC)
+
 	getCurrentTime = func() time.Time { return mockTime }
 	defer func() { getCurrentTime = time.Now }() // Restore the original function
 
@@ -25,14 +26,22 @@ func TestGenerateNonce(t *testing.T) {
 
 	// Decode the generated nonce
 	decodedData, err := base64.URLEncoding.DecodeString(nonce)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Unmarshal the decoded data
 	var data map[string]interface{}
-	err = json.Unmarshal(decodedData, &data)
-	assert.NoError(t, err)
+	if err := json.Unmarshal(decodedData, &data); err != nil {
+		t.Fatal(err)
+	}
 
 	// Check if the UUID and date are correct
-	assert.Equal(t, "mock-uuid", data["uuid"])
-	assert.Equal(t, "2024-02-15T10:00:00Z", data["date"])
+	if data["uuid"] != "mock-uuid" {
+		t.Errorf("expected UUID: mock-uuid, got: %s", data["uuid"])
+	}
+
+	if data["date"] != "2024-02-15T10:00:00Z" {
+		t.Errorf("expected date: 2024-02-15T10:00:00Z, got: %s", data["date"])
+	}
 }
