@@ -26,11 +26,15 @@ jobs:
           cache: true
 
       - name: Test
-        run: |
-          go test -race -coverprofile=coverage.out -covermode=atomic -v ./...
-          go tool cover -func=coverage.out -o=coverage.out
+        run: go test -race -v ./...
 
-      - name: Go Coverage Badge
-        uses: tj-actions/coverage-badge-go@v2
+      - name: Update coverage report
+        uses: ncruces/go-coverage-report@v0
         with:
-          filename: coverage.out
+          report: true
+          chart: true
+          amend: true
+        if: |
+          matrix.os == 'ubuntu-latest' &&
+          github.event_name == 'push'
+        continue-on-error: true
