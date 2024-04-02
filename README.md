@@ -1,5 +1,10 @@
 # Dfns Golang SDK
 
+[![Go Build](https://github.com/dfns/dfns-sdk-go/actions/workflows/build.yaml/badge.svg)](https://github.com/dfns/dfns-sdk-go/actions/workflows/build.yaml)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dfns/dfns-sdk-go/blob/master/LICENSE)
+[![Godoc](https://godoc.org/github.com/dfns/dfns-sdk-go?status.svg)](https://godoc.org/github.com/dfns/dfns-sdk-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dfns/dfns-sdk-go)](https://goreportcard.com/report/github.com/dfns/dfns-sdk-go)
+
 Welcome, builders 👋🔑 This repo holds Dfns Golang SDK. Useful links:
 
 - [Dfns Website](https://www.dfns.co)
