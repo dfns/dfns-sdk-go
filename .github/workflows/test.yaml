@@ -26,4 +26,11 @@ jobs:
           cache: true
 
       - name: Test
-        run: go test -v ./... -race
+        run: |
+          go test -race -coverprofile=coverage.out -covermode=atomic -v ./...
+          go tool cover -func=coverage.out -o=coverage.out
+
+      - name: Go Coverage Badge
+        uses: tj-actions/coverage-badge-go@v2
+        with:
+          filename: coverage.out
