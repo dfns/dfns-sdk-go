@@ -10,6 +10,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"errors"
 	"testing"
 )
 
@@ -200,5 +201,24 @@ func TestAsymmetricKeySigner_SignAndVerify_Ed25519(t *testing.T) {
 	valid := ed25519.Verify(ed25519PublicKey, clientDataBytes, signature)
 	if !valid {
 		t.Fatal("Ed25519 signature verification failed")
+	}
+}
+
+func TestAsymmetricKeySigner_Sign_InvalidPEMFormat(t *testing.T) {
+	t.Parallel()
+
+	conf := &AsymmetricKeySignerConfig{
+		PrivateKey: "invalid PEM format",
+		CredID:     "mockCredId",
+		AppOrigin:  "mockAppOrigin",
+	}
+
+	signer := NewAsymmetricKeySigner(conf)
+
+	challenge := "mockChallenge"
+
+	_, err := signer.Sign(challenge, nil)
+	if errors.Unwrap(err).Error() != errFailedToDecodePEMBlock.Error() {
+		t.Error("Expected an error due to invalid PEM format, but got none")
 	}
 }
