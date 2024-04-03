@@ -26,15 +26,10 @@ jobs:
           cache: true
 
       - name: Test
-        run: go test -race -v ./...
+        run: go test -race -v -coverprofile=coverage.txt -covermode=atomic ./...
 
-      - name: Update coverage report
-        uses: ncruces/go-coverage-report@v0
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
         with:
-          report: true
-          chart: true
-          amend: true
-        if: |
-          matrix.os == 'ubuntu-latest' &&
-          github.event_name == 'push'
-        continue-on-error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: dfns/dfns-sdk-go
