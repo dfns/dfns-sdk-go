@@ -20,14 +20,13 @@ var (
 	errFailedToDecodePEMBlock       = errors.New("failed to decode PEM block")
 	errUnsupportedPrivateKeyTypeFmt = errors.New("unsupported private key type: %s")
 	errUnsupportedPrivateKeyType    = errors.New("unsupported private key type")
+	errNotAllowedCredentials        = errors.New("not allowed credentials")
 )
 
 type AsymmetricKeySignerConfig struct {
-	PrivateKey  string
-	CredID      string
-	AppOrigin   string
-	CrossOrigin *bool
-	Algorithm   *crypto.Hash
+	PrivateKey string
+	CredID     string
+	Algorithm  *crypto.Hash
 }
 
 type AsymmetricKeySigner struct {
@@ -44,9 +43,24 @@ func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySig
 // algorithm specified in the Algorithm field. If the Algorithm field is
 // not set or invalid, it defaults to SHA256.
 func (signer *AsymmetricKeySigner) Sign(
-	challenge string,
-	_ *credentials.AllowCredentials,
+	userActionChallenge *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
+	allowedIDs := []string{}
+	hasCredID := false
+
+	for _, cred := range userActionChallenge.AllowCredentials.Key {
+		if cred.ID == signer.CredID {
+			hasCredID = true
+		}
+
+		allowedIDs = append(allowedIDs, cred.ID)
+	}
+
+	if !hasCredID {
+		return nil, fmt.Errorf("%w: %s does not match allowed credentials: %v",
+			errNotAllowedCredentials, signer.CredID, allowedIDs)
+	}
+
 	// Determine the hashing algorithm
 	hash := signer.Algorithm
 	if hash == nil {
@@ -60,21 +74,12 @@ func (signer *AsymmetricKeySigner) Sign(
 		return nil, fmt.Errorf("can't parse PEM format: %w", err)
 	}
 
-	var crossOrigin bool
-	if signer.CrossOrigin != nil {
-		crossOrigin = *signer.CrossOrigin
-	}
-
 	clientData := struct {
-		Type        string `json:"type"`
-		Challenge   string `json:"challenge"`
-		Origin      string `json:"origin"`
-		CrossOrigin bool   `json:"crossOrigin"`
+		Type      string `json:"type"`
+		Challenge string `json:"challenge"`
 	}{
-		Type:        "key.get",
-		Challenge:   challenge,
-		Origin:      signer.AppOrigin,
-		CrossOrigin: crossOrigin,
+		Type:      "key.get",
+		Challenge: userActionChallenge.Challenge,
 	}
 
 	// Marshal the clientData object to JSON

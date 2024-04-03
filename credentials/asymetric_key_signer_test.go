@@ -12,10 +12,15 @@ import (
 	"encoding/pem"
 	"errors"
 	"testing"
+
+	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
 func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS1(t *testing.T) {
 	t.Parallel()
+
+	credID := "mockCredId"
+	challenge := "mockChallenge"
 
 	// Generate a new RSA private key
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -26,27 +31,30 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS1(t *testing.T) {
 	// PKS1
 	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
 
-	crossOrigin := true
-
 	conf := &AsymmetricKeySignerConfig{
-		PrivateKey:  string(rsaPrivateKeyPEM),
-		CredID:      "mockCredId",
-		AppOrigin:   "mockAppOrigin",
-		CrossOrigin: &crossOrigin,
+		PrivateKey: string(rsaPrivateKeyPEM),
+		CredID:     credID,
 	}
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	challenge := "mockChallenge"
-
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(challenge, nil)
+	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
+		Challenge: challenge,
+		AllowCredentials: &credentials.AllowCredentials{
+			Key: []credentials.AllowCredential{
+				{
+					ID: credID,
+				},
+			},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify the signature
-	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge","origin":"mockAppOrigin","crossOrigin":true}`)
+	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge"}`)
 	h := crypto.SHA256.New()
 	h.Write(clientDataBytes)
 
@@ -64,6 +72,9 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS1(t *testing.T) {
 func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS8(t *testing.T) {
 	t.Parallel()
 
+	credID := "mockCredId"
+	challenge := "mockChallenge"
+
 	// Generate a new RSA private key
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -80,22 +91,28 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS8(t *testing.T) {
 
 	conf := &AsymmetricKeySignerConfig{
 		PrivateKey: string(rsaPrivateKeyPEM),
-		CredID:     "mockCredId",
-		AppOrigin:  "mockAppOrigin",
+		CredID:     credID,
 	}
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	challenge := "mockChallenge"
-
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(challenge, nil)
+	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
+		Challenge: challenge,
+		AllowCredentials: &credentials.AllowCredentials{
+			Key: []credentials.AllowCredential{
+				{
+					ID: credID,
+				},
+			},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify the signature
-	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge","origin":"mockAppOrigin","crossOrigin":false}`)
+	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge"}`)
 	h := crypto.SHA256.New()
 	h.Write(clientDataBytes)
 
@@ -113,6 +130,9 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS8(t *testing.T) {
 func TestAsymmetricKeySigner_SignAndVerify_ECDSA(t *testing.T) {
 	t.Parallel()
 
+	credID := "mockCredId"
+	challenge := "mockChallenge"
+
 	// Generate a new ECDSA private key
 	ecdsaPrivateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
@@ -128,22 +148,28 @@ func TestAsymmetricKeySigner_SignAndVerify_ECDSA(t *testing.T) {
 
 	conf := &AsymmetricKeySignerConfig{
 		PrivateKey: string(ecdsaPrivateKeyPEM),
-		CredID:     "mockCredId",
-		AppOrigin:  "mockAppOrigin",
+		CredID:     credID,
 	}
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	challenge := "mockChallenge"
-
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(challenge, nil)
+	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
+		Challenge: challenge,
+		AllowCredentials: &credentials.AllowCredentials{
+			Key: []credentials.AllowCredential{
+				{
+					ID: credID,
+				},
+			},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify the signature
-	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge","origin":"mockAppOrigin","crossOrigin":false}`)
+	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge"}`)
 	h := crypto.SHA256.New()
 	h.Write(clientDataBytes)
 
@@ -161,6 +187,9 @@ func TestAsymmetricKeySigner_SignAndVerify_ECDSA(t *testing.T) {
 func TestAsymmetricKeySigner_SignAndVerify_Ed25519(t *testing.T) {
 	t.Parallel()
 
+	credID := "mockCredId"
+	challenge := "mockChallenge"
+
 	// Generate a new Ed25519 private key
 	ed25519PublicKey, ed25519PrivateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
@@ -176,22 +205,28 @@ func TestAsymmetricKeySigner_SignAndVerify_Ed25519(t *testing.T) {
 
 	conf := &AsymmetricKeySignerConfig{
 		PrivateKey: string(eddsaPrivateKeyPEM),
-		CredID:     "mockCredId",
-		AppOrigin:  "mockAppOrigin",
+		CredID:     credID,
 	}
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	challenge := "mockChallenge"
-
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(challenge, nil)
+	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
+		Challenge: challenge,
+		AllowCredentials: &credentials.AllowCredentials{
+			Key: []credentials.AllowCredential{
+				{
+					ID: credID,
+				},
+			},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify the signature
-	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge","origin":"mockAppOrigin","crossOrigin":false}`)
+	clientDataBytes := []byte(`{"type":"key.get","challenge":"mockChallenge"}`)
 
 	signature, err := base64.RawURLEncoding.DecodeString(keyAssertion.CredentialAssertion.Signature)
 	if err != nil {
@@ -207,18 +242,55 @@ func TestAsymmetricKeySigner_SignAndVerify_Ed25519(t *testing.T) {
 func TestAsymmetricKeySigner_Sign_InvalidPEMFormat(t *testing.T) {
 	t.Parallel()
 
+	challenge := "mockChallenge"
+	credID := "mockCredId"
+
 	conf := &AsymmetricKeySignerConfig{
 		PrivateKey: "invalid PEM format",
-		CredID:     "mockCredId",
-		AppOrigin:  "mockAppOrigin",
+		CredID:     credID,
 	}
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	challenge := "mockChallenge"
-
-	_, err := signer.Sign(challenge, nil)
+	_, err := signer.Sign(&credentials.UserActionChallenge{
+		Challenge: challenge,
+		AllowCredentials: &credentials.AllowCredentials{
+			Key: []credentials.AllowCredential{
+				{
+					ID: credID,
+				},
+			},
+		},
+	})
 	if errors.Unwrap(err).Error() != errFailedToDecodePEMBlock.Error() {
-		t.Error("Expected an error due to invalid PEM format, but got none")
+		t.Fatalf("Expected an error due to invalid PEM format, but got %s", err)
+	}
+}
+
+func TestAsymmetricKeySigner_Sign_NotAllowedCredential(t *testing.T) {
+	t.Parallel()
+
+	challenge := "mockChallenge"
+	credID := "mockCredId"
+
+	conf := &AsymmetricKeySignerConfig{
+		PrivateKey: "invalid PEM format",
+		CredID:     credID,
+	}
+
+	signer := NewAsymmetricKeySigner(conf)
+
+	_, err := signer.Sign(&credentials.UserActionChallenge{
+		Challenge: challenge,
+		AllowCredentials: &credentials.AllowCredentials{
+			Key: []credentials.AllowCredential{
+				{
+					ID: "otherCredID",
+				},
+			},
+		},
+	})
+	if errors.Unwrap(err).Error() != errNotAllowedCredentials.Error() {
+		t.Fatalf("Expected an error due to invalid credID, but got %s", err)
 	}
 }

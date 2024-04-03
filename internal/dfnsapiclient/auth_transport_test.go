@@ -197,7 +197,6 @@ func TestPerformUserActionRequest(t *testing.T) {
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 	credID := "credId"
-	appOrigin := "appOrigin"
 	userAction := "userAction"
 
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -207,7 +206,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 
 	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
 
-	signer := createRSASigner(string(rsaPrivateKeyPEM), credID, appOrigin)
+	signer := createRSASigner(string(rsaPrivateKeyPEM), credID)
 
 	config := &AuthTransportConfig{
 		AppID:     "your-app-id",
@@ -249,7 +248,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 		case "/auth/action":
 			checkBasicHeaders(t, r, config)
 
-			assertion, signErr := config.Signer.Sign(challenge, nil)
+			assertion, signErr := config.Signer.Sign(nil)
 			if signErr != nil {
 				t.Fatal(signErr)
 			}
@@ -356,19 +355,17 @@ func createHTTPClient(config *AuthTransportConfig) *http.Client {
 type simpleRSASigner struct {
 	privateKey string
 	credID     string
-	appOrigin  string
 }
 
 func (s *simpleRSASigner) Sign(
-	_ string, _ *credentials.AllowCredentials,
+	_ *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	return &credentials.KeyAssertion{}, nil
 }
 
-func createRSASigner(privateKey, credID, appOrigin string) *simpleRSASigner {
+func createRSASigner(privateKey, credID string) *simpleRSASigner {
 	return &simpleRSASigner{
 		privateKey,
 		credID,
-		appOrigin,
 	}
 }
