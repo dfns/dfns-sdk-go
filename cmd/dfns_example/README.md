@@ -17,7 +17,6 @@ api:
 keySigner:
   privateKey: >
    the private key from the step 'generate a keypair', the newlines should not be a problem
-  appOrigin: "http://localhost:3000"
   credId: "the `Signing Key Cred ID` from above"
   algorithm: "The algorithm used by keysigner to prehash message for ecdsa and rsa"
 

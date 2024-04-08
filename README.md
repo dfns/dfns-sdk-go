@@ -49,13 +49,11 @@ import (
 conf := &credentials.AsymmetricKeySignerConfig{
 		PrivateKey: os.Getenv("DFNS_PRIVATE_KEY"), // Credential private key
 		CredId:     os.Getenv("DFNS_CRED_ID"),     // Credential Id
-		AppOrigin:  os.Getenv("DFNS_APP_ORIGIN"),  // Application's origin, should match the Application registered with Dfns
 	}
 ```
 
 - `credential Id`: ID of the Credential registered with the auth token you’re using (Personal Access Token, or Service Account Token). In Dfns dashboard, you can find it next to your token (in `Settings` > `My Access Tokens` or `Settings > Service Accounts`)
 - `Private Key`: private key (in .pem format) which only you have, associated with the public key you registered when you created your PAT / Service Account.
-- `App Origin`: Origin of the client-side Application registered with Dfns. In Dfns dashboard, you can find Applications in `Settings > Application`
 
 ### `DfnsApiClient`
 

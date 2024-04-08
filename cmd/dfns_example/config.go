@@ -12,11 +12,9 @@ import (
 )
 
 type KeySignerConfig struct {
-	PrivateKey  string  `mapstructure:"privateKey"`
-	CredID      string  `mapstructure:"credId"`
-	AppOrigin   string  `mapstructure:"appOrigin"`
-	CrossOrigin *bool   `mapstructure:"crossOrigin"`
-	Algorithm   *string `mapstructure:"algorithm"`
+	PrivateKey string  `mapstructure:"privateKey"`
+	CredID     string  `mapstructure:"credId"`
+	Algorithm  *string `mapstructure:"algorithm"`
 }
 
 type DfnsAPIConfig struct {
@@ -68,8 +66,6 @@ func setDefaultConfig() {
 	// Default values for KeySignerConfig
 	viper.SetDefault("keySigner.privateKey", "")
 	viper.SetDefault("keySigner.credId", "")
-	viper.SetDefault("keySigner.appOrigin", "")
-	viper.SetDefault("keySigner.crossOrigin", nil)
 	viper.SetDefault("keySigner.algorithm", nil)
 
 	// Default values for DfnsApiConfig
@@ -91,11 +87,9 @@ func (c *DfnsConfig) GetKeySignerConfig() (*credentials.AsymmetricKeySignerConfi
 	}
 
 	return &credentials.AsymmetricKeySignerConfig{
-		PrivateKey:  c.AsymmetricKeySignerConfig.PrivateKey,
-		CredID:      c.AsymmetricKeySignerConfig.CredID,
-		AppOrigin:   c.AsymmetricKeySignerConfig.AppOrigin,
-		CrossOrigin: c.AsymmetricKeySignerConfig.CrossOrigin,
-		Algorithm:   hashingAlgo,
+		PrivateKey: c.AsymmetricKeySignerConfig.PrivateKey,
+		CredID:     c.AsymmetricKeySignerConfig.CredID,
+		Algorithm:  hashingAlgo,
 	}, nil
 }
 

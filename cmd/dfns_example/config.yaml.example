@@ -10,6 +10,5 @@ keySigner:
     ... <redacted> ...
     TPOQt+D2uTWr7Sn/PyTHS9A16g5jA7YlSg==
     -----END EC PRIVATE KEY-----
-  appOrigin: "http://localhost:3000"
   credId: "Y2kt...<redacted>..."
   algorithm: "SHA-256"

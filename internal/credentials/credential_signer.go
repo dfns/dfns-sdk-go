@@ -39,7 +39,13 @@ type AllowCredentials struct {
 	Webauthn []AllowCredential `json:"webauthn"`
 }
 
+// UserActionChallenge contains the challenge to sign
+type UserActionChallenge struct {
+	Challenge        string
+	AllowCredentials *AllowCredentials
+}
+
 // For not it returns a KeyAssertion. But we can make it more generic afterward
 type ICredentialSigner interface {
-	Sign(challenge string, allowCredentials *AllowCredentials) (*KeyAssertion, error)
+	Sign(userActionChallenge *UserActionChallenge) (*KeyAssertion, error)
 }
