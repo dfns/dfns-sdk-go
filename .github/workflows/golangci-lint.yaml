@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 env:
-  GOLANG_VERSION: "1.22.1"
-    
+  GOLANG_VERSION: "1.22.2"
+
 jobs:
   golangci:
     name: lint

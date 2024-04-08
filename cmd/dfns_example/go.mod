@@ -1,6 +1,6 @@
 module github.com/dfns/dfns-sdk-go/cmd/dfns_example
 
-go 1.22.1
+go 1.22.2
 
 require (
 	github.com/dfns/dfns-sdk-go v0.0.1-beta
