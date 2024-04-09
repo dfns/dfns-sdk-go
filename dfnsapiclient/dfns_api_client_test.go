@@ -3,6 +3,8 @@ package dfnsapiclient
 import (
 	"reflect"
 	"testing"
+
+	"github.com/dfns/dfns-sdk-go/internal/dfnsapiclient"
 )
 
 // TestNewDfnsAPIOptions tests the NewDfnsAPIOptions function.
@@ -68,5 +70,29 @@ func TestNewDfnsAPIOptions(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestCreateDfnsAPIClient(t *testing.T) {
+	t.Parallel()
+
+	options, err := NewDfnsAPIOptions(&DfnsAPIConfig{
+		AppID:     "your_app_id",
+		AuthToken: func(s string) *string { return &s }("authToken"),
+		BaseURL:   "https://yourapi.example.com",
+	}, nil)
+	if err != nil {
+		t.Fatal("error when creating DfnsAPIOptions")
+	}
+
+	client := CreateDfnsAPIClient(options)
+
+	if client.Transport == nil {
+		t.Fatal("Client transport is nil")
+	}
+
+	_, ok := client.Transport.(*dfnsapiclient.AuthTransport)
+	if !ok {
+		t.Fatal("Expected dfnsapi.AuthTransport got different type")
 	}
 }

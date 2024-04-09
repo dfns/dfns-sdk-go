@@ -9,9 +9,12 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,6 +23,18 @@ import (
 
 func TestPerformSimpleRequest(t *testing.T) {
 	t.Parallel()
+
+	performSimpleRequest(t, http.MethodGet, "")
+}
+
+func TestPerformSimpleRequest_With_POST(t *testing.T) {
+	t.Parallel()
+
+	performSimpleRequest(t, http.MethodPost, "false")
+}
+
+func performSimpleRequest(t *testing.T, method, userActionHeader string) {
+	t.Helper()
 
 	authToken := "your-auth-token" //nolint:gosec // This is a test
 
@@ -43,9 +58,13 @@ func TestPerformSimpleRequest(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, server.URL+"/some-path", nil)
+	req, err := http.NewRequestWithContext(ctx, method, server.URL+"/some-path", nil)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if userActionHeader != "" {
+		req.Header.Set(UserActionHeader, userActionHeader)
 	}
 
 	resp, err := httpClient.Do(req)
@@ -59,32 +78,92 @@ func TestPerformSimpleRequest(t *testing.T) {
 	}
 }
 
-func TestPerformSimpleRequest_Error(t *testing.T) {
+func TestPerformRequest_Error(t *testing.T) {
 	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	})
+
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, server.URL+"/some-path", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+	_, err = httpClient.Do(req)
+	if err == nil {
+		t.Fatal("Expected an http error but got nil")
+	}
+}
+
+func TestPerformRequest_Response_Error(t *testing.T) {
+	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
 
 	testCases := []struct {
 		name               string
 		statusCode         int
-		response           string
+		response           io.Reader
 		expectedErrMessage string
+		shouldBeDFNSError  bool
 	}{
 		{
-			name:               "Error",
+			name:               "Error with response body containing error message",
 			statusCode:         400,
-			response:           `{"error":{"message": "aie"}}`,
+			response:           strings.NewReader(`{"error":{"message": "aie"}}`),
 			expectedErrMessage: "aie",
+			shouldBeDFNSError:  true,
 		},
 		{
-			name:               "UnknownError",
+			name:               "Error with response body containing message",
 			statusCode:         400,
-			response:           `{"body": "aie"}`,
-			expectedErrMessage: "Unknown error",
+			response:           strings.NewReader(`{"message": "aie"}`),
+			expectedErrMessage: "aie",
+			shouldBeDFNSError:  true,
 		},
 		{
-			name:               "PolicyPendingError",
+			name:               "UnknownError with response body containing unknown error",
+			statusCode:         400,
+			response:           strings.NewReader(`{"body": "aie"}`),
+			expectedErrMessage: "Unknown error",
+			shouldBeDFNSError:  true,
+		},
+		{
+			name:               "PolicyPendingError with response body containing policy pending message",
 			statusCode:         202,
-			response:           `{"message": "policy pending!"}`,
+			response:           strings.NewReader(`{"message": "policy pending!"}`),
 			expectedErrMessage: "Operation triggered a policy pending approval",
+			shouldBeDFNSError:  true,
+		},
+		{
+			name:               "Error with mock unmarshal error",
+			statusCode:         400,
+			response:           MockUnmarshalError{},
+			expectedErrMessage: "unexpected end of JSON input",
 		},
 	}
 
@@ -92,18 +171,14 @@ func TestPerformSimpleRequest_Error(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			authToken := "your-auth-token" //nolint:gosec // This is a test
-
-			config := &AuthTransportConfig{
-				AppID:     "your-app-id",
-				AuthToken: &authToken,
-				BaseURL:   "https://your.api.endpoint",
-			}
-
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				checkBasicHeaders(t, r, config)
 				w.WriteHeader(tc.statusCode)
-				_, _ = w.Write([]byte(tc.response))
+
+				_, err := io.Copy(w, tc.response)
+				if err != nil {
+					t.Fatalf("Error when building the handler func %s", err)
+				}
 			})
 
 			server := httptest.NewServer(handler)
@@ -119,7 +194,11 @@ func TestPerformSimpleRequest_Error(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			resp, err := httpClient.Do(req)
+			//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+			_, err = httpClient.Do(req)
+			if err == nil {
+				t.Fatalf("expected an error, got nil")
+			}
 
 			var (
 				dfnsErr *DfnsError
@@ -131,24 +210,24 @@ func TestPerformSimpleRequest_Error(t *testing.T) {
 				if castOk {
 					dfnsErr, ok = &policyErr.DfnsError, castOk
 				}
-			} else {
+			} else if tc.shouldBeDFNSError {
 				dfnsErr, ok = errors.Unwrap(err).(*DfnsError)
 			}
 
-			if !ok {
-				t.Fatalf("error is not of type DfnsError: %v", err)
-			}
+			if tc.shouldBeDFNSError {
+				if !ok {
+					t.Fatalf("error is not of type DfnsError: %v", err)
+				}
 
-			if dfnsErr.Message != tc.expectedErrMessage {
-				t.Errorf("expected error message %q, got %q", tc.expectedErrMessage, dfnsErr.Message)
-			}
+				if dfnsErr.Message != tc.expectedErrMessage {
+					t.Errorf("expected error message %q, got %q", tc.expectedErrMessage, dfnsErr.Message)
+				}
 
-			if dfnsErr.HTTPStatus != tc.statusCode {
-				t.Errorf("expected HTTP status code %d, got %d", tc.statusCode, dfnsErr.HTTPStatus)
-			}
-
-			if err == nil {
-				resp.Body.Close()
+				if dfnsErr.HTTPStatus != tc.statusCode {
+					t.Errorf("expected HTTP status code %d, got %d", tc.statusCode, dfnsErr.HTTPStatus)
+				}
+			} else if !strings.Contains(errors.Unwrap(err).Error(), tc.expectedErrMessage) {
+				t.Errorf("expected error containing %s, got %s", tc.expectedErrMessage, err.Error())
 			}
 		})
 	}
@@ -195,7 +274,6 @@ func TestPerformUserActionRequest(t *testing.T) {
 	authToken := "your-auth-token" //nolint:gosec // This is a test
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
-	credID := "credId"
 	userAction := "userAction"
 
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -205,7 +283,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 
 	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
 
-	signer := createRSASigner(string(rsaPrivateKeyPEM), credID)
+	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
 		AppID:     "your-app-id",
@@ -312,6 +390,295 @@ func TestPerformUserActionRequest(t *testing.T) {
 	}
 }
 
+func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
+	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		Signer:    &ErrorSigner{},
+	}
+
+	body := []byte(`{"network": "eth"}`)
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/some-path", bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+	_, err = httpClient.Do(req)
+	if err == nil {
+		t.Fatalf("Expected http error but got nil")
+	}
+}
+
+func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) {
+	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+
+	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
+
+	signer := createMockSigner(string(rsaPrivateKeyPEM))
+
+	// Creating HTTP test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		io.Copy(w, MockUnmarshalError{})
+	}))
+	defer ts.Close()
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		Signer:    signer,
+		BaseURL:   ts.URL,
+	}
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	body := []byte(`{"network": "eth"}`)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/some-path", bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+	_, err = httpClient.Do(req)
+	if !strings.Contains(err.Error(), "couldn't unmarshal challenge response: unexpected end of JSON input") {
+		t.Fatalf("Expected marshall error but got %s", err)
+	}
+}
+
+func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
+	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+	challenge := "challenge"
+	challengeIdentifier := "challengeIdentifier"
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		Signer:    &ErrorSigner{},
+	}
+
+	body := []byte(`{"network": "eth"}`)
+
+	// Creating HTTP test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkBasicHeaders(t, r, config)
+
+		expectedBody := createUserActionChallengeRequest{
+			UserActionPayload:    string(body),
+			UserActionHTTPMethod: "POST",
+			UserActionHTTPPath:   "/some-path",
+			UserActionServerKind: "Api",
+		}
+
+		checkJSONRequest(t, r, expectedBody)
+
+		response := createUserActionChallengeResponse{
+			Challenge:           challenge,
+			ChallengeIdentifier: challengeIdentifier,
+			AllowCredentials:    nil,
+		}
+
+		respBody, marchalErr := json.Marshal(response)
+		if marchalErr != nil {
+			t.Fatal(marchalErr)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(respBody)
+	}))
+	defer ts.Close()
+
+	config.BaseURL = ts.URL
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/some-path", bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+	_, err = httpClient.Do(req)
+	if errors.Unwrap(err).Error() != fmt.Sprintf("error signing the user challenge: %s", errSigner) {
+		t.Fatalf("Expected signer error but got %s", err)
+	}
+}
+
+func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
+	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+	challenge := "challenge"
+	challengeIdentifier := "challengeIdentifier"
+
+	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
+
+	signer := createMockSigner(string(rsaPrivateKeyPEM))
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		Signer:    signer,
+	}
+
+	body := []byte(`{"network": "eth"}`)
+
+	// Creating HTTP test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/auth/action/init":
+			checkBasicHeaders(t, r, config)
+
+			expectedBody := createUserActionChallengeRequest{
+				UserActionPayload:    string(body),
+				UserActionHTTPMethod: "POST",
+				UserActionHTTPPath:   "/some-path",
+				UserActionServerKind: "Api",
+			}
+
+			checkJSONRequest(t, r, expectedBody)
+
+			response := createUserActionChallengeResponse{
+				Challenge:           challenge,
+				ChallengeIdentifier: challengeIdentifier,
+				AllowCredentials:    nil,
+			}
+
+			respBody, marchalErr := json.Marshal(response)
+			if marchalErr != nil {
+				t.Fatal(marchalErr)
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write(respBody)
+
+		default:
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Not Found"))
+		}
+	}))
+	defer ts.Close()
+
+	config.BaseURL = ts.URL
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/some-path", bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+	_, err = httpClient.Do(req)
+	if err == nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
+	t.Parallel()
+
+	authToken := "your-auth-token" //nolint:gosec // This is a test
+	challenge := "challenge"
+	challengeIdentifier := "challengeIdentifier"
+
+	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(rsaPrivateKey)})
+
+	signer := createMockSigner(string(rsaPrivateKeyPEM))
+
+	config := &AuthTransportConfig{
+		AppID:     "your-app-id",
+		AuthToken: &authToken,
+		Signer:    signer,
+	}
+
+	body := []byte(`{"network": "eth"}`)
+
+	// Creating HTTP test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/auth/action/init":
+			response := createUserActionChallengeResponse{
+				Challenge:           challenge,
+				ChallengeIdentifier: challengeIdentifier,
+				AllowCredentials:    nil,
+			}
+
+			respBody, marchalErr := json.Marshal(response)
+			if marchalErr != nil {
+				t.Fatal(marchalErr)
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write(respBody)
+
+		case "/auth/action":
+			io.Copy(w, MockUnmarshalError{})
+
+		default:
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Not Found"))
+		}
+	}))
+	defer ts.Close()
+
+	config.BaseURL = ts.URL
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/some-path", bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
+	_, err = httpClient.Do(req)
+	if !strings.Contains(err.Error(), "couldn't unmarshaling user action response: unexpected end of JSON input") {
+		t.Fatalf("Expected marshall error but got %s", err)
+	}
+}
+
 func checkJSONRequest[T any](t *testing.T, r *http.Request, expected T) {
 	t.Helper()
 
@@ -351,20 +718,40 @@ func createHTTPClient(config *AuthTransportConfig) *http.Client {
 	}
 }
 
-type simpleRSASigner struct {
+// MockUnmarshalError is a custom type to simulate an error when unmarshaling JSON.
+type MockUnmarshalError struct{}
+
+// Read implements the io.Reader interface but always returns an error.
+func (m MockUnmarshalError) Read(_ []byte) (int, error) {
+	return 0, io.EOF
+}
+
+// Simple RSA Signer that returns no error when signing
+type mockSigner struct {
 	privateKey string
 	credID     string
 }
 
-func (s *simpleRSASigner) Sign(
+func (s *mockSigner) Sign(
 	_ *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	return &credentials.KeyAssertion{}, nil
 }
 
-func createRSASigner(privateKey, credID string) *simpleRSASigner {
-	return &simpleRSASigner{
+func createMockSigner(privateKey string) *mockSigner {
+	return &mockSigner{
 		privateKey,
-		credID,
+		"credId",
 	}
+}
+
+// Signer that always return an error
+type ErrorSigner struct{}
+
+var errSigner = errors.New("sign error")
+
+func (s *ErrorSigner) Sign(
+	_ *credentials.UserActionChallenge,
+) (*credentials.KeyAssertion, error) {
+	return nil, errSigner
 }

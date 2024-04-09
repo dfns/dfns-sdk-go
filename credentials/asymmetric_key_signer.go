@@ -17,10 +17,9 @@ import (
 )
 
 var (
-	errFailedToDecodePEMBlock       = errors.New("failed to decode PEM block")
-	errUnsupportedPrivateKeyTypeFmt = errors.New("unsupported private key type: %s")
-	errUnsupportedPrivateKeyType    = errors.New("unsupported private key type")
-	errNotAllowedCredentials        = errors.New("not allowed credentials")
+	errFailedToDecodePEMBlock    = errors.New("failed to decode PEM block")
+	errUnsupportedPrivateKeyType = errors.New("unsupported private key type")
+	errNotAllowedCredentials     = errors.New("not allowed credentials")
 )
 
 type AsymmetricKeySignerConfig struct {
@@ -141,7 +140,7 @@ func parsePEMPrivateKey(privateKey string) (interface{}, error) {
 		return key, nil
 
 	default:
-		return nil, fmt.Errorf("%w: %s", errUnsupportedPrivateKeyTypeFmt, block.Type)
+		return nil, fmt.Errorf("%w: %s", errUnsupportedPrivateKeyType, block.Type)
 	}
 }
 
