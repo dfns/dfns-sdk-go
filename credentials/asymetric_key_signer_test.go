@@ -11,6 +11,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
@@ -125,6 +126,65 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS8(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestAsymmetricKeySigner_SignAndVerify_RSA_Sign_Error(t *testing.T) {
+	t.Parallel()
+
+	credID := "mockCredId"
+	challenge := "mockChallenge"
+
+	testSignWithError := func(privateKeyPEMType string) {
+		// Generate a new RSA private key
+		rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var privateKeyBytes []byte
+
+		switch privateKeyPEMType {
+		case "RSA PRIVATE KEY":
+			privateKeyBytes = x509.MarshalPKCS1PrivateKey(rsaPrivateKey)
+		case "PRIVATE KEY":
+			privateKeyBytes, err = x509.MarshalPKCS8PrivateKey(rsaPrivateKey)
+			if err != nil {
+				t.Fatal(err)
+			}
+		default:
+			t.Fatalf("Unsupported private key PEM type: %s", privateKeyPEMType)
+		}
+
+		rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: privateKeyPEMType, Bytes: privateKeyBytes})
+
+		algo := crypto.SHA512_224
+
+		conf := &AsymmetricKeySignerConfig{
+			PrivateKey: string(rsaPrivateKeyPEM),
+			CredID:     credID,
+			Algorithm:  &algo,
+		}
+
+		signer := NewAsymmetricKeySigner(conf)
+
+		// Sign the challenge
+		_, err = signer.Sign(&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: credID,
+					},
+				},
+			},
+		})
+		if err == nil || !strings.Contains(err.Error(), "failed to sign with RSA private key") {
+			t.Fatalf("Expecting failed RSA signature but got %s", err)
+		}
+	}
+
+	testSignWithError("RSA PRIVATE KEY")
+	testSignWithError("PRIVATE KEY")
 }
 
 func TestAsymmetricKeySigner_SignAndVerify_ECDSA(t *testing.T) {
@@ -292,5 +352,76 @@ func TestAsymmetricKeySigner_Sign_NotAllowedCredential(t *testing.T) {
 	})
 	if errors.Unwrap(err).Error() != errNotAllowedCredentials.Error() {
 		t.Fatalf("Expected an error due to invalid credID, but got %s", err)
+	}
+}
+
+func TestAsymmetricKeySigner_SignAndVerify_ParseErrors(t *testing.T) {
+	t.Parallel()
+
+	credID := "mockCredId"
+	challenge := "mockChallenge"
+
+	tests := []struct {
+		name       string
+		privateKey string
+
+		errMsg string
+	}{
+		{
+			name:       "RSA PKCS1 Parse Error",
+			privateKey: "RSA PRIVATE KEY",
+
+			errMsg: "failed to parse PKCS1 private key",
+		},
+		{
+			name:       "RSA PKCS8 Parse Error",
+			privateKey: "PRIVATE KEY",
+			errMsg:     "failed to parse PKCS8 private key",
+		},
+		{
+			name:       "ECDSA Parse Error",
+			privateKey: "EC PRIVATE KEY",
+			errMsg:     "failed to parse EC private key",
+		},
+		{
+			name:       "Ed25519 Parse Error",
+			privateKey: "PRIVATE KEY",
+			errMsg:     "failed to parse PKCS8 private key",
+		},
+		{
+			name:       "Unsupported Parse Error",
+			privateKey: "UNKNOWN PRIVATE KEY",
+			errMsg:     "unsupported private key type",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			privateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: tc.privateKey, Bytes: []byte{}})
+
+			conf := &AsymmetricKeySignerConfig{
+				PrivateKey: string(privateKeyPEM),
+				CredID:     credID,
+			}
+
+			signer := NewAsymmetricKeySigner(conf)
+
+			_, err := signer.Sign(&credentials.UserActionChallenge{
+				Challenge: challenge,
+				AllowCredentials: &credentials.AllowCredentials{
+					Key: []credentials.AllowCredential{
+						{
+							ID: credID,
+						},
+					},
+				},
+			})
+
+			if err == nil || !strings.Contains(err.Error(), tc.errMsg) {
+				t.Fatalf("Expected error containing '%s', got: %v", tc.errMsg, err)
+			}
+		})
 	}
 }

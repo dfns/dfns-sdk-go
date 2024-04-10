@@ -12,14 +12,18 @@ import (
 //nolint:paralleltest // generateUUID is modified in other functions
 func TestGenerateNonce(t *testing.T) {
 	// Mock the UUID generation
+	originalGenerateUUID := generateUUID
 	generateUUID = func() string { return "mock-uuid" }
-	defer func() { generateUUID = uuid.NewString }() // Restore the original function
+
+	defer func() { generateUUID = originalGenerateUUID }() // Restore the original function
 
 	// Mock the time
 	mockTime := time.Date(2024, time.February, 15, 10, 0, 0, 0, time.UTC)
 
+	originalGetCurrentTime := getCurrentTime
 	getCurrentTime = func() time.Time { return mockTime }
-	defer func() { getCurrentTime = time.Now }() // Restore the original function
+
+	defer func() { getCurrentTime = originalGetCurrentTime }() // Restore the original function
 
 	// Call the function
 	nonce := generateNonce()

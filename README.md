@@ -1,6 +1,7 @@
 # Dfns Golang SDK
 
 [![Go Build](https://github.com/dfns/dfns-sdk-go/actions/workflows/build.yaml/badge.svg)](https://github.com/dfns/dfns-sdk-go/actions/workflows/build.yaml)
+[![Coverage](https://codecov.io/github/dfns/dfns-sdk-go/graph/badge.svg?token=0VPR2C7OZJ)](https://codecov.io/github/dfns/dfns-sdk-go)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dfns/dfns-sdk-go/blob/master/LICENSE)
 [![Godoc](https://godoc.org/github.com/dfns/dfns-sdk-go?status.svg)](https://godoc.org/github.com/dfns/dfns-sdk-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dfns/dfns-sdk-go)](https://goreportcard.com/report/github.com/dfns/dfns-sdk-go)
