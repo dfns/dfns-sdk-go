@@ -35,7 +35,7 @@ func TestNewDfnsAPIOptions(t *testing.T) {
 			name:           "EmptyAppID",
 			config:         &DfnsAPIConfig{},
 			expectedResult: nil,
-			expectedError:  ErrAppIDEmpty,
+			expectedError:  errAppIDEmpty,
 		},
 		{
 			name: "EmptyBaseURL",
@@ -43,7 +43,7 @@ func TestNewDfnsAPIOptions(t *testing.T) {
 				AppID: "testAppID",
 			},
 			expectedResult: nil,
-			expectedError:  ErrBaseURLEmpty,
+			expectedError:  errBaseURLEmpty,
 		},
 	}
 

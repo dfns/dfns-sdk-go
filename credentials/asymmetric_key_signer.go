@@ -23,15 +23,19 @@ var (
 )
 
 type AsymmetricKeySignerConfig struct {
+	// PrivateKey holds the PEM-encoded private key used for signing.
 	PrivateKey string
-	CredID     string
-	Algorithm  *crypto.Hash
+	// CredID is the identifier of the credential associated with the private key.
+	CredID string
+	// Algorithm specifies the hashing algorithm to use for signing. Defaults to SHA256 if not set.
+	Algorithm *crypto.Hash
 }
 
 type AsymmetricKeySigner struct {
 	*AsymmetricKeySignerConfig
 }
 
+// NewAsymmetricKeySigner creates a new instance of AsymmetricKeySigner with the provided configuration.
 func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySigner {
 	return &AsymmetricKeySigner{
 		AsymmetricKeySignerConfig: config,

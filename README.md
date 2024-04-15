@@ -39,12 +39,12 @@ Credentials currently support only Key Credentials (_refer to our [API documenta
 
 #### `AsymmetricKeySigner`
 
-This functionality is exposed in the `pkg/api` package and implements the `CredentialSigner` interface. It is primarily intended for server-side use. Although it could be employed client-side, we don't recommend it. In a browser context, any key-based crypto signing should be handled within a service worker. We are actively working on additional helper classes to facilitate this support.
+This functionality is exposed in the `credential` repository. It is primarily intended for server-side use. Although it could be employed client-side, we don't recommend it. In a browser context, any key-based crypto signing should be handled within a service worker. We are actively working on additional helper classes to facilitate this support.
 
 ```golang
 import (
   .....
-	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	"github.com/dfns/dfns-sdk-go/credentials"
 )
 
 conf := &credentials.AsymmetricKeySignerConfig{
@@ -83,8 +83,8 @@ _Note: You can include a context directly in your httprequest if you want some c
 ```golang
 import (
   .....
-	api "github.com/dfns/dfns-sdk-go/pkg/dfns_api_client"
-	"github.com/dfns/dfns-sdk-go/pkg/credentials"
+	api "github.com/dfns/dfns-sdk-go/dfnsapiclient"
+	"github.com/dfns/dfns-sdk-go/credentials"
 )
 
 signer := ... // a Credential Signer (webauthN or key signer from section above)
