@@ -1,6 +1,7 @@
 package dfnsapiclient
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -52,7 +53,7 @@ func TestNewDfnsAPIOptions(t *testing.T) {
 			t.Parallel()
 
 			result, err := NewDfnsAPIOptions(test.config, nil)
-			if err != test.expectedError {
+			if !errors.Is(err, test.expectedError) {
 				t.Errorf("Unexpected error. Got: %v, Want: %v", err, test.expectedError)
 			}
 
