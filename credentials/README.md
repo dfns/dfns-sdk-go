@@ -8,14 +8,81 @@ import "github.com/dfns/dfns-sdk-go/credentials"
 
 ## Index
 
+- [func WithAWSKMSClient\(client AWSKMSClient\) func\(\*AWSKMSSigner\)](<#WithAWSKMSClient>)
+- [type AWSKMSClient](<#AWSKMSClient>)
+- [type AWSKMSSigner](<#AWSKMSSigner>)
+  - [func NewAWSKMSSigner\(ctx context.Context, cfgSigner \*AWSKMSSignerConfig, options ...func\(\*AWSKMSSigner\)\) \(\*AWSKMSSigner, error\)](<#NewAWSKMSSigner>)
+  - [func \(akss \*AWSKMSSigner\) Sign\(userActionChallenge \*credentials.UserActionChallenge\) \(\*credentials.KeyAssertion, error\)](<#AWSKMSSigner.Sign>)
+- [type AWSKMSSignerConfig](<#AWSKMSSignerConfig>)
 - [type AsymmetricKeySigner](<#AsymmetricKeySigner>)
   - [func NewAsymmetricKeySigner\(config \*AsymmetricKeySignerConfig\) \*AsymmetricKeySigner](<#NewAsymmetricKeySigner>)
   - [func \(signer \*AsymmetricKeySigner\) Sign\(userActionChallenge \*credentials.UserActionChallenge\) \(\*credentials.KeyAssertion, error\)](<#AsymmetricKeySigner.Sign>)
 - [type AsymmetricKeySignerConfig](<#AsymmetricKeySignerConfig>)
 
 
+<a name="WithAWSKMSClient"></a>
+## func [WithAWSKMSClient](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/aws_kms_signer.go#L34>)
+
+```go
+func WithAWSKMSClient(client AWSKMSClient) func(*AWSKMSSigner)
+```
+
+
+
+<a name="AWSKMSClient"></a>
+## type [AWSKMSClient](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/aws_kms_signer.go#L18-L20>)
+
+AWSKMSClient defines the subset of the AWS KMS client's functionality used here.
+
+```go
+type AWSKMSClient interface {
+    Sign(ctx context.Context, params *kms.SignInput, optFns ...func(*kms.Options)) (*kms.SignOutput, error)
+}
+```
+
+<a name="AWSKMSSigner"></a>
+## type [AWSKMSSigner](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/aws_kms_signer.go#L29-L32>)
+
+AWSKMSSigner implements credentials.ICredentialSigner using AWS KMS.
+
+```go
+type AWSKMSSigner struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="NewAWSKMSSigner"></a>
+### func [NewAWSKMSSigner](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/aws_kms_signer.go#L41-L45>)
+
+```go
+func NewAWSKMSSigner(ctx context.Context, cfgSigner *AWSKMSSignerConfig, options ...func(*AWSKMSSigner)) (*AWSKMSSigner, error)
+```
+
+NewAWSKMSSigner creates a new Signer instance using a real KMS client.
+
+<a name="AWSKMSSigner.Sign"></a>
+### func \(\*AWSKMSSigner\) [Sign](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/aws_kms_signer.go#L68-L70>)
+
+```go
+func (akss *AWSKMSSigner) Sign(userActionChallenge *credentials.UserActionChallenge) (*credentials.KeyAssertion, error)
+```
+
+Sign implements the credentials.ICredentialSigner interface.
+
+<a name="AWSKMSSignerConfig"></a>
+## type [AWSKMSSignerConfig](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/aws_kms_signer.go#L23-L26>)
+
+AWSKMSSignerConfig holds the configuration for the AWS KMS signer.
+
+```go
+type AWSKMSSignerConfig struct {
+    KeyID  string // The AWS KMS key identifier
+    Region string // The AWS region
+}
+```
+
 <a name="AsymmetricKeySigner"></a>
-## type [AsymmetricKeySigner](<https://github.com/dfns/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L34-L36>)
+## type [AsymmetricKeySigner](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L34-L36>)
 
 
 
@@ -26,7 +93,7 @@ type AsymmetricKeySigner struct {
 ```
 
 <a name="NewAsymmetricKeySigner"></a>
-### func [NewAsymmetricKeySigner](<https://github.com/dfns/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L39>)
+### func [NewAsymmetricKeySigner](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L39>)
 
 ```go
 func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySigner
@@ -35,7 +102,7 @@ func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySig
 NewAsymmetricKeySigner creates a new instance of AsymmetricKeySigner with the provided configuration.
 
 <a name="AsymmetricKeySigner.Sign"></a>
-### func \(\*AsymmetricKeySigner\) [Sign](<https://github.com/dfns/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L48-L50>)
+### func \(\*AsymmetricKeySigner\) [Sign](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L48-L50>)
 
 ```go
 func (signer *AsymmetricKeySigner) Sign(userActionChallenge *credentials.UserActionChallenge) (*credentials.KeyAssertion, error)
@@ -44,7 +111,7 @@ func (signer *AsymmetricKeySigner) Sign(userActionChallenge *credentials.UserAct
 Sign signs the given challenge using the private key and the hashing algorithm specified in the Algorithm field. If the Algorithm field is not set or invalid, it defaults to SHA256.
 
 <a name="AsymmetricKeySignerConfig"></a>
-## type [AsymmetricKeySignerConfig](<https://github.com/dfns/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L25-L32>)
+## type [AsymmetricKeySignerConfig](<https://github.com/vincentserpoul/dfns-sdk-go/blob/main/credentials/asymmetric_key_signer.go#L25-L32>)
 
 
 
