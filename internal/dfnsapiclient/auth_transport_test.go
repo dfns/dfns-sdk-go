@@ -325,7 +325,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 		case "/auth/action":
 			checkBasicHeaders(t, r, config)
 
-			assertion, signErr := config.Signer.Sign(nil)
+			assertion, signErr := config.Signer.Sign(context.Background(), nil)
 			if signErr != nil {
 				t.Fatal(signErr)
 			}
@@ -733,6 +733,7 @@ type mockSigner struct {
 }
 
 func (s *mockSigner) Sign(
+	_ context.Context,
 	_ *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	return &credentials.KeyAssertion{}, nil
@@ -751,6 +752,7 @@ type ErrorSigner struct{}
 var errSigner = errors.New("sign error")
 
 func (s *ErrorSigner) Sign(
+	_ context.Context,
 	_ *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	return nil, errSigner

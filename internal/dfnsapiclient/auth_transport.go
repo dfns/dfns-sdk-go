@@ -171,10 +171,11 @@ func (auth *AuthTransport) executeUserActionRequest(req *http.Request) error {
 		return err
 	}
 
-	assertion, err := auth.Signer.Sign(&credentials.UserActionChallenge{
-		Challenge:        createUserActionResp.Challenge,
-		AllowCredentials: createUserActionResp.AllowCredentials,
-	})
+	assertion, err := auth.Signer.Sign(req.Context(),
+		&credentials.UserActionChallenge{
+			Challenge:        createUserActionResp.Challenge,
+			AllowCredentials: createUserActionResp.AllowCredentials,
+		})
 	if err != nil {
 		return fmt.Errorf("error signing the user challenge: %w", err)
 	}

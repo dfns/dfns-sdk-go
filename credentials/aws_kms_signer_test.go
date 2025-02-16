@@ -54,7 +54,7 @@ func TestAwsKmsSigner_Sign(t *testing.T) {
 		// ...existing code for allow credentials if needed...
 	}
 
-	keyAssertion, err := signer.Sign(userActionChallenge)
+	keyAssertion, err := signer.Sign(context.Background(), userActionChallenge)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -112,7 +112,7 @@ func TestAwsKmsSigner_Sign_Error(t *testing.T) {
 		// ...existing code...
 	}
 
-	_, err = signer.Sign(userActionChallenge)
+	_, err = signer.Sign(context.Background(), userActionChallenge)
 	if err == nil {
 		t.Fatal("Expected error, got nil")
 	}
@@ -147,7 +147,7 @@ func TestAwsKmsSigner_Sign_NotAllowedCredentials(t *testing.T) {
 		},
 	}
 
-	_, err = signer.Sign(userActionChallenge)
+	_, err = signer.Sign(context.Background(), userActionChallenge)
 	if err == nil {
 		t.Fatal("Expected error due to not allowed credentials, got none")
 	}

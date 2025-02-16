@@ -14,6 +14,9 @@ import (
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
+// enforce that AWSKMSSigner implements credentials.ICredentialSigner
+var _ credentials.ICredentialSigner = (*AWSKMSSigner)(nil)
+
 // AWSKMSClient defines the subset of the AWS KMS client's functionality used here.
 type AWSKMSClient interface {
 	Sign(ctx context.Context, params *kms.SignInput, optFns ...func(*kms.Options)) (*kms.SignOutput, error)
@@ -66,6 +69,7 @@ func NewAWSKMSSigner(
 
 // Sign implements the credentials.ICredentialSigner interface.
 func (akss *AWSKMSSigner) Sign(
+	ctx context.Context,
 	userActionChallenge *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	if userActionChallenge.AllowCredentials != nil {
@@ -107,7 +111,7 @@ func (akss *AWSKMSSigner) Sign(
 		SigningAlgorithm: types.SigningAlgorithmSpecRsassaPkcs1V15Sha256,
 	}
 
-	output, err := akss.kmsClient.Sign(context.Background(), input)
+	output, err := akss.kmsClient.Sign(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign data with AWS KMS: %w", err)
 	}

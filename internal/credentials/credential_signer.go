@@ -1,5 +1,7 @@
 package credentials
 
+import "context"
+
 type CredentialKind string
 
 const (
@@ -47,5 +49,5 @@ type UserActionChallenge struct {
 
 // For not it returns a KeyAssertion. But we can make it more generic afterward
 type ICredentialSigner interface {
-	Sign(userActionChallenge *UserActionChallenge) (*KeyAssertion, error)
+	Sign(ctx context.Context, userActionChallenge *UserActionChallenge) (*KeyAssertion, error)
 }

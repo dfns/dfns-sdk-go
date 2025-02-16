@@ -1,6 +1,7 @@
 package credentials
 
 import (
+	"context"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/ed25519"
@@ -15,6 +16,8 @@ import (
 
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
+
+var _ credentials.ICredentialSigner = (*AsymmetricKeySigner)(nil)
 
 var (
 	errFailedToDecodePEMBlock    = errors.New("failed to decode PEM block")
@@ -46,6 +49,7 @@ func NewAsymmetricKeySigner(config *AsymmetricKeySignerConfig) *AsymmetricKeySig
 // algorithm specified in the Algorithm field. If the Algorithm field is
 // not set or invalid, it defaults to SHA256.
 func (signer *AsymmetricKeySigner) Sign(
+	_ context.Context,
 	userActionChallenge *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	allowedIDs := []string{}
