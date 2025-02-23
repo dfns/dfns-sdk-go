@@ -24,8 +24,9 @@ type AWSKMSClient interface {
 
 // AWSKMSSignerConfig holds the configuration for the AWS KMS signer.
 type AWSKMSSignerConfig struct {
-	KeyID  string // The AWS KMS key identifier
-	Region string // The AWS region
+	KeyID            string // The AWS KMS key identifier
+	Region           string // The AWS region
+	SigningAlgorithm types.SigningAlgorithmSpec
 }
 
 // AWSKMSSigner implements credentials.ICredentialSigner using AWS KMS.
@@ -62,6 +63,23 @@ func NewAWSKMSSigner(
 	if newSgn.kmsClient == nil {
 		client := kms.NewFromConfig(cfg)
 		newSgn.kmsClient = client
+	}
+
+	var (
+		sas      types.SigningAlgorithmSpec
+		sasFound bool
+	)
+
+	for _, sasv := range sas.Values() {
+		if sasv == newSgn.config.SigningAlgorithm {
+			sasFound = true
+
+			break
+		}
+	}
+
+	if !sasFound {
+		return nil, fmt.Errorf("invalid signing algorithm: %v", newSgn.config.SigningAlgorithm)
 	}
 
 	return newSgn, nil
@@ -108,7 +126,7 @@ func (akss *AWSKMSSigner) Sign(
 		KeyId:            aws.String(akss.config.KeyID),
 		Message:          clientDataJSON,
 		MessageType:      types.MessageTypeRaw,
-		SigningAlgorithm: types.SigningAlgorithmSpecRsassaPkcs1V15Sha256,
+		SigningAlgorithm: akss.config.SigningAlgorithm,
 	}
 
 	output, err := akss.kmsClient.Sign(ctx, input)
@@ -124,7 +142,7 @@ func (akss *AWSKMSSigner) Sign(
 			CredID:     akss.config.KeyID,
 			Signature:  base64.RawURLEncoding.EncodeToString(signatureBytes),
 			ClientData: base64.RawURLEncoding.EncodeToString(clientDataJSON),
-			Algorithm:  "AWS_KMS_RSASSA_PKCS1_V1_5_SHA_256", // keeping human-readable algorithm name
+			Algorithm:  string(akss.config.SigningAlgorithm),
 		},
 	}
 

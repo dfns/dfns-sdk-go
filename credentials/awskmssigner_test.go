@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
+	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
@@ -39,8 +40,9 @@ func TestAWSKMSSigner_Sign(t *testing.T) {
 	ctx := context.Background()
 
 	config := &AWSKMSSignerConfig{
-		KeyID:  "test-key-id",
-		Region: "us-west-2",
+		KeyID:            "test-key-id",
+		Region:           "us-west-2",
+		SigningAlgorithm: types.SigningAlgorithmSpecRsassaPkcs1V15Sha256,
 	}
 	// Inject the mock client.
 	signer, errS := NewAWSKMSSigner(ctx, config, WithAWSKMSClient(&mockKMSClient{}))
@@ -84,7 +86,7 @@ func TestAWSKMSSigner_Sign(t *testing.T) {
 		t.Errorf("Expected clientData %s, got: %s", expectedClientDataB64, keyAssertion.CredentialAssertion.ClientData)
 	}
 
-	if keyAssertion.CredentialAssertion.Algorithm != "AWS_KMS_RSASSA_PKCS1_V1_5_SHA_256" {
+	if keyAssertion.CredentialAssertion.Algorithm != string(types.SigningAlgorithmSpecRsassaPkcs1V15Sha256) {
 		t.Errorf("Unexpected algorithm: %s", keyAssertion.CredentialAssertion.Algorithm)
 	}
 
@@ -98,8 +100,9 @@ func TestAWSKMSSigner_Sign_Error(t *testing.T) {
 
 	ctx := context.Background()
 	config := &AWSKMSSignerConfig{
-		KeyID:  "error-key-id",
-		Region: "us-west-2",
+		KeyID:            "error-key-id",
+		Region:           "us-west-2",
+		SigningAlgorithm: types.SigningAlgorithmSpecRsassaPkcs1V15Sha256,
 	}
 	// Inject the error mock client.
 	signer, err := NewAWSKMSSigner(ctx, config, WithAWSKMSClient(&errorKMSClient{}))
@@ -128,8 +131,9 @@ func TestAWSKMSSigner_Sign_NotAllowedCredentials(t *testing.T) {
 	ctx := context.Background()
 
 	config := &AWSKMSSignerConfig{
-		KeyID:  "test-key-id",
-		Region: "us-west-2",
+		KeyID:            "test-key-id",
+		Region:           "us-west-2",
+		SigningAlgorithm: types.SigningAlgorithmSpecRsassaPkcs1V15Sha256,
 	}
 	// Use the mock client to bypass the actual KMS call.
 	signer, err := NewAWSKMSSigner(ctx, config, WithAWSKMSClient(&mockKMSClient{}))
@@ -155,5 +159,28 @@ func TestAWSKMSSigner_Sign_NotAllowedCredentials(t *testing.T) {
 	// Verify that the error is of type NotAllowedCredentialsError.
 	if _, ok := err.(*credentials.NotAllowedCredentialsError); !ok {
 		t.Fatalf("Expected NotAllowedCredentialsError, got error: %v", err)
+	}
+}
+
+// Test that the NewAWSKMSSigner function returns an error when the signing algorithm is invalid.
+func TestNewAWSKMSSigner_InvalidSigningAlgorithm(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+
+	config := &AWSKMSSignerConfig{
+		KeyID:            "test-key-id",
+		Region:           "us-west-2",
+		SigningAlgorithm: "invalid-algorithm",
+	}
+
+	_, err := NewAWSKMSSigner(ctx, config)
+
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+
+	if !strings.Contains(err.Error(), "invalid signing algorithm") {
+		t.Errorf("Unexpected error: %v", err)
 	}
 }
