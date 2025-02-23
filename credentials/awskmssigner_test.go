@@ -33,7 +33,7 @@ func (e *errorKMSClient) Sign(_ context.Context, _ *kms.SignInput, _ ...func(*km
 	return nil, errors.New("simulated kms error")
 }
 
-func TestAwsKmsSigner_Sign(t *testing.T) {
+func TestAWSKMSSigner_Sign(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
@@ -93,7 +93,7 @@ func TestAwsKmsSigner_Sign(t *testing.T) {
 	}
 }
 
-func TestAwsKmsSigner_Sign_Error(t *testing.T) {
+func TestAWSKMSSigner_Sign_Error(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
@@ -122,7 +122,7 @@ func TestAwsKmsSigner_Sign_Error(t *testing.T) {
 	}
 }
 
-func TestAwsKmsSigner_Sign_NotAllowedCredentials(t *testing.T) {
+func TestAWSKMSSigner_Sign_NotAllowedCredentials(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
