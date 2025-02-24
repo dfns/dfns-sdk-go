@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -100,7 +102,12 @@ func main() {
 func getNativeBalance(client *http.Client, apiOptions *dfnsapiclient.DfnsAPIOptions, walletID string) (string, error) {
 	log.Println("Retrieving native balance for wallet:", walletID)
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/wallets/%s/assets", apiOptions.BaseURL, walletID), http.NoBody)
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		fmt.Sprintf("%s/wallets/%s/assets", apiOptions.BaseURL, walletID),
+		http.NoBody,
+	)
 	if err != nil {
 		return "", fmt.Errorf("error creating GET request: %w", err)
 	}
@@ -122,7 +129,7 @@ func getNativeBalance(client *http.Client, apiOptions *dfnsapiclient.DfnsAPIOpti
 		}
 	}
 
-	return "", fmt.Errorf("native asset not found")
+	return "", errors.New("native asset not found")
 }
 
 // createWallet creates a new wallet via the DFNS API.
@@ -140,7 +147,12 @@ func createWallet(client *http.Client, apiOptions *dfnsapiclient.DfnsAPIOptions)
 		return "", fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/wallets", apiOptions.BaseURL), bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodPost,
+		apiOptions.BaseURL+"/wallets",
+		bytes.NewBuffer(jsonData),
+	)
 	if err != nil {
 		return "", fmt.Errorf("error creating POST request: %w", err)
 	}

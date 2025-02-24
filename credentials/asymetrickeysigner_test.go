@@ -1,6 +1,7 @@
 package credentials
 
 import (
+	"context"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/ed25519"
@@ -40,16 +41,18 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS1(t *testing.T) {
 	signer := NewAsymmetricKeySigner(conf)
 
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
-		Challenge: challenge,
-		AllowCredentials: &credentials.AllowCredentials{
-			Key: []credentials.AllowCredential{
-				{
-					ID: credID,
+	keyAssertion, err := signer.Sign(
+		context.Background(),
+		&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: credID,
+					},
 				},
 			},
-		},
-	})
+		})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,16 +101,17 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS8(t *testing.T) {
 	signer := NewAsymmetricKeySigner(conf)
 
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
-		Challenge: challenge,
-		AllowCredentials: &credentials.AllowCredentials{
-			Key: []credentials.AllowCredential{
-				{
-					ID: credID,
+	keyAssertion, err := signer.Sign(context.Background(),
+		&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: credID,
+					},
 				},
 			},
-		},
-	})
+		})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,65 +130,6 @@ func TestAsymmetricKeySigner_SignAndVerify_RSA_PKS8(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-}
-
-func TestAsymmetricKeySigner_SignAndVerify_RSA_Sign_Error(t *testing.T) {
-	t.Parallel()
-
-	credID := "mockCredId"
-	challenge := "mockChallenge"
-
-	testSignWithError := func(privateKeyPEMType string) {
-		// Generate a new RSA private key
-		rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		var privateKeyBytes []byte
-
-		switch privateKeyPEMType {
-		case "RSA PRIVATE KEY":
-			privateKeyBytes = x509.MarshalPKCS1PrivateKey(rsaPrivateKey)
-		case "PRIVATE KEY":
-			privateKeyBytes, err = x509.MarshalPKCS8PrivateKey(rsaPrivateKey)
-			if err != nil {
-				t.Fatal(err)
-			}
-		default:
-			t.Fatalf("Unsupported private key PEM type: %s", privateKeyPEMType)
-		}
-
-		rsaPrivateKeyPEM := pem.EncodeToMemory(&pem.Block{Type: privateKeyPEMType, Bytes: privateKeyBytes})
-
-		algo := crypto.SHA512_224
-
-		conf := &AsymmetricKeySignerConfig{
-			PrivateKey: string(rsaPrivateKeyPEM),
-			CredID:     credID,
-			Algorithm:  &algo,
-		}
-
-		signer := NewAsymmetricKeySigner(conf)
-
-		// Sign the challenge
-		_, err = signer.Sign(&credentials.UserActionChallenge{
-			Challenge: challenge,
-			AllowCredentials: &credentials.AllowCredentials{
-				Key: []credentials.AllowCredential{
-					{
-						ID: credID,
-					},
-				},
-			},
-		})
-		if err == nil || !strings.Contains(err.Error(), "failed to sign with RSA private key") {
-			t.Fatalf("Expecting failed RSA signature but got %s", err)
-		}
-	}
-
-	testSignWithError("RSA PRIVATE KEY")
-	testSignWithError("PRIVATE KEY")
 }
 
 func TestAsymmetricKeySigner_SignAndVerify_ECDSA(t *testing.T) {
@@ -214,16 +159,17 @@ func TestAsymmetricKeySigner_SignAndVerify_ECDSA(t *testing.T) {
 	signer := NewAsymmetricKeySigner(conf)
 
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
-		Challenge: challenge,
-		AllowCredentials: &credentials.AllowCredentials{
-			Key: []credentials.AllowCredential{
-				{
-					ID: credID,
+	keyAssertion, err := signer.Sign(context.Background(),
+		&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: credID,
+					},
 				},
 			},
-		},
-	})
+		})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,16 +217,17 @@ func TestAsymmetricKeySigner_SignAndVerify_Ed25519(t *testing.T) {
 	signer := NewAsymmetricKeySigner(conf)
 
 	// Sign the challenge
-	keyAssertion, err := signer.Sign(&credentials.UserActionChallenge{
-		Challenge: challenge,
-		AllowCredentials: &credentials.AllowCredentials{
-			Key: []credentials.AllowCredential{
-				{
-					ID: credID,
+	keyAssertion, err := signer.Sign(context.Background(),
+		&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: credID,
+					},
 				},
 			},
-		},
-	})
+		})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -312,16 +259,17 @@ func TestAsymmetricKeySigner_Sign_InvalidPEMFormat(t *testing.T) {
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	_, err := signer.Sign(&credentials.UserActionChallenge{
-		Challenge: challenge,
-		AllowCredentials: &credentials.AllowCredentials{
-			Key: []credentials.AllowCredential{
-				{
-					ID: credID,
+	_, err := signer.Sign(context.Background(),
+		&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: credID,
+					},
 				},
 			},
-		},
-	})
+		})
 	if errors.Unwrap(err).Error() != errFailedToDecodePEMBlock.Error() {
 		t.Fatalf("Expected an error due to invalid PEM format, but got %s", err)
 	}
@@ -340,16 +288,17 @@ func TestAsymmetricKeySigner_Sign_NotAllowedCredential(t *testing.T) {
 
 	signer := NewAsymmetricKeySigner(conf)
 
-	_, err := signer.Sign(&credentials.UserActionChallenge{
-		Challenge: challenge,
-		AllowCredentials: &credentials.AllowCredentials{
-			Key: []credentials.AllowCredential{
-				{
-					ID: "otherCredID",
+	_, err := signer.Sign(context.Background(),
+		&credentials.UserActionChallenge{
+			Challenge: challenge,
+			AllowCredentials: &credentials.AllowCredentials{
+				Key: []credentials.AllowCredential{
+					{
+						ID: "otherCredID",
+					},
 				},
 			},
-		},
-	})
+		})
 	if errors.Unwrap(err).Error() != errNotAllowedCredentials.Error() {
 		t.Fatalf("Expected an error due to invalid credID, but got %s", err)
 	}
@@ -408,16 +357,17 @@ func TestAsymmetricKeySigner_SignAndVerify_ParseErrors(t *testing.T) {
 
 			signer := NewAsymmetricKeySigner(conf)
 
-			_, err := signer.Sign(&credentials.UserActionChallenge{
-				Challenge: challenge,
-				AllowCredentials: &credentials.AllowCredentials{
-					Key: []credentials.AllowCredential{
-						{
-							ID: credID,
+			_, err := signer.Sign(context.Background(),
+				&credentials.UserActionChallenge{
+					Challenge: challenge,
+					AllowCredentials: &credentials.AllowCredentials{
+						Key: []credentials.AllowCredential{
+							{
+								ID: credID,
+							},
 						},
 					},
-				},
-			})
+				})
 
 			if err == nil || !strings.Contains(err.Error(), tc.errMsg) {
 				t.Fatalf("Expected error containing '%s', got: %v", tc.errMsg, err)

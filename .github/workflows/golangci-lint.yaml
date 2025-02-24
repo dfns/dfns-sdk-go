@@ -10,9 +10,6 @@ on:
 permissions:
   contents: read
 
-env:
-  GOLANG_VERSION: "1.22.2"
-
 jobs:
   golangci:
     name: lint
@@ -24,10 +21,11 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GOLANG_VERSION }}
+          go-version-file: 'go.mod'
           cache: true
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
+          args: ./... --config=./.golangci.yml
           version: latest

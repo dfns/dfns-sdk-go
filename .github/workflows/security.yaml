@@ -9,8 +9,7 @@ on:
       - main
 
 env:
-  GOLANG_VERSION: "1.22.2"
-  TRIVY_VERSION: "v0.50.0"
+  TRIVY_VERSION: "v0.59.1"
 
 jobs:
   sec-scan:
@@ -24,8 +23,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GOLANG_VERSION }}
-          cache: true
+          go-version-file: 'go.mod'
 
       - name: Install trivy
         run: |
