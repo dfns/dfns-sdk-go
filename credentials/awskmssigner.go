@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
-	"github.com/aws/aws-sdk-go-v2/service/kms/types" // added import for constants
+	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
