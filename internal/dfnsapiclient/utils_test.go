@@ -27,7 +27,7 @@ func TestGetCurrentTime(t *testing.T) {
 //nolint:paralleltest // generatedUUID is modified in other functions
 func TestGenerateUUID(t *testing.T) {
 	generatedUUID := generateUUID()
-	
+
 	_, err := uuid.Parse(generatedUUID)
 	if err != nil {
 		t.Errorf("generatedUUID generated a non parsable uuid: %s", generatedUUID)
@@ -40,14 +40,22 @@ func TestAssertAuthTokenIsSameOrg_Unit(t *testing.T) {
 		authToken string
 		orgID     string
 	}
+
 	makeJWT := func(orgID any, includeClaim bool) string {
 		header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
 		payloadMap := map[string]interface{}{}
+
 		if includeClaim {
 			payloadMap[JwtCustomDataClaim] = map[string]interface{}{"orgId": orgID}
 		}
-		payloadBytes, _ := json.Marshal(payloadMap)
+
+		payloadBytes, err := json.Marshal(payloadMap)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		payload := base64.RawURLEncoding.EncodeToString(payloadBytes)
+
 		return header + "." + payload + "."
 	}
 
@@ -72,7 +80,7 @@ func TestAssertAuthTokenIsSameOrg_Unit(t *testing.T) {
 				orgID:     "org-abc",
 			},
 			wantErr:     true,
-			errContains: "Provided auth token is not scoped to org ID",
+			errContains: "provided auth token is not scoped to org ID",
 		},
 		{
 			name: "missing orgId in claim",
@@ -129,6 +137,7 @@ func TestAssertAuthTokenIsSameOrg_Unit(t *testing.T) {
 				if err == nil {
 					t.Fatalf("expected error, got nil")
 				}
+
 				if !strings.Contains(err.Error(), tt.errContains) {
 					t.Errorf("expected error to contain %q, got %q", tt.errContains, err.Error())
 				}

@@ -3,6 +3,7 @@ package dfnsapiclient
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -24,10 +25,10 @@ const JwtCustomDataClaim = "https://custom/app_metadata"
 
 // Checks if the "orgId" claim in the auth token matches the provided orgId.
 // Returns nil if it matches, otherwise returns an error.
-func AssertAuthTokenIsSameOrg(authToken string, orgID string) error {
+func AssertAuthTokenIsSameOrg(authToken, orgID string) error {
 	parts := strings.Split(authToken, ".")
 	if len(parts) != 3 {
-		return fmt.Errorf("invalid JWT format")
+		return errors.New("invalid JWT format")
 	}
 
 	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
@@ -40,18 +41,18 @@ func AssertAuthTokenIsSameOrg(authToken string, orgID string) error {
 		return fmt.Errorf("failed to unmarshal JWT payload: %w", err)
 	}
 
-	customData, ok := claims[JwtCustomDataClaim].(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("orgId claim not found in jwt token")
+	customData, success := claims[JwtCustomDataClaim].(map[string]interface{})
+	if !success {
+		return errors.New("orgId claim not found in jwt token")
 	}
 
 	jwtOrgID, ok := customData["orgId"].(string)
 	if !ok {
-		return fmt.Errorf("orgId claim not found in jwt token")
+		return errors.New("orgId claim not found in jwt token")
 	}
 
 	if jwtOrgID != orgID {
-		return fmt.Errorf("Provided auth token is not scoped to org ID: expected %s, got %s", orgID, jwtOrgID)
+		return fmt.Errorf("provided auth token is not scoped to org ID: expected %s, got %s", orgID, jwtOrgID)
 	}
 
 	return nil

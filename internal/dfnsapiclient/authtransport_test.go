@@ -21,8 +21,10 @@ import (
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
-const testOrgID = "org-id"
-const testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0.xxx" //nolint:gosec // This is a test
+const (
+	testOrgID     = "org-id"
+	testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0.xxx" //nolint:gosec // test
+)
 
 func TestPerformSimpleRequest(t *testing.T) {
 	t.Parallel()
@@ -39,7 +41,7 @@ func TestPerformSimpleRequest_With_POST(t *testing.T) {
 func performSimpleRequest(t *testing.T, method, userActionHeader string) {
 	t.Helper()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
 		OrgID:     testOrgID,
@@ -84,7 +86,7 @@ func performSimpleRequest(t *testing.T, method, userActionHeader string) {
 func TestPerformRequest_WrongAuthToken(t *testing.T) {
 	t.Parallel()
 
-	authToken := "bad-token" //nolint:gosec // This is a test
+	authToken := "bad-token"
 
 	config := &AuthTransportConfig{
 		OrgID:     testOrgID,
@@ -112,7 +114,6 @@ func TestPerformRequest_WrongAuthToken(t *testing.T) {
 	}
 
 	_, err = httpClient.Do(req)
-	
 
 	if err == nil {
 		t.Fatal("Expected an http error but got nil")
@@ -122,7 +123,7 @@ func TestPerformRequest_WrongAuthToken(t *testing.T) {
 func TestPerformRequest_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
 		OrgID:     testOrgID,
@@ -147,7 +148,6 @@ func TestPerformRequest_Error(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if err == nil {
 		t.Fatal("Expected an http error but got nil")
@@ -157,7 +157,7 @@ func TestPerformRequest_Error(t *testing.T) {
 func TestPerformRequest_Response_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
 		OrgID:     testOrgID,
@@ -235,7 +235,6 @@ func TestPerformRequest_Response_Error(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 			_, err = httpClient.Do(req)
 			if err == nil {
 				t.Fatalf("expected an error, got nil")
@@ -277,7 +276,7 @@ func TestPerformRequest_Response_Error(t *testing.T) {
 func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
 		OrgID:     testOrgID,
@@ -302,7 +301,6 @@ func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 
 	req.Header.Set(UserActionHeader, "toto")
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if err == nil {
 		t.Fatal("expected error when parsing auth header but got nil")
@@ -312,7 +310,7 @@ func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 func TestPerformUserActionRequest(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 	userAction := "userAction"
@@ -434,7 +432,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
 		OrgID:     testOrgID,
@@ -454,7 +452,6 @@ func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if err == nil {
 		t.Fatalf("Expected http error but got nil")
@@ -464,7 +461,7 @@ func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
 func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -500,7 +497,6 @@ func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) 
 		t.Fatal(err)
 	}
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if !strings.Contains(err.Error(), "couldn't unmarshal challenge response: unexpected end of JSON input") {
 		t.Fatalf("Expected marshall error but got %s", err)
@@ -510,7 +506,7 @@ func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) 
 func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 
@@ -563,7 +559,6 @@ func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if errors.Unwrap(err).Error() != fmt.Sprintf("error signing the user challenge: %s", errSigner) {
 		t.Fatalf("Expected signer error but got %s", err)
@@ -573,7 +568,7 @@ func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
 func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 
@@ -642,7 +637,6 @@ func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if err == nil {
 		t.Fatal(err)
@@ -652,7 +646,7 @@ func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken //nolint:gosec // This is a test
+	authToken := testAuthToken
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 
@@ -713,7 +707,6 @@ func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//nolint: bodyclose // the linter doesn't detect the fact resp body will be nil
 	_, err = httpClient.Do(req)
 	if !strings.Contains(err.Error(), "couldn't unmarshaling user action response: unexpected end of JSON input") {
 		t.Fatalf("Expected marshall error but got %s", err)
