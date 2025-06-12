@@ -3,52 +3,12 @@ package dfnsapiclient
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
 )
-
-//nolint:paralleltest // generateUUID is modified in other functions
-func TestGenerateNonce(t *testing.T) {
-	// Mock the UUID generation
-	originalGenerateUUID := generateUUID
-	generateUUID = func() string { return "mock-uuid" }
-
-	defer func() { generateUUID = originalGenerateUUID }() // Restore the original function
-
-	// Mock the time
-	mockTime := time.Date(2024, time.February, 15, 10, 0, 0, 0, time.UTC)
-
-	originalGetCurrentTime := getCurrentTime
-	getCurrentTime = func() time.Time { return mockTime }
-
-	defer func() { getCurrentTime = originalGetCurrentTime }() // Restore the original function
-
-	// Call the function
-	nonce := generateNonce()
-
-	// Decode the generated nonce
-	decodedData, err := base64.URLEncoding.DecodeString(nonce)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Unmarshal the decoded data
-	var data map[string]interface{}
-	if err := json.Unmarshal(decodedData, &data); err != nil {
-		t.Fatal(err)
-	}
-
-	// Check if the UUID and date are correct
-	if data["uuid"] != "mock-uuid" {
-		t.Errorf("expected UUID: mock-uuid, got: %s", data["uuid"])
-	}
-
-	if data["date"] != "2024-02-15T10:00:00Z" {
-		t.Errorf("expected date: 2024-02-15T10:00:00Z, got: %s", data["date"])
-	}
-}
 
 //nolint:paralleltest // currentTime is modified in other functions
 func TestGetCurrentTime(t *testing.T) {
@@ -67,9 +27,116 @@ func TestGetCurrentTime(t *testing.T) {
 //nolint:paralleltest // generatedUUID is modified in other functions
 func TestGenerateUUID(t *testing.T) {
 	generatedUUID := generateUUID()
-
+	
 	_, err := uuid.Parse(generatedUUID)
 	if err != nil {
 		t.Errorf("generatedUUID generated a non parsable uuid: %s", generatedUUID)
+	}
+}
+
+//nolint:paralleltest // AssertAuthTokenIsSameOrg is modified in other functions
+func TestAssertAuthTokenIsSameOrg_Unit(t *testing.T) {
+	type args struct {
+		authToken string
+		orgID     string
+	}
+	makeJWT := func(orgID any, includeClaim bool) string {
+		header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+		payloadMap := map[string]interface{}{}
+		if includeClaim {
+			payloadMap[JwtCustomDataClaim] = map[string]interface{}{"orgId": orgID}
+		}
+		payloadBytes, _ := json.Marshal(payloadMap)
+		payload := base64.RawURLEncoding.EncodeToString(payloadBytes)
+		return header + "." + payload + "."
+	}
+
+	tests := []struct {
+		name        string
+		args        args
+		wantErr     bool
+		errContains string
+	}{
+		{
+			name: "valid orgId match",
+			args: args{
+				authToken: makeJWT("org-abc", true),
+				orgID:     "org-abc",
+			},
+			wantErr: false,
+		},
+		{
+			name: "orgId mismatch",
+			args: args{
+				authToken: makeJWT("org-def", true),
+				orgID:     "org-abc",
+			},
+			wantErr:     true,
+			errContains: "Provided auth token is not scoped to org ID",
+		},
+		{
+			name: "missing orgId in claim",
+			args: args{
+				authToken: makeJWT(nil, true),
+				orgID:     "org-abc",
+			},
+			wantErr:     true,
+			errContains: "orgId claim not found",
+		},
+		{
+			name: "missing custom data claim",
+			args: args{
+				authToken: makeJWT(nil, false),
+				orgID:     "org-abc",
+			},
+			wantErr:     true,
+			errContains: "orgId claim not found",
+		},
+		{
+			name: "invalid JWT format",
+			args: args{
+				authToken: "invalid.token",
+				orgID:     "org-abc",
+			},
+			wantErr:     true,
+			errContains: "invalid JWT format",
+		},
+		{
+			name: "invalid payload base64",
+			args: args{
+				authToken: "aW52YWxpZA==.!!!.c2ln",
+				orgID:     "org-abc",
+			},
+			wantErr:     true,
+			errContains: "failed to decode JWT payload",
+		},
+		{
+			name: "invalid payload json",
+			args: args{
+				authToken: base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`)) + "." +
+					base64.RawURLEncoding.EncodeToString([]byte("{not-json")) + ".",
+				orgID: "org-abc",
+			},
+			wantErr:     true,
+			errContains: "failed to unmarshal JWT payload",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := AssertAuthTokenIsSameOrg(tt.args.authToken, tt.args.orgID)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.errContains) {
+					t.Errorf("expected error to contain %q, got %q", tt.errContains, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("expected no error, got %v", err)
+				}
+			}
+		})
 	}
 }

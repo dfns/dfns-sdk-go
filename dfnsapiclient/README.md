@@ -46,8 +46,8 @@ DfnsAPIConfig defines the configuration options to connect the DFNS API.
 
 ```go
 type DfnsAPIConfig struct {
-    // The application ID for authentication
-    AppID string
+    // The Dfns Organisation ID
+    OrgID string
     // The authentication token
     AuthToken *string
     // The base URL of the DFNS API

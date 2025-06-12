@@ -21,6 +21,9 @@ import (
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
+const testOrgID = "org-id"
+const testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0.xxx" //nolint:gosec // This is a test
+
 func TestPerformSimpleRequest(t *testing.T) {
 	t.Parallel()
 
@@ -36,10 +39,10 @@ func TestPerformSimpleRequest_With_POST(t *testing.T) {
 func performSimpleRequest(t *testing.T, method, userActionHeader string) {
 	t.Helper()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -78,13 +81,51 @@ func performSimpleRequest(t *testing.T, method, userActionHeader string) {
 	}
 }
 
+func TestPerformRequest_WrongAuthToken(t *testing.T) {
+	t.Parallel()
+
+	authToken := "bad-token" //nolint:gosec // This is a test
+
+	config := &AuthTransportConfig{
+		OrgID:     testOrgID,
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkBasicHeaders(t, r, config)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status": "success"}`))
+	})
+
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	httpClient := createHTTPClient(config)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, server.URL+"/some-path", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = httpClient.Do(req)
+	
+
+	if err == nil {
+		t.Fatal("Expected an http error but got nil")
+	}
+}
+
 func TestPerformRequest_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -116,10 +157,10 @@ func TestPerformRequest_Error(t *testing.T) {
 func TestPerformRequest_Response_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -236,10 +277,10 @@ func TestPerformRequest_Response_Error(t *testing.T) {
 func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -271,7 +312,7 @@ func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 func TestPerformUserActionRequest(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 	userAction := "userAction"
@@ -286,7 +327,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		Signer:    signer,
 	}
@@ -393,10 +434,10 @@ func TestPerformUserActionRequest(t *testing.T) {
 func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		Signer:    &ErrorSigner{},
 	}
@@ -423,7 +464,7 @@ func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
 func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -441,7 +482,7 @@ func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) 
 	defer ts.Close()
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		Signer:    signer,
 		BaseURL:   ts.URL,
@@ -469,12 +510,12 @@ func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) 
 func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		Signer:    &ErrorSigner{},
 	}
@@ -532,7 +573,7 @@ func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
 func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 
@@ -546,7 +587,7 @@ func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		Signer:    signer,
 	}
@@ -611,7 +652,7 @@ func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
 	t.Parallel()
 
-	authToken := "your-auth-token" //nolint:gosec // This is a test
+	authToken := testAuthToken //nolint:gosec // This is a test
 	challenge := "challenge"
 	challengeIdentifier := "challengeIdentifier"
 
@@ -625,7 +666,7 @@ func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
 	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
-		AppID:     "your-app-id",
+		OrgID:     testOrgID,
 		AuthToken: &authToken,
 		Signer:    signer,
 	}
@@ -694,14 +735,6 @@ func checkJSONRequest[T any](t *testing.T, r *http.Request, expected T) {
 
 func checkBasicHeaders(t *testing.T, req *http.Request, config *AuthTransportConfig) {
 	t.Helper()
-
-	if got, want := req.Header.Get("x-dfns-appid"), config.AppID; got != want {
-		t.Errorf("appid header = %q; want %q", got, want)
-	}
-
-	if got := req.Header.Get("x-dfns-nonce"); got == "" {
-		t.Error("nonce header is empty")
-	}
 
 	if got, want := req.Header.Get("authorization"), "Bearer "+*config.AuthToken; got != want {
 		t.Errorf("authorization header = %q; want %q", got, want)

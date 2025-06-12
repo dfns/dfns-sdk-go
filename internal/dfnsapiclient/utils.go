@@ -3,6 +3,8 @@ package dfnsapiclient
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,21 +20,39 @@ var getCurrentTime = func() time.Time {
 	return time.Now().UTC()
 }
 
-// generateNonce generates a random nonce string.
-func generateNonce() string {
-	uuidStr := generateUUID()
-	dateStr := getCurrentTime().Format(time.RFC3339)
-	data := map[string]interface{}{
-		"uuid": uuidStr,
-		"date": dateStr,
+const JwtCustomDataClaim = "https://custom/app_metadata"
+
+// Checks if the "orgId" claim in the auth token matches the provided orgId.
+// Returns nil if it matches, otherwise returns an error.
+func AssertAuthTokenIsSameOrg(authToken string, orgID string) error {
+	parts := strings.Split(authToken, ".")
+	if len(parts) != 3 {
+		return fmt.Errorf("invalid JWT format")
 	}
 
-	jsonData, err := json.Marshal(data)
+	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
-		return ""
+		return fmt.Errorf("failed to decode JWT payload: %w", err)
 	}
 
-	encodedData := base64.URLEncoding.EncodeToString(jsonData)
+	var claims map[string]interface{}
+	if err := json.Unmarshal(payload, &claims); err != nil {
+		return fmt.Errorf("failed to unmarshal JWT payload: %w", err)
+	}
 
-	return encodedData
+	customData, ok := claims[JwtCustomDataClaim].(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("orgId claim not found in jwt token")
+	}
+
+	jwtOrgID, ok := customData["orgId"].(string)
+	if !ok {
+		return fmt.Errorf("orgId claim not found in jwt token")
+	}
+
+	if jwtOrgID != orgID {
+		return fmt.Errorf("Provided auth token is not scoped to org ID: expected %s, got %s", orgID, jwtOrgID)
+	}
+
+	return nil
 }

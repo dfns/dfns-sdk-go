@@ -18,7 +18,7 @@ type KeySignerConfig struct {
 }
 
 type DfnsAPIConfig struct {
-	AppID     string  `mapstructure:"appId"`
+	OrgID     string  `mapstructure:"orgId"`
 	AuthToken *string `mapstructure:"authToken"`
 	BaseURL   string  `mapstructure:"baseUrl"`
 }
@@ -69,7 +69,7 @@ func setDefaultConfig() {
 	viper.SetDefault("keySigner.algorithm", nil)
 
 	// Default values for DfnsApiConfig
-	viper.SetDefault("api.appId", "")
+	viper.SetDefault("api.orgId", "")
 	viper.SetDefault("api.authToken", nil)
 	viper.SetDefault("api.baseUrl", "")
 }
@@ -95,7 +95,7 @@ func (c *DfnsConfig) GetKeySignerConfig() (*credentials.AsymmetricKeySignerConfi
 
 func (c *DfnsConfig) GetDfnsAPIConfig() *dfns_api_client.DfnsAPIConfig {
 	return &dfns_api_client.DfnsAPIConfig{
-		AppID:     c.DfnsBaseAPIConfig.AppID,
+		OrgID:     c.DfnsBaseAPIConfig.OrgID,
 		AuthToken: c.DfnsBaseAPIConfig.AuthToken,
 		BaseURL:   c.DfnsBaseAPIConfig.BaseURL,
 	}

@@ -21,27 +21,27 @@ func TestNewDfnsAPIOptions(t *testing.T) {
 		{
 			name: "ValidConfig",
 			config: &DfnsAPIConfig{
-				AppID:   "testAppID",
+				OrgID:   "testOrgID",
 				BaseURL: "https://example.com/api",
 			},
 			expectedResult: &DfnsAPIOptions{
 				DfnsAPIConfig: &DfnsAPIConfig{
-					AppID:   "testAppID",
+					OrgID:   "testOrgID",
 					BaseURL: "https://example.com/api",
 				},
 			},
 			expectedError: nil,
 		},
 		{
-			name:           "EmptyAppID",
+			name:           "EmptyOrgID",
 			config:         &DfnsAPIConfig{},
 			expectedResult: nil,
-			expectedError:  errAppIDEmpty,
+			expectedError:  errOrgIDEmpty,
 		},
 		{
 			name: "EmptyBaseURL",
 			config: &DfnsAPIConfig{
-				AppID: "testAppID",
+				OrgID: "testOrgID",
 			},
 			expectedResult: nil,
 			expectedError:  errBaseURLEmpty,
@@ -78,7 +78,7 @@ func TestCreateDfnsAPIClient(t *testing.T) {
 	t.Parallel()
 
 	options, err := NewDfnsAPIOptions(&DfnsAPIConfig{
-		AppID:     "your_app_id",
+		OrgID:     "your_org_id",
 		AuthToken: func(s string) *string { return &s }("authToken"),
 		BaseURL:   "https://yourapi.example.com",
 	}, nil)

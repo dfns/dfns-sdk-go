@@ -15,14 +15,12 @@ import (
 
 const (
 	UserActionHeader    = "x-dfns-useraction"
-	appIDHeader         = "x-dfns-appid"
-	nonceHeader         = "x-dfns-nonce"
 	authorizationHeader = "authorization"
 	contentTypeHeader   = "Content-Type"
 )
 
 type AuthTransportConfig struct {
-	AppID     string
+	OrgID     string
 	AuthToken *string
 	BaseURL   string
 	Signer    credentials.ICredentialSigner
@@ -37,7 +35,10 @@ func NewAuthTransport(config *AuthTransportConfig) *AuthTransport {
 }
 
 func (auth *AuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	auth.setHeaders(req)
+	err := auth.setHeaders(req)
+	if err != nil {
+		return nil, err
+	}
 
 	performUserAction, err := shouldPerformUserAction(req)
 	if err != nil {
@@ -75,28 +76,38 @@ func shouldPerformUserAction(req *http.Request) (bool, error) {
 
 // PerformSimpleRequest performs a simple HTTP request.
 func (auth *AuthTransport) performSimpleRequest(req *http.Request) (*http.Response, error) {
-	auth.setHeaders(req)
+	err := auth.setHeaders(req)
+	if err != nil {
+		return nil, err
+	}
 
 	return executeRequest(req)
 }
 
 // PerformUserActionRequest performs a user action HTTP request.
 func (auth *AuthTransport) performUserActionRequest(req *http.Request) error {
-	auth.setHeaders(req)
+	err := auth.setHeaders(req)
+	if err != nil {
+		return err
+	}
 
 	return auth.executeUserActionRequest(req)
 }
 
 // setHeaders sets the request headers.
-func (auth *AuthTransport) setHeaders(req *http.Request) {
-	req.Header.Set(appIDHeader, auth.AppID)
-	req.Header.Set(nonceHeader, generateNonce())
-
+func (auth *AuthTransport) setHeaders(req *http.Request) error {
 	if auth.AuthToken != nil {
+		err := AssertAuthTokenIsSameOrg(*auth.AuthToken, auth.OrgID)
+		if err != nil {
+			return err
+		}
+
 		req.Header.Set(authorizationHeader, "Bearer "+*auth.AuthToken)
 	}
 
 	req.Header.Set(contentTypeHeader, "application/json")
+
+	return nil
 }
 
 func executeRequest(req *http.Request) (*http.Response, error) {
