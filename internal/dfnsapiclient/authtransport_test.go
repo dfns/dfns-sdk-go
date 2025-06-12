@@ -23,7 +23,7 @@ import (
 
 const (
 	testOrgID     = "org-id"
-	testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0.xxx" //nolint:gosec // test
+	testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0K.xxx" //nolint:gosec // test
 )
 
 func TestPerformSimpleRequest(t *testing.T) {
@@ -710,6 +710,62 @@ func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
 	_, err = httpClient.Do(req)
 	if !strings.Contains(err.Error(), "couldn't unmarshaling user action response: unexpected end of JSON input") {
 		t.Fatalf("Expected marshall error but got %s", err)
+	}
+}
+
+func TestPerformSimpleRequest_SetHeaders_Error(t *testing.T) {
+	t.Parallel()
+
+	// Use a JWT token with different orgID to trigger setHeaders error
+	authToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJkaWZmZXJlbnQtb3JnLWlkIn19Cg.xxx" //nolint:gosec // test token with different orgId
+	config := &AuthTransportConfig{
+		OrgID:     testOrgID, // This will cause setHeaders to fail due to orgID mismatch
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://example.com/test", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = authTransport.performSimpleRequest(req)
+	if err == nil {
+		t.Fatal("expected error from setHeaders, got nil")
+	}
+
+	if !strings.Contains(err.Error(), "provided auth token is not scoped to org ID") {
+		t.Errorf("expected error about org ID mismatch, got: %v", err)
+	}
+}
+
+func TestPerformUserActionRequest_SetHeaders_Error(t *testing.T) {
+	t.Parallel()
+
+	// Use a JWT token with different orgID to trigger setHeaders error
+	authToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJkaWZmZXJlbnQtb3JnLWlkIn19Cg.xxx" //nolint:gosec // test token with different orgId
+	config := &AuthTransportConfig{
+		OrgID:     testOrgID, // This will cause setHeaders to fail due to orgID mismatch
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "https://example.com/test", strings.NewReader("{}"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = authTransport.performUserActionRequest(req)
+	if err == nil {
+		t.Fatal("expected error from setHeaders, got nil")
+	}
+
+	if !strings.Contains(err.Error(), "provided auth token is not scoped to org ID") {
+		t.Errorf("expected error about org ID mismatch, got: %v", err)
 	}
 }
 
