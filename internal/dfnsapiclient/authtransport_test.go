@@ -21,8 +21,10 @@ import (
 	"github.com/dfns/dfns-sdk-go/internal/credentials"
 )
 
-const testOrgID = "org-id"
-const testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0.xxx" //nolint:gosec // This is a test
+const (
+	testOrgID     = "org-id"
+	testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0.xxx" //nolint:gosec // This is a test
+)
 
 func TestPerformSimpleRequest(t *testing.T) {
 	t.Parallel()
@@ -112,7 +114,6 @@ func TestPerformRequest_WrongAuthToken(t *testing.T) {
 	}
 
 	_, err = httpClient.Do(req)
-	
 
 	if err == nil {
 		t.Fatal("Expected an http error but got nil")

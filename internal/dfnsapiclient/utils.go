@@ -24,7 +24,7 @@ const JwtCustomDataClaim = "https://custom/app_metadata"
 
 // Checks if the "orgId" claim in the auth token matches the provided orgId.
 // Returns nil if it matches, otherwise returns an error.
-func AssertAuthTokenIsSameOrg(authToken string, orgID string) error {
+func AssertAuthTokenIsSameOrg(authToken, orgID string) error {
 	parts := strings.Split(authToken, ".")
 	if len(parts) != 3 {
 		return fmt.Errorf("invalid JWT format")
