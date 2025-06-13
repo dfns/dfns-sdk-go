@@ -26,6 +26,11 @@ const (
 	testAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJvcmctaWQifX0K.xxx" //nolint:gosec // test
 )
 
+func getTestOrgIDPtr() *string {
+	orgID := testOrgID
+	return &orgID
+}
+
 func TestPerformSimpleRequest(t *testing.T) {
 	t.Parallel()
 
@@ -44,7 +49,7 @@ func performSimpleRequest(t *testing.T, method, userActionHeader string) {
 	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -89,7 +94,7 @@ func TestPerformRequest_WrongAuthToken(t *testing.T) {
 	authToken := "bad-token"
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -126,7 +131,7 @@ func TestPerformRequest_Error(t *testing.T) {
 	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -160,7 +165,7 @@ func TestPerformRequest_Response_Error(t *testing.T) {
 	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -279,7 +284,7 @@ func TestPerformUserActionRequest_ParseAuthHeader_Error(t *testing.T) {
 	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -325,7 +330,7 @@ func TestPerformUserActionRequest(t *testing.T) {
 	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		Signer:    signer,
 	}
@@ -435,7 +440,7 @@ func TestPerformUserActionRequest_CreateChallenge_Error(t *testing.T) {
 	authToken := testAuthToken
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		Signer:    &ErrorSigner{},
 	}
@@ -479,7 +484,7 @@ func TestPerformUserActionRequest_CreateChallenge_UnmarshallError(t *testing.T) 
 	defer ts.Close()
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		Signer:    signer,
 		BaseURL:   ts.URL,
@@ -511,7 +516,7 @@ func TestPerformUserActionRequest_Signer_Error(t *testing.T) {
 	challengeIdentifier := "challengeIdentifier"
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		Signer:    &ErrorSigner{},
 	}
@@ -582,7 +587,7 @@ func TestPerformUserActionRequest_SignChallenge_Error(t *testing.T) {
 	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		Signer:    signer,
 	}
@@ -660,7 +665,7 @@ func TestPerformUserActionRequest_SignChallenge_UnmarshallError(t *testing.T) {
 	signer := createMockSigner(string(rsaPrivateKeyPEM))
 
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID,
+		OrgID:     getTestOrgIDPtr(),
 		AuthToken: &authToken,
 		Signer:    signer,
 	}
@@ -719,7 +724,7 @@ func TestPerformSimpleRequest_SetHeaders_Error(t *testing.T) {
 	// Use a JWT token with different orgID to trigger setHeaders error
 	authToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJkaWZmZXJlbnQtb3JnLWlkIn19Cg.xxx" //nolint:gosec // test token with different orgId
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID, // This will cause setHeaders to fail due to orgID mismatch
+		OrgID:     getTestOrgIDPtr(), // This will cause setHeaders to fail due to orgID mismatch
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -747,7 +752,7 @@ func TestPerformUserActionRequest_SetHeaders_Error(t *testing.T) {
 	// Use a JWT token with different orgID to trigger setHeaders error
 	authToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2N1c3RvbS9hcHBfbWV0YWRhdGEiOnsib3JnSWQiOiJkaWZmZXJlbnQtb3JnLWlkIn19Cg.xxx" //nolint:gosec // test token with different orgId
 	config := &AuthTransportConfig{
-		OrgID:     testOrgID, // This will cause setHeaders to fail due to orgID mismatch
+		OrgID:     getTestOrgIDPtr(), // This will cause setHeaders to fail due to orgID mismatch
 		AuthToken: &authToken,
 		BaseURL:   "https://your.api.endpoint",
 	}
@@ -766,6 +771,81 @@ func TestPerformUserActionRequest_SetHeaders_Error(t *testing.T) {
 
 	if !strings.Contains(err.Error(), "provided auth token is not scoped to org ID") {
 		t.Errorf("expected error about org ID mismatch, got: %v", err)
+	}
+}
+
+func TestPerformSimpleRequest_NoOrgID(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+
+	config := &AuthTransportConfig{
+		OrgID:     nil,
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		checkBasicHeaders(t, r, config)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status": "success"}`))
+	})
+
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	authTransport := NewAuthTransport(config)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL+"/test", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resp, err := authTransport.performSimpleRequest(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+}
+
+func TestPerformUserActionRequest_NoOrgID(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+
+	config := &AuthTransportConfig{
+		OrgID:     nil,
+		AuthToken: &authToken,
+		BaseURL:   "https://your.api.endpoint",
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "https://example.com/test", strings.NewReader("{}"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// This should not fail due to missing OrgID validation
+	err = authTransport.setHeaders(req)
+	if err != nil {
+		t.Fatalf("expected no error when OrgID is nil, got: %v", err)
+	}
+
+	// Verify the authorization header is set correctly
+	expectedAuth := "Bearer " + authToken
+	if got := req.Header.Get("authorization"); got != expectedAuth {
+		t.Errorf("authorization header = %q; want %q", got, expectedAuth)
+	}
+
+	// Verify the content type header is set
+	expectedContentType := "application/json"
+	if got := req.Header.Get("Content-Type"); got != expectedContentType {
+		t.Errorf("Content-Type header = %q; want %q", got, expectedContentType)
 	}
 }
 

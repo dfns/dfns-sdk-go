@@ -20,7 +20,7 @@ const (
 )
 
 type AuthTransportConfig struct {
-	OrgID     string
+	OrgID     *string
 	AuthToken *string
 	BaseURL   string
 	Signer    credentials.ICredentialSigner
@@ -97,9 +97,12 @@ func (auth *AuthTransport) performUserActionRequest(req *http.Request) error {
 // setHeaders sets the request headers.
 func (auth *AuthTransport) setHeaders(req *http.Request) error {
 	if auth.AuthToken != nil {
-		err := AssertAuthTokenIsSameOrg(*auth.AuthToken, auth.OrgID)
-		if err != nil {
-			return err
+		// Only validate organization if OrgID is provided
+		if auth.OrgID != nil {
+			err := AssertAuthTokenIsSameOrg(*auth.AuthToken, *auth.OrgID)
+			if err != nil {
+				return err
+			}
 		}
 
 		req.Header.Set(authorizationHeader, "Bearer "+*auth.AuthToken)

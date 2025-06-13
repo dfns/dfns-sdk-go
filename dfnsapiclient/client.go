@@ -8,16 +8,13 @@ import (
 	dfnsapi "github.com/dfns/dfns-sdk-go/internal/dfnsapiclient"
 )
 
-var (
-	errBaseURLEmpty = errors.New("BaseUrl cannot be empty")
-	errOrgIDEmpty   = errors.New("OrgID cannot be empty")
-)
+var errBaseURLEmpty = errors.New("BaseUrl cannot be empty")
 
 // DfnsAPIConfig defines the configuration options to connect
 // the DFNS API.
 type DfnsAPIConfig struct {
-	// The Dfns organisation ID
-	OrgID string
+	// The Dfns organisation ID (optional)
+	OrgID *string
 	// The authentication token
 	AuthToken *string
 	// The base URL of the DFNS API
@@ -35,10 +32,6 @@ type DfnsAPIOptions struct {
 
 // NewDfnsAPIOptions creates a new DfnsApiOptions instance with the provided parameters.
 func NewDfnsAPIOptions(config *DfnsAPIConfig, signer credentials.ICredentialSigner) (*DfnsAPIOptions, error) {
-	if config.OrgID == "" {
-		return nil, errOrgIDEmpty
-	}
-
 	if config.BaseURL == "" {
 		return nil, errBaseURLEmpty
 	}

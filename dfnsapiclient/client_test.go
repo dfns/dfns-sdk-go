@@ -8,6 +8,10 @@ import (
 	"github.com/dfns/dfns-sdk-go/internal/dfnsapiclient"
 )
 
+func stringPtr(s string) *string {
+	return &s
+}
+
 // TestNewDfnsAPIOptions tests the NewDfnsAPIOptions function.
 func TestNewDfnsAPIOptions(t *testing.T) {
 	t.Parallel()
@@ -21,28 +25,20 @@ func TestNewDfnsAPIOptions(t *testing.T) {
 		{
 			name: "ValidConfig",
 			config: &DfnsAPIConfig{
-				OrgID:   "testOrgID",
+				OrgID:   stringPtr("testOrgID"),
 				BaseURL: "https://example.com/api",
 			},
 			expectedResult: &DfnsAPIOptions{
 				DfnsAPIConfig: &DfnsAPIConfig{
-					OrgID:   "testOrgID",
+					OrgID:   stringPtr("testOrgID"),
 					BaseURL: "https://example.com/api",
 				},
 			},
 			expectedError: nil,
 		},
 		{
-			name:           "EmptyOrgID",
+			name:           "EmptyBaseURL",
 			config:         &DfnsAPIConfig{},
-			expectedResult: nil,
-			expectedError:  errOrgIDEmpty,
-		},
-		{
-			name: "EmptyBaseURL",
-			config: &DfnsAPIConfig{
-				OrgID: "testOrgID",
-			},
 			expectedResult: nil,
 			expectedError:  errBaseURLEmpty,
 		},
@@ -78,7 +74,7 @@ func TestCreateDfnsAPIClient(t *testing.T) {
 	t.Parallel()
 
 	options, err := NewDfnsAPIOptions(&DfnsAPIConfig{
-		OrgID:     "your_org_id",
+		OrgID:     stringPtr("your_org_id"),
 		AuthToken: func(s string) *string { return &s }("authToken"),
 		BaseURL:   "https://yourapi.example.com",
 	}, nil)
