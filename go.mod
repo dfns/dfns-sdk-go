@@ -1,6 +1,6 @@
 module github.com/dfns/dfns-sdk-go
 
-go 1.23.6
+go 1.23.10
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.2

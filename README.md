@@ -91,7 +91,7 @@ signer := ... // a Credential Signer (webauthN or key signer from section above)
 
 // Create a DfnsApiClient instance
 apiOptions, err := api.NewDfnsBaseApiOptions(&api.DfnsBaseApiConfig{
-	AppId:     os.Getenv("DFNS_APP_ID"),     // ID of the Application registered with DFNS
+	OrgId:     os.Getenv("DFNS_ORG_ID"),     // ID of the Dfns Organisation
 	AuthToken: os.Getenv("DFNS_AUTH_TOKEN"), // an auth token
 	BaseUrl:   os.Getenv("DFNS_API_URL"),    // base Url of DFNS API
 }, signer)

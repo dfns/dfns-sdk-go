@@ -10,7 +10,7 @@ Copy the `config.yaml.example`  and set the following values:
 
 ``` yaml
 api:
-  appId: "the `App ID` from above"
+  orgId: "your Dfns Organisation ID"
   authToken: "the `authToken` from above, the value should start with `eyJ0...`"
   baseUrl: "https://api.dfns.wtf"
 

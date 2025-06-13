@@ -150,6 +150,7 @@ issues:
     - path: (.+)_test\.go
       linters:
         - funlen
+        - bodyclose
         - goconst
         - interfacer
         - dupl
@@ -170,3 +171,4 @@ issues:
       source: "^//go:generate "
   exclude-dirs:
     - cmd
+    - pkg/mod
