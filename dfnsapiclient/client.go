@@ -19,6 +19,10 @@ type DfnsAPIConfig struct {
 	AuthToken *string
 	// The base URL of the DFNS API
 	BaseURL string
+	// The base Auth URL of the DFNS API (optional)
+	BaseAuthURL *string
+	// The kind of server to perform user actions against (optional, default is "Api")
+	UserActionServerKind *string
 }
 
 // DfnsAPIOptions contains all the information needed for
@@ -68,10 +72,12 @@ func CreateDfnsAPIClient(options *DfnsAPIOptions) *http.Client {
 	return &http.Client{
 		Transport: dfnsapi.NewAuthTransport(
 			&dfnsapi.AuthTransportConfig{
-				OrgID:     options.OrgID,
-				AuthToken: options.AuthToken,
-				BaseURL:   options.BaseURL,
-				Signer:    options.Signer,
+				OrgID:                options.OrgID,
+				AuthToken:            options.AuthToken,
+				BaseURL:              options.BaseURL,
+				BaseAuthURL:          options.BaseAuthURL,
+				UserActionServerKind: options.UserActionServerKind,
+				Signer:               options.Signer,
 			},
 		),
 	}

@@ -20,10 +20,12 @@ const (
 )
 
 type AuthTransportConfig struct {
-	OrgID     *string
-	AuthToken *string
-	BaseURL   string
-	Signer    credentials.ICredentialSigner
+	OrgID       *string
+	AuthToken   *string
+	BaseURL     string
+	BaseAuthURL *string
+	UserActionServerKind *string
+	Signer      credentials.ICredentialSigner
 }
 
 type AuthTransport struct {
@@ -31,6 +33,10 @@ type AuthTransport struct {
 }
 
 func NewAuthTransport(config *AuthTransportConfig) *AuthTransport {
+	if config.UserActionServerKind == nil {
+		defaultKind := "Api"
+		config.UserActionServerKind = &defaultKind
+	}
 	return &AuthTransport{config}
 }
 
@@ -230,7 +236,7 @@ func (auth *AuthTransport) createUserActionChallenge(
 		UserActionPayload:    body,
 		UserActionHTTPMethod: method,
 		UserActionHTTPPath:   path,
-		UserActionServerKind: "Api",
+		UserActionServerKind: *auth.UserActionServerKind,
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -238,8 +244,12 @@ func (auth *AuthTransport) createUserActionChallenge(
 		return nil, fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
+	if auth.BaseAuthURL == nil {
+		auth.BaseAuthURL = &auth.BaseURL
+	}
+	
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
-		auth.BaseURL+"/auth/action/init", bytes.NewBuffer(jsonData))
+		*auth.BaseAuthURL+"/auth/action/init", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("Error creating request: %w", err)
 	}
@@ -297,8 +307,12 @@ func (auth *AuthTransport) signUserActionChallenge(
 		return "", fmt.Errorf("Error marshaling JSON: %w", err)
 	}
 
+	if auth.BaseAuthURL == nil {
+		auth.BaseAuthURL = &auth.BaseURL
+	}
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
-		auth.BaseURL+"/auth/action", bytes.NewBuffer(jsonData))
+		*auth.BaseAuthURL+"/auth/action", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("Error creating request: %w", err)
 	}
