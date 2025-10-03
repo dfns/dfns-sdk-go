@@ -20,12 +20,12 @@ const (
 )
 
 type AuthTransportConfig struct {
-	OrgID       *string
-	AuthToken   *string
-	BaseURL     string
-	BaseAuthURL *string
+	OrgID                *string
+	AuthToken            *string
+	BaseURL              string
+	BaseAuthURL          *string
 	UserActionServerKind *string
-	Signer      credentials.ICredentialSigner
+	Signer               credentials.ICredentialSigner
 }
 
 type AuthTransport struct {
@@ -37,6 +37,7 @@ func NewAuthTransport(config *AuthTransportConfig) *AuthTransport {
 		defaultKind := "Api"
 		config.UserActionServerKind = &defaultKind
 	}
+
 	return &AuthTransport{config}
 }
 
@@ -247,7 +248,7 @@ func (auth *AuthTransport) createUserActionChallenge(
 	if auth.BaseAuthURL == nil {
 		auth.BaseAuthURL = &auth.BaseURL
 	}
-	
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
 		*auth.BaseAuthURL+"/auth/action/init", bytes.NewBuffer(jsonData))
 	if err != nil {

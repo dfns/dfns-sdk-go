@@ -1,56 +1,6 @@
-linters-settings:
-  gci:
-    sections:
-      - standard
-      - default
-      - prefix(github.com/dfns/dfns-sdk-go)
-  gofumpt:
-    extra-rules: true
-    module-path: github.com/dfns/dfns-sdk-go
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-  revive:
-    confidence: 0
-  prealloc:
-    simple: false
-    range-loops: true
-    for-loops: true
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - whyNoLint
-      - unnamedResult
-  errorlint:
-    errorf: true
-  nolintlint:
-    require-explanation: true
-    require-specific: true
-  tagalign:
-    align: false
-  depguard:
-    rules:
-      main:
-        allow:
-          - $gostd
-          - github.com/dfns/dfns-sdk-go
-          - github.com/google/uuid
-          - github.com/aws/aws-sdk-go-v2/service/kms
-          - github.com/aws/aws-sdk-go-v2/config
-          - github.com/aws/aws-sdk-go-v2/aws
-run:
-  timeout: 15m
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - asasalint
     - asciicheck
@@ -73,7 +23,6 @@ linters:
     - exhaustive
     - forbidigo
     - forcetypeassert
-    - gci
     - ginkgolinter
     - gocheckcompilerdirectives
     - gochecknoglobals
@@ -84,15 +33,11 @@ linters:
     - gocritic
     - gocyclo
     - godox
-    - gofmt
-    - gofumpt
     - goheader
-    - goimports
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - gosmopolitan
     - govet
     - grouper
@@ -129,7 +74,6 @@ linters:
     - spancheck
     - sqlclosecheck
     - staticcheck
-    - stylecheck
     - tagalign
     - testableexamples
     - testifylint
@@ -143,32 +87,109 @@ linters:
     - wastedassign
     - whitespace
     - wrapcheck
-    - wsl
+    - wsl_v5
     - zerologlint
-issues:
-  exclude-rules:
-    - path: (.+)_test\.go
-      linters:
-        - funlen
-        - bodyclose
-        - goconst
-        - interfacer
-        - dupl
-        - lll
-        - goerr113
-        - varnamelen
-        - errcheck
-        - gocritic
-        - cyclop
-        - wrapcheck
-        - gocognit
-        - contextcheck
-        - nlreturn
-        - gochecknoglobals
-        - errorlint
-    - linters:
-        - lll
-      source: "^//go:generate "
-  exclude-dirs:
-    - cmd
-    - pkg/mod
+  settings:
+    depguard:
+      rules:
+        main:
+          allow:
+            - $gostd
+            - github.com/dfns/dfns-sdk-go
+            - github.com/google/uuid
+            - github.com/aws/aws-sdk-go-v2/service/kms
+            - github.com/aws/aws-sdk-go-v2/config
+            - github.com/aws/aws-sdk-go-v2/aws
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    errorlint:
+      errorf: true
+    gocritic:
+      disabled-checks:
+        - whyNoLint
+        - unnamedResult
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    prealloc:
+      simple: false
+      range-loops: true
+      for-loops: true
+    revive:
+      confidence: 0
+    tagalign:
+      align: false
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2 
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - bodyclose
+          - contextcheck
+          - cyclop
+          - dupl
+          - err113
+          - errcheck
+          - errorlint
+          - funlen
+          - gochecknoglobals
+          - gocognit
+          - goconst
+          - gocritic
+          - interfacer
+          - lll
+          - nlreturn
+          - varnamelen
+          - wrapcheck
+        path: (.+)_test\.go
+      - linters:
+          - lll
+        source: '^//go:generate '
+    paths:
+      - cmd
+      - pkg/mod
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/dfns/dfns-sdk-go)
+    gofumpt:
+      module-path: github.com/dfns/dfns-sdk-go
+      extra-rules: true
+  exclusions:
+    generated: lax
+    paths:
+      - cmd
+      - pkg/mod
+      - third_party$
+      - builtin$
+      - examples$

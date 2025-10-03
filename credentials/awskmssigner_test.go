@@ -175,7 +175,6 @@ func TestNewAWSKMSSigner_InvalidSigningAlgorithm(t *testing.T) {
 	}
 
 	_, err := NewAWSKMSSigner(ctx, config)
-
 	if err == nil {
 		t.Fatal("Expected error, got nil")
 	}
