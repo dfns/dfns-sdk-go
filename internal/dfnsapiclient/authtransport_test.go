@@ -161,14 +161,6 @@ func TestPerformRequest_Error(t *testing.T) {
 func TestPerformRequest_Response_Error(t *testing.T) {
 	t.Parallel()
 
-	authToken := testAuthToken
-
-	config := &AuthTransportConfig{
-		OrgID:     getTestOrgIDPtr(),
-		AuthToken: &authToken,
-		BaseURL:   "https://your.api.endpoint",
-	}
-
 	testCases := []struct {
 		name               string
 		statusCode         int
@@ -215,6 +207,13 @@ func TestPerformRequest_Response_Error(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+
+			authToken := testAuthToken
+			config := &AuthTransportConfig{
+				OrgID:     getTestOrgIDPtr(),
+				AuthToken: &authToken,
+				BaseURL:   "https://your.api.endpoint",
+			}
 
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				checkBasicHeaders(t, r, config)
