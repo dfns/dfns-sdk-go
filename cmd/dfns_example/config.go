@@ -18,7 +18,7 @@ type KeySignerConfig struct {
 }
 
 type DfnsAPIConfig struct {
-	OrgID     string  `mapstructure:"orgId"`
+	OrgID     *string `mapstructure:"orgId"`
 	AuthToken *string `mapstructure:"authToken"`
 	BaseURL   string  `mapstructure:"baseUrl"`
 }

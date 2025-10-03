@@ -119,7 +119,6 @@ func TestPerformRequest_WrongAuthToken(t *testing.T) {
 	}
 
 	_, err = httpClient.Do(req)
-
 	if err == nil {
 		t.Fatal("Expected an http error but got nil")
 	}
@@ -918,4 +917,263 @@ func (s *ErrorSigner) Sign(
 	_ *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
 	return nil, errSigner
+}
+
+func TestNewAuthTransport_DefaultUserActionServerKind(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+
+	config := &AuthTransportConfig{
+		OrgID:                getTestOrgIDPtr(),
+		AuthToken:            &authToken,
+		BaseURL:              "https://api.dfns.co",
+		UserActionServerKind: nil, // explicitly set to nil
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	if authTransport.UserActionServerKind == nil {
+		t.Fatal("Expected UserActionServerKind to be set, got nil")
+	}
+
+	if *authTransport.UserActionServerKind != "Api" {
+		t.Errorf("Expected UserActionServerKind to be 'Api', got: %s", *authTransport.UserActionServerKind)
+	}
+}
+
+func TestNewAuthTransport_ExistingUserActionServerKind(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+	customKind := "CustomServer"
+
+	config := &AuthTransportConfig{
+		OrgID:                getTestOrgIDPtr(),
+		AuthToken:            &authToken,
+		BaseURL:              "https://api.dfns.co",
+		UserActionServerKind: &customKind,
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	if authTransport.UserActionServerKind == nil {
+		t.Fatal("Expected UserActionServerKind to be set, got nil")
+	}
+
+	if *authTransport.UserActionServerKind != customKind {
+		t.Errorf("Expected UserActionServerKind to be '%s', got: %s", customKind, *authTransport.UserActionServerKind)
+	}
+}
+
+func TestCreateUserActionChallenge_DefaultBaseAuthURL(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+	baseURL := "https://api.dfns.co"
+
+	config := &AuthTransportConfig{
+		OrgID:       getTestOrgIDPtr(),
+		AuthToken:   &authToken,
+		BaseURL:     baseURL,
+		BaseAuthURL: nil, // explicitly set to nil to test default behavior
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	// Mock server to handle the auth action init request
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Verify the request was made to the correct URL (using BaseURL as default)
+		expectedPath := "/auth/action/init"
+		if r.URL.Path != expectedPath {
+			t.Errorf("Expected request to %s, got %s", expectedPath, r.URL.Path)
+		}
+
+		response := createUserActionChallengeResponse{
+			Challenge:           "test-challenge",
+			ChallengeIdentifier: "test-identifier",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}))
+	defer server.Close()
+
+	// Override the BaseURL to use our test server
+	authTransport.BaseURL = server.URL
+
+	ctx := context.Background()
+
+	_, err := authTransport.createUserActionChallenge(ctx, `{"test": "data"}`, "POST", "/test-path")
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	// Verify BaseAuthURL was set to BaseURL
+	if authTransport.BaseAuthURL == nil {
+		t.Fatal("Expected BaseAuthURL to be set, got nil")
+	}
+
+	if *authTransport.BaseAuthURL != server.URL {
+		t.Errorf("Expected BaseAuthURL to be '%s', got: %s", server.URL, *authTransport.BaseAuthURL)
+	}
+}
+
+func TestCreateUserActionChallenge_ExistingBaseAuthURL(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+	baseURL := "https://api.dfns.co"
+	customAuthURL := "https://auth.dfns.co"
+
+	config := &AuthTransportConfig{
+		OrgID:       getTestOrgIDPtr(),
+		AuthToken:   &authToken,
+		BaseURL:     baseURL,
+		BaseAuthURL: &customAuthURL, // explicitly set to test it's not overridden
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	// Mock server to handle the auth action init request
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		response := createUserActionChallengeResponse{
+			Challenge:           "test-challenge",
+			ChallengeIdentifier: "test-identifier",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}))
+	defer server.Close()
+
+	// Set BaseAuthURL to our test server for the actual request
+	testAuthURL := server.URL
+	authTransport.BaseAuthURL = &testAuthURL
+
+	ctx := context.Background()
+
+	_, err := authTransport.createUserActionChallenge(ctx, `{"test": "data"}`, "POST", "/test-path")
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	// Verify BaseAuthURL was not changed (should remain the test server URL)
+	if authTransport.BaseAuthURL == nil {
+		t.Fatal("Expected BaseAuthURL to be set, got nil")
+	}
+
+	if *authTransport.BaseAuthURL != testAuthURL {
+		t.Errorf("Expected BaseAuthURL to remain '%s', got: %s", testAuthURL, *authTransport.BaseAuthURL)
+	}
+}
+
+func TestSignUserActionChallenge_DefaultBaseAuthURL(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+	baseURL := "https://api.dfns.co"
+
+	config := &AuthTransportConfig{
+		OrgID:       getTestOrgIDPtr(),
+		AuthToken:   &authToken,
+		BaseURL:     baseURL,
+		BaseAuthURL: nil, // explicitly set to nil to test default behavior
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		expectedPath := "/auth/action"
+		if r.URL.Path != expectedPath {
+			t.Errorf("Expected request to %s, got %s", expectedPath, r.URL.Path)
+		}
+
+		response := signUserActionResponse{
+			UserAction: "test-user-action",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}))
+	defer server.Close()
+
+	// Override the BaseURL to use our test server
+	authTransport.BaseURL = server.URL
+
+	ctx := context.Background()
+	mockAssertion := &credentials.KeyAssertion{
+		CredentialAssertion: credentials.CredentialAssertion{
+			CredID:     "test-cred-id",
+			ClientData: "test-client-data",
+			Signature:  "test-signature",
+		},
+	}
+
+	_, err := authTransport.signUserActionChallenge(ctx, "test-challenge-id", mockAssertion)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	// Verify BaseAuthURL was set to BaseURL
+	if authTransport.BaseAuthURL == nil {
+		t.Fatal("Expected BaseAuthURL to be set, got nil")
+	}
+
+	if *authTransport.BaseAuthURL != server.URL {
+		t.Errorf("Expected BaseAuthURL to be '%s', got: %s", server.URL, *authTransport.BaseAuthURL)
+	}
+}
+
+func TestSignUserActionChallenge_ExistingBaseAuthURL(t *testing.T) {
+	t.Parallel()
+
+	authToken := testAuthToken
+	baseURL := "https://api.dfns.co"
+	customAuthURL := "https://auth.dfns.co"
+
+	config := &AuthTransportConfig{
+		OrgID:       getTestOrgIDPtr(),
+		AuthToken:   &authToken,
+		BaseURL:     baseURL,
+		BaseAuthURL: &customAuthURL, // explicitly set to test it's not overridden
+	}
+
+	authTransport := NewAuthTransport(config)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		response := signUserActionResponse{
+			UserAction: "test-user-action",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}))
+	defer server.Close()
+
+	testAuthURL := server.URL
+	authTransport.BaseAuthURL = &testAuthURL
+
+	ctx := context.Background()
+	mockAssertion := &credentials.KeyAssertion{
+		CredentialAssertion: credentials.CredentialAssertion{
+			CredID:     "test-cred-id",
+			ClientData: "test-client-data",
+			Signature:  "test-signature",
+		},
+	}
+
+	_, err := authTransport.signUserActionChallenge(ctx, "test-challenge-id", mockAssertion)
+	if err != nil {
+		t.Fatalf("Expected no error, got: %v", err)
+	}
+
+	// Verify BaseAuthURL was not changed (should remain the test server URL)
+	if authTransport.BaseAuthURL == nil {
+		t.Fatal("Expected BaseAuthURL to be set, got nil")
+	}
+
+	if *authTransport.BaseAuthURL != testAuthURL {
+		t.Errorf("Expected BaseAuthURL to remain '%s', got: %s", testAuthURL, *authTransport.BaseAuthURL)
+	}
 }
