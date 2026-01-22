@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  TRIVY_VERSION: "v0.59.1"
+  TRIVY_VERSION: "v0.68.2"
 
 jobs:
   sec-scan:
