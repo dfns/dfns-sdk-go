@@ -52,7 +52,7 @@ func (signer *AsymmetricKeySigner) Sign(
 	_ context.Context,
 	userActionChallenge *credentials.UserActionChallenge,
 ) (*credentials.KeyAssertion, error) {
-	allowedIDs := []string{}
+	allowedIDs := make([]string, 0, len(userActionChallenge.AllowCredentials.Key))
 	hasCredID := false
 
 	for _, cred := range userActionChallenge.AllowCredentials.Key {
