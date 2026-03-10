@@ -1,5 +1,4 @@
 api:
-  orgId: "or-1<redacted>cqgi"
   authToken: "eyJ0eXAiOiJKV1QiLCJh<redacted>VLhhhhnxrugZUfGrmTDAg"
   baseUrl: "https://api.dfns.wtf"
 
@@ -11,4 +10,3 @@ keySigner:
     TPOQt+D2uTWr7Sn/PyTHS9A16g5jA7YlSg==
     -----END EC PRIVATE KEY-----
   credId: "Y2kt...<redacted>..."
-  algorithm: "SHA-256"

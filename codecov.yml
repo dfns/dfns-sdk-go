@@ -1,0 +1,27 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+    patch:
+      default:
+        target: auto
+
+ignore:
+  - "agreements/**"
+  - "allocations/**"
+  - "auth/**"
+  - "exchanges/**"
+  - "feesponsors/**"
+  - "keys/**"
+  - "networks/**"
+  - "permissions/**"
+  - "policies/**"
+  - "signers/**"
+  - "staking/**"
+  - "swaps/**"
+  - "wallets/**"
+  - "webhooks/**"
+  - "types/**"
+  - "client.go"
+  - "cmd/**"
