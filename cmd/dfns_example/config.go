@@ -1,24 +1,21 @@
 package main
 
 import (
-	"crypto"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/viper"
 
-	"github.com/dfns/dfns-sdk-go/credentials"
-	dfns_api_client "github.com/dfns/dfns-sdk-go/dfnsapiclient"
+	dfns "github.com/dfns/dfns-sdk-go"
+	"github.com/dfns/dfns-sdk-go/signer"
 )
 
 type KeySignerConfig struct {
-	PrivateKey string  `mapstructure:"privateKey"`
-	CredID     string  `mapstructure:"credId"`
-	Algorithm  *string `mapstructure:"algorithm"`
+	PrivateKey string `mapstructure:"privateKey"`
+	CredID     string `mapstructure:"credId"`
 }
 
 type DfnsAPIConfig struct {
-	OrgID     *string `mapstructure:"orgId"`
 	AuthToken *string `mapstructure:"authToken"`
 	BaseURL   string  `mapstructure:"baseUrl"`
 }
@@ -28,24 +25,11 @@ type DfnsConfig struct {
 	DfnsBaseAPIConfig         DfnsAPIConfig   `mapstructure:"api"`
 }
 
-func stringToHash(hash *string) (*crypto.Hash, error) {
-	for algo := crypto.MD4; algo <= crypto.BLAKE2b_512; algo++ {
-		h := crypto.Hash(algo)
-		if strings.EqualFold(h.String(), strings.ToUpper(*hash)) {
-			return &h, nil
-		}
-	}
-
-	return nil, fmt.Errorf("hashing algorithm %s is not recognized", *hash)
-}
-
 func LoadConfig() (*DfnsConfig, error) {
-	// Set defaults
 	setDefaultConfig()
 
 	viper.SetConfigFile("config.yaml")
 
-	// Enable environment variable overwriting
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("DFNS")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -63,40 +47,27 @@ func LoadConfig() (*DfnsConfig, error) {
 }
 
 func setDefaultConfig() {
-	// Default values for KeySignerConfig
 	viper.SetDefault("keySigner.privateKey", "")
 	viper.SetDefault("keySigner.credId", "")
-	viper.SetDefault("keySigner.algorithm", nil)
 
-	// Default values for DfnsApiConfig
-	viper.SetDefault("api.orgId", "")
 	viper.SetDefault("api.authToken", nil)
 	viper.SetDefault("api.baseUrl", "")
 }
 
-func (c *DfnsConfig) GetKeySignerConfig() (*credentials.AsymmetricKeySignerConfig, error) {
-	var hashingAlgo *crypto.Hash
-
-	if c.AsymmetricKeySignerConfig.Algorithm != nil {
-		var err error
-
-		hashingAlgo, err = stringToHash(c.AsymmetricKeySignerConfig.Algorithm)
-		if err != nil {
-			return nil, err
-		}
+func (c *DfnsConfig) NewDfnsClient() (*dfns.Client, error) {
+	s, err := signer.NewKeySigner(c.AsymmetricKeySignerConfig.CredID, c.AsymmetricKeySignerConfig.PrivateKey)
+	if err != nil {
+		return nil, fmt.Errorf("error creating key signer: %w", err)
 	}
 
-	return &credentials.AsymmetricKeySignerConfig{
-		PrivateKey: c.AsymmetricKeySignerConfig.PrivateKey,
-		CredID:     c.AsymmetricKeySignerConfig.CredID,
-		Algorithm:  hashingAlgo,
-	}, nil
-}
+	authToken := ""
+	if c.DfnsBaseAPIConfig.AuthToken != nil {
+		authToken = *c.DfnsBaseAPIConfig.AuthToken
+	}
 
-func (c *DfnsConfig) GetDfnsAPIConfig() *dfns_api_client.DfnsAPIConfig {
-	return &dfns_api_client.DfnsAPIConfig{
-		OrgID:     c.DfnsBaseAPIConfig.OrgID,
-		AuthToken: c.DfnsBaseAPIConfig.AuthToken,
+	return dfns.NewClient(dfns.Options{
 		BaseURL:   c.DfnsBaseAPIConfig.BaseURL,
-	}
+		AuthToken: authToken,
+		Signer:    s,
+	})
 }
