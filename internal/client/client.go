@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/dfns/dfns-sdk-go/signer"
+	"github.com/dfns/dfns-sdk-go/v2/signer"
 )
 
 // Options contains configuration for the Dfns client.

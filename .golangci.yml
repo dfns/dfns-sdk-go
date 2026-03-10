@@ -95,7 +95,7 @@ linters:
         main:
           allow:
             - $gostd
-            - github.com/dfns/dfns-sdk-go
+            - github.com/dfns/dfns-sdk-go/v2
             - github.com/google/uuid
             - github.com/aws/aws-sdk-go-v2/service/kms
             - github.com/aws/aws-sdk-go-v2/config
@@ -181,9 +181,9 @@ formatters:
       sections:
         - standard
         - default
-        - prefix(github.com/dfns/dfns-sdk-go)
+        - prefix(github.com/dfns/dfns-sdk-go/v2)
     gofumpt:
-      module-path: github.com/dfns/dfns-sdk-go
+      module-path: github.com/dfns/dfns-sdk-go/v2
       extra-rules: true
   exclusions:
     generated: lax

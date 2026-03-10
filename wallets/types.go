@@ -3,7 +3,7 @@
 package wallets
 
 import (
-	"github.com/dfns/dfns-sdk-go/types"
+	"github.com/dfns/dfns-sdk-go/v2/types"
 )
 
 // ActivateWalletRequest represents the request body for the activateWallet operation.

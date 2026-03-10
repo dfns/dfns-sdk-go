@@ -3,7 +3,7 @@ module github.com/dfns/dfns-sdk-go/cmd/dfns_example
 go 1.26.1
 
 require (
-	github.com/dfns/dfns-sdk-go v1.0.0
+	github.com/dfns/dfns-sdk-go/v2 v2.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.19.0
 )
@@ -29,4 +29,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/dfns/dfns-sdk-go => ../..
+replace github.com/dfns/dfns-sdk-go/v2 => ../..
