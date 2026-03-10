@@ -3,7 +3,7 @@
 package auth
 
 import (
-	"github.com/dfns/dfns-sdk-go/types"
+	"github.com/dfns/dfns-sdk-go/v2/types"
 )
 
 // Create User Action Signature

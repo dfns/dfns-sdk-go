@@ -5,7 +5,7 @@ Auto-generated Go SDK for the Dfns API.
 ## Installation
 
 ```bash
-go get github.com/dfns/dfns-sdk-go
+go get github.com/dfns/dfns-sdk-go/v2
 ```
 
 ## Quick Start
@@ -18,7 +18,7 @@ import (
     "fmt"
     "log"
 
-    dfns "github.com/dfns/dfns-sdk-go"
+    dfns "github.com/dfns/dfns-sdk-go/v2"
 )
 
 func main() {
@@ -54,9 +54,9 @@ import (
     "log"
     "os"
 
-    dfns "github.com/dfns/dfns-sdk-go"
-    "github.com/dfns/dfns-sdk-go/signer"
-    "github.com/dfns/dfns-sdk-go/wallets"
+    dfns "github.com/dfns/dfns-sdk-go/v2"
+    "github.com/dfns/dfns-sdk-go/v2/signer"
+    "github.com/dfns/dfns-sdk-go/v2/wallets"
 )
 
 func main() {
@@ -128,7 +128,7 @@ import (
     "fmt"
     "log"
 
-    dfns "github.com/dfns/dfns-sdk-go"
+    dfns "github.com/dfns/dfns-sdk-go/v2"
 )
 
 func main() {

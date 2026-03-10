@@ -8,8 +8,8 @@ import (
 
 	"github.com/joho/godotenv"
 
-	dfns "github.com/dfns/dfns-sdk-go"
-	"github.com/dfns/dfns-sdk-go/wallets"
+	dfns "github.com/dfns/dfns-sdk-go/v2"
+	"github.com/dfns/dfns-sdk-go/v2/wallets"
 )
 
 func main() {

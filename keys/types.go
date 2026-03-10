@@ -3,7 +3,7 @@
 package keys
 
 import (
-	"github.com/dfns/dfns-sdk-go/types"
+	"github.com/dfns/dfns-sdk-go/v2/types"
 )
 
 // List Keys

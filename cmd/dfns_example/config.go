@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/viper"
 
-	dfns "github.com/dfns/dfns-sdk-go"
-	"github.com/dfns/dfns-sdk-go/signer"
+	dfns "github.com/dfns/dfns-sdk-go/v2"
+	"github.com/dfns/dfns-sdk-go/v2/signer"
 )
 
 type KeySignerConfig struct {

@@ -3,21 +3,21 @@
 package dfns
 
 import (
-	"github.com/dfns/dfns-sdk-go/internal/client"
-	"github.com/dfns/dfns-sdk-go/auth"
-	"github.com/dfns/dfns-sdk-go/exchanges"
-	"github.com/dfns/dfns-sdk-go/feesponsors"
-	"github.com/dfns/dfns-sdk-go/keys"
-	"github.com/dfns/dfns-sdk-go/networks"
-	"github.com/dfns/dfns-sdk-go/permissions"
-	"github.com/dfns/dfns-sdk-go/policies"
-	"github.com/dfns/dfns-sdk-go/signers"
-	"github.com/dfns/dfns-sdk-go/staking"
-	"github.com/dfns/dfns-sdk-go/wallets"
-	"github.com/dfns/dfns-sdk-go/webhooks"
-	"github.com/dfns/dfns-sdk-go/swaps"
-	"github.com/dfns/dfns-sdk-go/agreements"
-	"github.com/dfns/dfns-sdk-go/allocations"
+	"github.com/dfns/dfns-sdk-go/v2/internal/client"
+	"github.com/dfns/dfns-sdk-go/v2/auth"
+	"github.com/dfns/dfns-sdk-go/v2/exchanges"
+	"github.com/dfns/dfns-sdk-go/v2/feesponsors"
+	"github.com/dfns/dfns-sdk-go/v2/keys"
+	"github.com/dfns/dfns-sdk-go/v2/networks"
+	"github.com/dfns/dfns-sdk-go/v2/permissions"
+	"github.com/dfns/dfns-sdk-go/v2/policies"
+	"github.com/dfns/dfns-sdk-go/v2/signers"
+	"github.com/dfns/dfns-sdk-go/v2/staking"
+	"github.com/dfns/dfns-sdk-go/v2/wallets"
+	"github.com/dfns/dfns-sdk-go/v2/webhooks"
+	"github.com/dfns/dfns-sdk-go/v2/swaps"
+	"github.com/dfns/dfns-sdk-go/v2/agreements"
+	"github.com/dfns/dfns-sdk-go/v2/allocations"
 )
 
 // Options contains configuration for the Dfns client.

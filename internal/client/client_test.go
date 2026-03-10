@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dfns/dfns-sdk-go/signer"
+	"github.com/dfns/dfns-sdk-go/v2/signer"
 )
 
 // mockSigner implements signer.Signer for testing.

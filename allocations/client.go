@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/dfns/dfns-sdk-go/internal/client"
+	"github.com/dfns/dfns-sdk-go/v2/internal/client"
 )
 
 // AllocationsClient provides methods for allocations operations.

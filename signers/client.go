@@ -4,7 +4,7 @@ package signers
 
 import (
 	"context"
-	"github.com/dfns/dfns-sdk-go/internal/client"
+	"github.com/dfns/dfns-sdk-go/v2/internal/client"
 )
 
 // SignersClient provides methods for signers operations.
