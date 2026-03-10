@@ -1,6 +1,15 @@
 # Dfns Go SDK
 
-Auto-generated Go SDK for the Dfns API.
+[![Go Build](https://github.com/dfns/dfns-sdk-go/actions/workflows/build.yaml/badge.svg)](https://github.com/dfns/dfns-sdk-go/actions/workflows/build.yaml)
+[![Coverage](https://codecov.io/github/dfns/dfns-sdk-go/graph/badge.svg?token=0VPR2C7OZJ)](https://codecov.io/github/dfns/dfns-sdk-go)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dfns/dfns-sdk-go/blob/master/LICENSE)
+[![Godoc](https://godoc.org/github.com/dfns/dfns-sdk-go/v2?status.svg)](https://godoc.org/github.com/dfns/dfns-sdk-go/v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dfns/dfns-sdk-go/v2)](https://goreportcard.com/report/github.com/dfns/dfns-sdk-go/v2)
+
+Welcome, builders. This repo holds the Dfns Golang SDK. Useful links:
+
+- [Dfns Website](https://www.dfns.co)
+- [Dfns API Docs](https://docs.dfns.co)
 
 ## Installation
 
