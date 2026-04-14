@@ -44,7 +44,8 @@ type CreateSwapResponse struct {
 	SlippageBps float64 `json:"slippageBps"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
+	FailureReason *string `json:"failureReason,omitempty"`
 }
 
 // Request Swap Quote
@@ -68,7 +69,7 @@ type RequestSwapQuoteResponse struct {
 	SlippageBps float64 `json:"slippageBps"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 }
 
 // Get Swap
@@ -85,7 +86,8 @@ type GetSwapResponse struct {
 	SlippageBps float64 `json:"slippageBps"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
+	FailureReason *string `json:"failureReason,omitempty"`
 }
 
 // Get Swap Quote
@@ -99,5 +101,5 @@ type GetSwapQuoteResponse struct {
 	SlippageBps float64 `json:"slippageBps"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 }
