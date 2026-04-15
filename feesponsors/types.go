@@ -2,15 +2,19 @@
 
 package feesponsors
 
+import (
+	"github.com/dfns/dfns-sdk-go/v2/types"
+)
+
 // List Fee Sponsors
 type ListFeeSponsorsResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.FeeSponsor `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ListFeeSponsorsQuery represents query parameters.
 type ListFeeSponsorsQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
