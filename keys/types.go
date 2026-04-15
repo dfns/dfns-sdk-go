@@ -8,21 +8,21 @@ import (
 
 // List Keys
 type ListKeysResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.Key `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
 // ListKeysQuery represents query parameters.
 type ListKeysQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 	Owner *string `json:"owner,omitempty"`
 }
 
 // Create Key
 type CreateKeyRequest struct {
-	Scheme string `json:"scheme"`
-	Curve string `json:"curve"`
+	Scheme types.KeyScheme `json:"scheme"`
+	Curve types.KeyCurve `json:"curve"`
 	Name *string `json:"name,omitempty"`
 	MasterKey *bool `json:"masterKey,omitempty"`
 	DeriveFrom *map[string]interface{} `json:"deriveFrom,omitempty"`
@@ -34,8 +34,8 @@ type CreateKeyRequest struct {
 // Create Key
 type CreateKeyResponse struct {
 	ID string `json:"id"`
-	Scheme string `json:"scheme"`
-	Curve string `json:"curve"`
+	Scheme types.KeyScheme `json:"scheme"`
+	Curve types.KeyCurve `json:"curve"`
 	PublicKey string `json:"publicKey"`
 	MasterKey *bool `json:"masterKey,omitempty"`
 	DerivedFrom *map[string]interface{} `json:"derivedFrom,omitempty"`
@@ -63,8 +63,8 @@ type DelegateKeyResponse struct {
 // Get Key
 type GetKeyResponse struct {
 	ID string `json:"id"`
-	Scheme string `json:"scheme"`
-	Curve string `json:"curve"`
+	Scheme types.KeyScheme `json:"scheme"`
+	Curve types.KeyCurve `json:"curve"`
 	PublicKey string `json:"publicKey"`
 	MasterKey *bool `json:"masterKey,omitempty"`
 	DerivedFrom *map[string]interface{} `json:"derivedFrom,omitempty"`
@@ -88,8 +88,8 @@ type UpdateKeyRequest struct {
 // Update Key
 type UpdateKeyResponse struct {
 	ID string `json:"id"`
-	Scheme string `json:"scheme"`
-	Curve string `json:"curve"`
+	Scheme types.KeyScheme `json:"scheme"`
+	Curve types.KeyCurve `json:"curve"`
 	PublicKey string `json:"publicKey"`
 	MasterKey *bool `json:"masterKey,omitempty"`
 	DerivedFrom *map[string]interface{} `json:"derivedFrom,omitempty"`
@@ -106,8 +106,8 @@ type UpdateKeyResponse struct {
 // Delete Key
 type DeleteKeyResponse struct {
 	ID string `json:"id"`
-	Scheme string `json:"scheme"`
-	Curve string `json:"curve"`
+	Scheme types.KeyScheme `json:"scheme"`
+	Curve types.KeyCurve `json:"curve"`
 	PublicKey string `json:"publicKey"`
 	MasterKey *bool `json:"masterKey,omitempty"`
 	DerivedFrom *map[string]interface{} `json:"derivedFrom,omitempty"`
@@ -149,14 +149,14 @@ type ExportKeyResponse struct {
 
 // List Signatures
 type ListSignaturesResponse struct {
-	KeyID string `json:"keyId"`
-	Items []map[string]interface{} `json:"items"`
+	Items []types.SignatureRequest `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
+	KeyID string `json:"keyId"`
 }
 
 // ListSignaturesQuery represents query parameters.
 type ListSignaturesQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
@@ -167,7 +167,7 @@ type GenerateSignatureRequest = any
 type GenerateSignatureResponse struct {
 	ID string `json:"id"`
 	KeyID string `json:"keyId"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -189,7 +189,7 @@ type GenerateSignatureResponse struct {
 type GetSignatureResponse struct {
 	ID string `json:"id"`
 	KeyID string `json:"keyId"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -220,8 +220,8 @@ type ImportKeyRequest struct {
 // Import Key
 type ImportKeyResponse struct {
 	ID string `json:"id"`
-	Scheme string `json:"scheme"`
-	Curve string `json:"curve"`
+	Scheme types.KeyScheme `json:"scheme"`
+	Curve types.KeyCurve `json:"curve"`
 	PublicKey string `json:"publicKey"`
 	MasterKey *bool `json:"masterKey,omitempty"`
 	DerivedFrom *map[string]interface{} `json:"derivedFrom,omitempty"`
