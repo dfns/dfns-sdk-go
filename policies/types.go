@@ -2,6 +2,10 @@
 
 package policies
 
+import (
+	"github.com/dfns/dfns-sdk-go/v2/types"
+)
+
 // Get Policy
 type GetPolicyResponse struct {
 	PendingChangeRequest *map[string]interface{} `json:"pendingChangeRequest,omitempty"`
@@ -62,7 +66,7 @@ type GetApprovalResponse struct {
 
 // List Approvals
 type ListApprovalsResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.PolicyApproval `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 

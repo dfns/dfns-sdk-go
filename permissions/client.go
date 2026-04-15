@@ -20,9 +20,32 @@ func NewPermissionsClient(c *client.Client) *PermissionsClient {
 	return &PermissionsClient{client: c}
 }
 
-// Retrieves a list of permission assignments (success) or gives a reason why it's not possible (failure).
-func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permissionID string) (*ListPermissionAssignmentsResponse, error) {
+// Archives or unarchives a permission (role). Archived permissions are effectively soft-deleted.
+func (c *PermissionsClient) ArchivePermission(ctx context.Context, permissionID string, body ArchivePermissionRequest) (*ArchivePermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID) + "/archive"
+	var result ArchivePermissionResponse
+	err := c.client.Do(ctx, "PUT", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Lists all permission (role) assignments for a given permission.
+func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permissionID string, query *ListPermissionAssignmentsQuery) (*ListPermissionAssignmentsResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
 	var result ListPermissionAssignmentsResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
@@ -31,9 +54,7 @@ func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permi
 	return &result, nil
 }
 
-// Creates a permission that allows certain specified operations to be executed. 
-//   
-//   Response is either the permission object itself (success) or a reason why it was not possible to create the permission (failure).
+// Assigns a permission (role) to an identity (user, PAT or service account), granting it access to the operations defined in the permission. Returns the assignment on success (200), or a pending change request if approval is required (202).
 func (c *PermissionsClient) AssignPermission(ctx context.Context, permissionID string, body AssignPermissionRequest) (*AssignPermissionResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments"
 	var result AssignPermissionResponse
@@ -44,33 +65,7 @@ func (c *PermissionsClient) AssignPermission(ctx context.Context, permissionID s
 	return &result, nil
 }
 
-// Revokes a permission assignment (success) or gives reason why it’s not possible (failure).
-func (c *PermissionsClient) RevokePermission(ctx context.Context, permissionID string, assignmentID string, query *RevokePermissionQuery) error {
-	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments/" + url.PathEscape(assignmentID)
-	if query != nil {
-		q := url.Values{}
-		if query.Force != nil {
-			q.Set("force", fmt.Sprintf("%v", *query.Force))
-		}
-		if len(q) > 0 {
-			path += "?" + q.Encode()
-		}
-	}
-	return c.client.Do(ctx, "DELETE", path, nil, nil, true)
-}
-
-// Delete a specific Permission.
-func (c *PermissionsClient) DeletePermission(ctx context.Context, permissionID string, body DeletePermissionRequest) (*DeletePermissionResponse, error) {
-	path := "/permissions/" + url.PathEscape(permissionID) + "/archive"
-	var result DeletePermissionResponse
-	err := c.client.Do(ctx, "PUT", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// Retrieves a list of permissions (success) or gives a reason why it's not possible (failure).
+// Lists all permissions (roles) in the organization.
 func (c *PermissionsClient) ListPermissions(ctx context.Context, query *ListPermissionsQuery) (*ListPermissionsResponse, error) {
 	path := "/permissions"
 	if query != nil {
@@ -93,7 +88,7 @@ func (c *PermissionsClient) ListPermissions(ctx context.Context, query *ListPerm
 	return &result, nil
 }
 
-// Creates a permission that allows certain specified operations to be executed.
+// Creates a new permission (also referred to as "role" in the dashboard) that grants access to the specified API operations.
 func (c *PermissionsClient) CreatePermission(ctx context.Context, body CreatePermissionRequest) (*CreatePermissionResponse, error) {
 	path := "/permissions"
 	var result CreatePermissionResponse
@@ -104,7 +99,22 @@ func (c *PermissionsClient) CreatePermission(ctx context.Context, body CreatePer
 	return &result, nil
 }
 
-// Retrieves a specific permission (success) or gives a reason why it's not possible (failure).
+// Revokes a permission (role) assignment, removing the identity's access to the operations granted by the permission.
+func (c *PermissionsClient) RevokePermission(ctx context.Context, permissionID string, assignmentID string, query *RevokePermissionQuery) error {
+	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments/" + url.PathEscape(assignmentID)
+	if query != nil {
+		q := url.Values{}
+		if query.Force != nil {
+			q.Set("force", fmt.Sprintf("%v", *query.Force))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	return c.client.Do(ctx, "DELETE", path, nil, nil, true)
+}
+
+// Retrieves a permission (role) by ID, including any pending change request.
 func (c *PermissionsClient) GetPermission(ctx context.Context, permissionID string) (*GetPermissionResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID)
 	var result GetPermissionResponse
@@ -115,7 +125,7 @@ func (c *PermissionsClient) GetPermission(ctx context.Context, permissionID stri
 	return &result, nil
 }
 
-// Updates an existing permission. Response either returns the updated permission (success) or the reason why it was not possible to update (failure).
+// Updates the name or operations of an existing permission (role).
 func (c *PermissionsClient) UpdatePermission(ctx context.Context, permissionID string, body UpdatePermissionRequest) (*UpdatePermissionResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID)
 	var result UpdatePermissionResponse
