@@ -11,13 +11,11 @@ type EstimateFeesQuery struct {
 	Network string `json:"network"`
 }
 
-// ReadContractRequest represents the request body for the readContract operation.
-type ReadContractRequest = any
-
-// Read Contract
-type ReadContractResponse struct {
-	Kind string `json:"kind"`
-	Data string `json:"data"`
+// Call Function
+type CallFunctionRequest struct {
+	Contract string `json:"contract"`
+	Abi map[string]interface{} `json:"abi"`
+	Calldata *map[string]interface{} `json:"calldata,omitempty"`
 }
 
 // Get Canton Validator
