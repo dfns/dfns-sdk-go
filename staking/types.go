@@ -2,6 +2,10 @@
 
 package staking
 
+import (
+	"github.com/dfns/dfns-sdk-go/v2/types"
+)
+
 // List Stakes
 type ListStakesResponse struct {
 	Items []interface{} `json:"items"`
@@ -21,12 +25,12 @@ type CreateStakeRequest struct {
 
 // Create Stake
 type CreateStakeResponse struct {
-	Actions []map[string]interface{} `json:"actions"`
+	Actions []types.StakeAction `json:"actions"`
 }
 
 // List Stake Actions
 type ListStakeActionsResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.StakeAction `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
@@ -43,12 +47,12 @@ type CreateStakeActionRequest struct {
 
 // Create Stake Action
 type CreateStakeActionResponse struct {
-	Actions []map[string]interface{} `json:"actions"`
+	Actions []types.StakeAction `json:"actions"`
 }
 
 // Get Stakes
 type GetStakesResponse struct {
-	Actions []map[string]interface{} `json:"actions"`
+	Actions []types.StakeAction `json:"actions"`
 }
 
 // GetStakesQuery represents query parameters.
