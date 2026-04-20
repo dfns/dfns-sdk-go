@@ -87,7 +87,7 @@ func (c *WebhooksClient) DeleteWebhook(ctx context.Context, webhookID string) (*
 	return &result, nil
 }
 
-// This endpoint is meant for webhook setup and troubleshooting. Calling the endpoint will trigger a fake test event that will be pushed to the webhook url. The fake event will not be saved and not appear in further requests to Webhook Events.
+// This endpoint is meant for webhook setup and troubleshooting. Calling the endpoint will trigger a fake test event that will be pushed to the webhook URL. The fake event will not be saved and not appear in further requests to Webhook Events.
 func (c *WebhooksClient) PingWebhook(ctx context.Context, webhookID string) (*PingWebhookResponse, error) {
 	path := "/webhooks/" + url.PathEscape(webhookID) + "/ping"
 	var result PingWebhookResponse
