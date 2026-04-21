@@ -2,6 +2,10 @@
 
 package exchanges
 
+import (
+	"github.com/dfns/dfns-sdk-go/v2/types"
+)
+
 // Get Exchange
 type GetExchangeResponse struct {
 	ID string `json:"id"`
@@ -79,7 +83,7 @@ type CreateExchangeDepositResponse struct {
 	ExchangeReference *string `json:"exchangeReference,omitempty"`
 	Kind string `json:"kind"`
 	WalletID string `json:"walletId"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	DateCreated string `json:"dateCreated"`
 }
@@ -96,7 +100,7 @@ type CreateExchangeWithdrawalResponse struct {
 	ExchangeReference *string `json:"exchangeReference,omitempty"`
 	Kind string `json:"kind"`
 	WalletID string `json:"walletId"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	DateCreated string `json:"dateCreated"`
 }
