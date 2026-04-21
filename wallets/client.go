@@ -20,9 +20,35 @@ func NewWalletsClient(c *client.Client) *WalletsClient {
 	return &WalletsClient{client: c}
 }
 
+// Aborts a transaction that is currently in 'Executing' status and has not yet been signed. Sets the transaction status to 'Failed' and removes it from the retry queue.
+// 
+//   This is useful when a transaction is stuck in the execution pipeline (e.g., during construct or sign phase) and you want to abort it without waiting for it to fail on its own.
+func (c *WalletsClient) AbortTransaction(ctx context.Context, walletID string, transactionID string) (*AbortTransactionResponse, error) {
+	path := "/wallets/" + url.PathEscape(walletID) + "/transactions/" + url.PathEscape(transactionID) + "/abort"
+	var result AbortTransactionResponse
+	err := c.client.Do(ctx, "PUT", path, nil, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Aborts a transfer that is currently in 'Executing' status and has not yet been signed. Sets the transfer status to 'Failed' and removes it from the retry queue.
+// 
+//   This is useful when a transfer is stuck in the execution pipeline (e.g., during construct or sign phase) and you want to abort it without waiting for it to fail on its own.
+func (c *WalletsClient) AbortTransfer(ctx context.Context, walletID string, transferID string) (*AbortTransferResponse, error) {
+	path := "/wallets/" + url.PathEscape(walletID) + "/transfers/" + url.PathEscape(transferID) + "/abort"
+	var result AbortTransferResponse
+	err := c.client.Do(ctx, "PUT", path, nil, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Activates a wallet by deploying the account contract on-chain, making it ready for transactions.
-//     
-//     This operation is required for wallets on networks where you need to explicitly activate your account on-chain 
+// 
+//     This operation is required for wallets on networks where you need to explicitly activate your account on-chain
 func (c *WalletsClient) ActivateWallet(ctx context.Context, walletID string, body ActivateWalletRequest) (*ActivateWalletResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/activate"
 	var result ActivateWalletResponse
@@ -57,7 +83,7 @@ func (c *WalletsClient) ListTransactions(ctx context.Context, walletID string, q
 }
 
 // Sign & Broadcast transaction enables communication with any arbitrary smart contract of the target blockchain. You can construct a transaction that performs a complex task and this endpoint will sign the transaction, add the signature and broadcast it to chain. It can be used to call smart contract functions like mint tokens and even deploy new smart contracts.
-//   
+// 
 // | Status      | Definition                                                                                                                                      |
 func (c *WalletsClient) SignAndBroadcastTransaction(ctx context.Context, walletID string, body SignAndBroadcastTransactionRequest) (*SignAndBroadcastTransactionResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/transactions"
@@ -69,9 +95,9 @@ func (c *WalletsClient) SignAndBroadcastTransaction(ctx context.Context, walletI
 	return &result, nil
 }
 
-// Cancels an EVM transaction by creating a replacement transaction with the same nonce but with a self-transfer of 0 native tokens.
+// Cancels an EVM transaction by creating a replacement transaction with the same nonce. The new transaction sends 0 value to the same address, effectively nullifying the original transaction.
 //   
-//   This endpoint only works for:
+//   This endpoint works for:
 func (c *WalletsClient) CancelTransaction(ctx context.Context, walletID string, transactionID string) (*CancelTransactionResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/transactions/" + url.PathEscape(transactionID) + "/cancel"
 	var result CancelTransactionResponse
@@ -82,9 +108,9 @@ func (c *WalletsClient) CancelTransaction(ctx context.Context, walletID string, 
 	return &result, nil
 }
 
-// Cancels an EVM transfer by creating a replacement transaction with the same nonce but with a self-transfer of 0 native tokens.
+// Cancels an EVM transfer by creating a replacement transaction with the same nonce. The new transaction sends 0 value to the same address, effectively nullifying the original transfer.
 //   
-//   This endpoint only works for:
+//   This endpoint works for:
 func (c *WalletsClient) CancelTransfer(ctx context.Context, walletID string, transferID string) (*CancelTransferResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/transfers/" + url.PathEscape(transferID) + "/cancel"
 	var result CancelTransferResponse
@@ -164,88 +190,6 @@ func (c *WalletsClient) CreateWallet(ctx context.Context, body CreateWalletReque
 	return &result, nil
 }
 
-// <Danger>
-//   Delegate Wallet is deprecated. Please use [Delegate Key](https://docs.dfns.co/api-reference/keys/delegate-key) instead.
-//   </Danger>
-// Deprecated: This endpoint is deprecated.
-func (c *WalletsClient) DelegateWallet(ctx context.Context, walletID string, body DelegateWalletRequest) (*DelegateWalletResponse, error) {
-	path := "/wallets/" + url.PathEscape(walletID) + "/delegate"
-	var result DelegateWalletResponse
-	err := c.client.Do(ctx, "POST", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// <Danger>
-// Export Wallet is deprecated. Please use [Export Key](https://docs.dfns.co/api-reference/keys/export-key) instead.
-// </Danger>
-// Deprecated: This endpoint is deprecated.
-func (c *WalletsClient) ExportWallet(ctx context.Context, walletID string, body ExportWalletRequest) (*ExportWalletResponse, error) {
-	path := "/wallets/" + url.PathEscape(walletID) + "/export"
-	var result ExportWalletResponse
-	err := c.client.Do(ctx, "POST", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// List all signature requests for a specific wallet.
-//   
-// <Danger>
-// Deprecated: This endpoint is deprecated.
-func (c *WalletsClient) ListSignatures(ctx context.Context, walletID string, query *ListSignaturesQuery) (*ListSignaturesResponse, error) {
-	path := "/wallets/" + url.PathEscape(walletID) + "/signatures"
-	if query != nil {
-		q := url.Values{}
-		if query.Limit != nil {
-			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
-		}
-		if query.PaginationToken != nil {
-			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
-		}
-		if len(q) > 0 {
-			path += "?" + q.Encode()
-		}
-	}
-	var result ListSignaturesResponse
-	err := c.client.Do(ctx, "GET", path, nil, &result, false)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// <Danger>
-// Generating Signatures from a Wallet is deprecated. Please use the Key's [Generate Signature](https://docs.dfns.co/api-reference/keys/generate-signature) endpoint instead.
-// </Danger>
-// Deprecated: This endpoint is deprecated.
-func (c *WalletsClient) GenerateSignature(ctx context.Context, walletID string, body GenerateSignatureRequest) (*GenerateSignatureResponse, error) {
-	path := "/wallets/" + url.PathEscape(walletID) + "/signatures"
-	var result GenerateSignatureResponse
-	err := c.client.Do(ctx, "POST", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// Retrieves a Transaction Request information by its ID.
-// 
-// <Danger>
-// Deprecated: This endpoint is deprecated.
-func (c *WalletsClient) GetSignature(ctx context.Context, walletID string, signatureID string) (*GetSignatureResponse, error) {
-	path := "/wallets/" + url.PathEscape(walletID) + "/signatures/" + url.PathEscape(signatureID)
-	var result GetSignatureResponse
-	err := c.client.Do(ctx, "GET", path, nil, &result, false)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
 // Retrieve information about a specific transaction.
 func (c *WalletsClient) GetTransaction(ctx context.Context, walletID string, transactionID string) (*GetTransactionResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/transactions/" + url.PathEscape(transactionID)
@@ -311,8 +255,8 @@ func (c *WalletsClient) GetWalletAssets(ctx context.Context, walletID string, qu
 }
 
 // Retrieves a list of historical on chain activities for the specified wallet.
-//   
-// The list reflects the indexed on-chain activity: it includes confirmed transactions only. 
+// 
+// The list reflects the indexed on-chain activity: it includes confirmed transactions only.
 func (c *WalletsClient) GetWalletHistory(ctx context.Context, walletID string, query *GetWalletHistoryQuery) (*GetWalletHistoryResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/history"
 	if query != nil {
@@ -391,9 +335,9 @@ func (c *WalletsClient) ListTransfers(ctx context.Context, walletID string, quer
 	return &result, nil
 }
 
-// Transfer an asset out of the specified wallet to a destination address. 
-//     For all fungible token transfers, the transfer amount must be specified in the minimum denomination of that token. 
-//     For example, use the amount in Satoshi for a Bitcoin transfer, or the amount in Wei for an Ethereum transfer etc.
+// Transfer an asset out of the specified wallet to a destination address.
+// For all fungible token transfers, the transfer amount must be specified in the minimum denomination of that token.
+// For example, use the amount in Satoshi for a Bitcoin transfer, or the amount in Wei for an Ethereum transfer etc.
 func (c *WalletsClient) TransferAsset(ctx context.Context, walletID string, body TransferAssetRequest) (*TransferAssetResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/transfers"
 	var result TransferAssetResponse
@@ -487,14 +431,14 @@ func (c *WalletsClient) ListOrgWalletHistory(ctx context.Context, query *ListOrg
 	path := "/wallets/all/history"
 	if query != nil {
 		q := url.Values{}
-		q.Set("startTime", fmt.Sprintf("%v", query.StartTime))
-		q.Set("endTime", fmt.Sprintf("%v", query.EndTime))
 		if query.Limit != nil {
 			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
 		}
 		if query.PaginationToken != nil {
 			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
 		}
+		q.Set("startTime", fmt.Sprintf("%v", query.StartTime))
+		q.Set("endTime", fmt.Sprintf("%v", query.EndTime))
 		if len(q) > 0 {
 			path += "?" + q.Encode()
 		}
