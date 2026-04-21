@@ -2,10 +2,33 @@
 
 package permissions
 
+// Archive Permission
+type ArchivePermissionRequest struct {
+	IsArchived bool `json:"isArchived"`
+}
+
+// Archive Permission
+type ArchivePermissionResponse struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
+	Operations []string `json:"operations"`
+	Status string `json:"status"`
+	IsImmutable bool `json:"isImmutable"`
+	IsArchived bool `json:"isArchived"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
 // List Permission Assignments
 type ListPermissionAssignmentsResponse struct {
 	Items []map[string]interface{} `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListPermissionAssignmentsQuery represents query parameters.
+type ListPermissionAssignmentsQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
 // Assign Permission
@@ -23,28 +46,6 @@ type AssignPermissionResponse struct {
 	DateUpdated string `json:"dateUpdated"`
 }
 
-// RevokePermissionQuery represents query parameters.
-type RevokePermissionQuery struct {
-	Force *bool `json:"force,omitempty"`
-}
-
-// Delete Permission
-type DeletePermissionRequest struct {
-	IsArchived bool `json:"isArchived"`
-}
-
-// Delete Permission
-type DeletePermissionResponse struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
-	Operations []string `json:"operations"`
-	Status string `json:"status"`
-	IsImmutable bool `json:"isImmutable"`
-	IsArchived bool `json:"isArchived"`
-	DateCreated string `json:"dateCreated"`
-	DateUpdated string `json:"dateUpdated"`
-}
-
 // List Permissions
 type ListPermissionsResponse struct {
 	Items []map[string]interface{} `json:"items"`
@@ -53,7 +54,7 @@ type ListPermissionsResponse struct {
 
 // ListPermissionsQuery represents query parameters.
 type ListPermissionsQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
@@ -73,6 +74,11 @@ type CreatePermissionResponse struct {
 	IsArchived bool `json:"isArchived"`
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
+}
+
+// RevokePermissionQuery represents query parameters.
+type RevokePermissionQuery struct {
+	Force *bool `json:"force,omitempty"`
 }
 
 // Get Permission
