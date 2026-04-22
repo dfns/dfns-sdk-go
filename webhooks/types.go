@@ -2,6 +2,10 @@
 
 package webhooks
 
+import (
+	"github.com/dfns/dfns-sdk-go/v2/types"
+)
+
 // List Webhooks
 type ListWebhooksResponse struct {
 	Items []map[string]interface{} `json:"items"`
@@ -43,6 +47,7 @@ type GetWebhookResponse struct {
 	Description *string `json:"description,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
+	Secret string `json:"secret"`
 }
 
 // Update Webhook
@@ -62,6 +67,7 @@ type UpdateWebhookResponse struct {
 	Description *string `json:"description,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
+	Secret string `json:"secret"`
 }
 
 // Delete Webhook
@@ -88,7 +94,7 @@ type GetWebhookEventResponse struct {
 
 // List Webhook Events
 type ListWebhookEventsResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.WebhookEvent `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
