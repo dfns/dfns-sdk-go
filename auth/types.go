@@ -71,12 +71,12 @@ type GetApplicationResponse struct {
 	IsActive bool `json:"isActive"`
 	ExpectedOrigin *string `json:"expectedOrigin,omitempty"`
 	PermissionAssignments []map[string]interface{} `json:"permissionAssignments"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
 }
 
 // List Credentials
 type ListCredentialsResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.Credential `json:"items"`
 }
 
 // CreateCredentialRequest represents the request body for the createCredential operation.
@@ -97,7 +97,7 @@ type CreateCredentialResponse struct {
 
 // Create Credential Challenge
 type CreateCredentialChallengeRequest struct {
-	Kind map[string]interface{} `json:"kind"`
+	Kind types.CredentialKind `json:"kind"`
 }
 
 // Activate Credential
@@ -247,7 +247,7 @@ type InitiateSsoLoginResponse struct {
 
 // List Personal Access Tokens
 type ListPersonalAccessTokensResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.PersonalAccessToken `json:"items"`
 }
 
 // Create Personal Access Token
@@ -549,13 +549,13 @@ type CreateServiceAccountRequest struct {
 // Create Service Account
 type CreateServiceAccountResponse struct {
 	UserInfo map[string]interface{} `json:"userInfo"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
 }
 
 // Get Service Account
 type GetServiceAccountResponse struct {
 	UserInfo map[string]interface{} `json:"userInfo"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
 }
 
 // Update Service Account
@@ -567,25 +567,35 @@ type UpdateServiceAccountRequest struct {
 // Update Service Account
 type UpdateServiceAccountResponse struct {
 	UserInfo map[string]interface{} `json:"userInfo"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
 }
 
 // Delete Service Account
 type DeleteServiceAccountResponse struct {
 	UserInfo map[string]interface{} `json:"userInfo"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
+}
+
+// DeleteServiceAccountQuery represents query parameters.
+type DeleteServiceAccountQuery struct {
+	Force *interface{} `json:"force,omitempty"`
 }
 
 // Activate Service Account
 type ActivateServiceAccountResponse struct {
 	UserInfo map[string]interface{} `json:"userInfo"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
+}
+
+// Deactivate Service Account
+type DeactivateServiceAccountRequest struct {
+	Force *bool `json:"force,omitempty"`
 }
 
 // Deactivate Service Account
 type DeactivateServiceAccountResponse struct {
 	UserInfo map[string]interface{} `json:"userInfo"`
-	AccessTokens []map[string]interface{} `json:"accessTokens"`
+	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
 }
 
 // Activate User
