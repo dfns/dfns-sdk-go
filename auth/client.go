@@ -289,7 +289,7 @@ func (c *AuthClient) CompleteSsoLogin(ctx context.Context, body CompleteSsoLogin
 	return &result, nil
 }
 
-// Initialize the login process with SSO by returning the IdP Url to call.
+// Initialize the login process with SSO by returning the IdP URL to call.
 func (c *AuthClient) InitiateSsoLogin(ctx context.Context, body InitiateSsoLoginRequest) (*InitiateSsoLoginResponse, error) {
 	path := "/auth/login/sso/init"
 	var result InitiateSsoLoginResponse
@@ -542,8 +542,17 @@ func (c *AuthClient) UpdateServiceAccount(ctx context.Context, serviceAccountID 
 }
 
 // Delete a specific Service Account.
-func (c *AuthClient) DeleteServiceAccount(ctx context.Context, serviceAccountID string) (*DeleteServiceAccountResponse, error) {
+func (c *AuthClient) DeleteServiceAccount(ctx context.Context, serviceAccountID string, query *DeleteServiceAccountQuery) (*DeleteServiceAccountResponse, error) {
 	path := "/auth/service-accounts/" + url.PathEscape(serviceAccountID)
+	if query != nil {
+		q := url.Values{}
+		if query.Force != nil {
+			q.Set("force", fmt.Sprintf("%v", *query.Force))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
 	var result DeleteServiceAccountResponse
 	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
 	if err != nil {
@@ -564,10 +573,10 @@ func (c *AuthClient) ActivateServiceAccount(ctx context.Context, serviceAccountI
 }
 
 // Deactivate a specific Service Account.
-func (c *AuthClient) DeactivateServiceAccount(ctx context.Context, serviceAccountID string) (*DeactivateServiceAccountResponse, error) {
+func (c *AuthClient) DeactivateServiceAccount(ctx context.Context, serviceAccountID string, body DeactivateServiceAccountRequest) (*DeactivateServiceAccountResponse, error) {
 	path := "/auth/service-accounts/" + url.PathEscape(serviceAccountID) + "/deactivate"
 	var result DeactivateServiceAccountResponse
-	err := c.client.Do(ctx, "PUT", path, nil, &result, true)
+	err := c.client.Do(ctx, "PUT", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}
