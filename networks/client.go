@@ -38,17 +38,17 @@ func (c *NetworksClient) EstimateFees(ctx context.Context, query *EstimateFeesQu
 	return result, nil
 }
 
-// Call a read-only function on a smart contract. In Solidity, this use the `view` keyword.
+// Call a read-only function on a smart contract. In Solidity, these are functions with the state mutability set to `view`.
 // 
 //   <Note>
-func (c *NetworksClient) ReadContract(ctx context.Context, body ReadContractRequest) (*ReadContractResponse, error) {
-	path := "/networks/read-contract"
-	var result ReadContractResponse
+func (c *NetworksClient) CallFunction(ctx context.Context, network string, body CallFunctionRequest) (interface{}, error) {
+	path := "/networks/" + url.PathEscape(network) + "/call-function"
+	var result interface{}
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
-	return &result, nil
+	return result, nil
 }
 
 // Return a configured Canton Validator in your organization.
@@ -111,7 +111,7 @@ func (c *NetworksClient) ListCantonValidators(ctx context.Context, network strin
 
 // Link a Canton Validator to your organization. This is required in order to create wallets or interact with the Canton network.
 // 
-//   The `Shared` option allows you to use a shared validator hosted by DFNS and get started in seconds, while the `Custom` option allows you to connect your own validator and ledger nodes using OAuth2 authentication.
+//   The `Shared` option allows you to use a shared validator hosted by Dfns and get started in seconds, while the `Custom` option allows you to connect your own validator and ledger nodes using OAuth2 authentication.
 func (c *NetworksClient) CreateCantonValidator(ctx context.Context, network string, body CreateCantonValidatorRequest) (*CreateCantonValidatorResponse, error) {
 	path := "/networks/" + url.PathEscape(network) + "/validators"
 	var result CreateCantonValidatorResponse
