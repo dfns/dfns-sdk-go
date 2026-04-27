@@ -2,6 +2,177 @@
 
 package types
 
+// Protocol represents the protocol type.
+type Protocol string
+
+const (
+	ProtocolN0fns Protocol = "0fns"
+)
+
+// Network represents the network type.
+type Network string
+
+const (
+	NetworkAlgorand Network = "Algorand"
+	NetworkAlgorandTestnet Network = "AlgorandTestnet"
+	NetworkAptos Network = "Aptos"
+	NetworkAptosTestnet Network = "AptosTestnet"
+	NetworkArbitrumOne Network = "ArbitrumOne"
+	NetworkArbitrumSepolia Network = "ArbitrumSepolia"
+	NetworkArcTestnet Network = "ArcTestnet"
+	NetworkAvalancheC Network = "AvalancheC"
+	NetworkAvalancheCFuji Network = "AvalancheCFuji"
+	NetworkBabylonGenesis Network = "BabylonGenesis"
+	NetworkBabylonTestnet5 Network = "BabylonTestnet5"
+	NetworkBase Network = "Base"
+	NetworkBaseSepolia Network = "BaseSepolia"
+	NetworkBerachain Network = "Berachain"
+	NetworkBerachainBepolia Network = "BerachainBepolia"
+	NetworkBitcoin Network = "Bitcoin"
+	NetworkBitcoinSignet Network = "BitcoinSignet"
+	NetworkBitcoinTestnet3 Network = "BitcoinTestnet3"
+	NetworkBitcoinCash Network = "BitcoinCash"
+	NetworkBob Network = "Bob"
+	NetworkBobSepolia Network = "BobSepolia"
+	NetworkBsc Network = "Bsc"
+	NetworkBscTestnet Network = "BscTestnet"
+	NetworkCanton Network = "Canton"
+	NetworkCantonTestnet Network = "CantonTestnet"
+	NetworkCardano Network = "Cardano"
+	NetworkCardanoPreprod Network = "CardanoPreprod"
+	NetworkConcordium Network = "Concordium"
+	NetworkConcordiumTestnet Network = "ConcordiumTestnet"
+	NetworkCelo Network = "Celo"
+	NetworkCeloAlfajores Network = "CeloAlfajores"
+	NetworkCodex Network = "Codex"
+	NetworkCodexSepolia Network = "CodexSepolia"
+	NetworkCosmosHub4 Network = "CosmosHub4"
+	NetworkCosmosIcsTestnet Network = "CosmosIcsTestnet"
+	NetworkDogecoin Network = "Dogecoin"
+	NetworkDogecoinTestnet Network = "DogecoinTestnet"
+	NetworkEthereum Network = "Ethereum"
+	NetworkEthereumClassic Network = "EthereumClassic"
+	NetworkEthereumClassicMordor Network = "EthereumClassicMordor"
+	NetworkEthereumSepolia Network = "EthereumSepolia"
+	NetworkEthereumHolesky Network = "EthereumHolesky"
+	NetworkEthereumHoodi Network = "EthereumHoodi"
+	NetworkFantomOpera Network = "FantomOpera"
+	NetworkFantomTestnet Network = "FantomTestnet"
+	NetworkFlareC Network = "FlareC"
+	NetworkFlareCCoston2 Network = "FlareCCoston2"
+	NetworkFlowEvm Network = "FlowEvm"
+	NetworkFlowEvmTestnet Network = "FlowEvmTestnet"
+	NetworkHedera Network = "Hedera"
+	NetworkHederaTestnet Network = "HederaTestnet"
+	NetworkInk Network = "Ink"
+	NetworkInkSepolia Network = "InkSepolia"
+	NetworkInternetComputer Network = "InternetComputer"
+	NetworkIon Network = "Ion"
+	NetworkIonTestnet Network = "IonTestnet"
+	NetworkIota Network = "Iota"
+	NetworkIotaTestnet Network = "IotaTestnet"
+	NetworkKaspa Network = "Kaspa"
+	NetworkKusama Network = "Kusama"
+	NetworkKusamaAssetHub Network = "KusamaAssetHub"
+	NetworkLitecoin Network = "Litecoin"
+	NetworkLitecoinTestnet Network = "LitecoinTestnet"
+	NetworkNear Network = "Near"
+	NetworkNearTestnet Network = "NearTestnet"
+	NetworkOptimism Network = "Optimism"
+	NetworkOptimismSepolia Network = "OptimismSepolia"
+	NetworkOrigyn Network = "Origyn"
+	NetworkPlasma Network = "Plasma"
+	NetworkPlasmaTestnet Network = "PlasmaTestnet"
+	NetworkPlume Network = "Plume"
+	NetworkPlumeSepolia Network = "PlumeSepolia"
+	NetworkPaseo Network = "Paseo"
+	NetworkPaseoAssetHub Network = "PaseoAssetHub"
+	NetworkPolkadot Network = "Polkadot"
+	NetworkPolkadotAssetHub Network = "PolkadotAssetHub"
+	NetworkPolygon Network = "Polygon"
+	NetworkPolygonAmoy Network = "PolygonAmoy"
+	NetworkPolymesh Network = "Polymesh"
+	NetworkPolymeshTestnet Network = "PolymeshTestnet"
+	NetworkRace Network = "Race"
+	NetworkRaceSepolia Network = "RaceSepolia"
+	NetworkSeiAtlantic2 Network = "SeiAtlantic2"
+	NetworkSeiPacific1 Network = "SeiPacific1"
+	NetworkSolana Network = "Solana"
+	NetworkSolanaDevnet Network = "SolanaDevnet"
+	NetworkStarknet Network = "Starknet"
+	NetworkStarknetSepolia Network = "StarknetSepolia"
+	NetworkStellar Network = "Stellar"
+	NetworkStellarTestnet Network = "StellarTestnet"
+	NetworkSui Network = "Sui"
+	NetworkSuiTestnet Network = "SuiTestnet"
+	NetworkTezos Network = "Tezos"
+	NetworkTezosGhostnet Network = "TezosGhostnet"
+	NetworkTempo Network = "Tempo"
+	NetworkTempoModerato Network = "TempoModerato"
+	NetworkTsc Network = "Tsc"
+	NetworkTscTestnet1 Network = "TscTestnet1"
+	NetworkTon Network = "Ton"
+	NetworkTonTestnet Network = "TonTestnet"
+	NetworkTron Network = "Tron"
+	NetworkTronNile Network = "TronNile"
+	NetworkWestend Network = "Westend"
+	NetworkWestendAssetHub Network = "WestendAssetHub"
+	NetworkXdc Network = "Xdc"
+	NetworkXdcApothem Network = "XdcApothem"
+	NetworkXrpLedger Network = "XrpLedger"
+	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
+)
+
+// Kind represents the kind type.
+type Kind string
+
+const (
+	KindPolicyTriggered Kind = "policy.triggered"
+	KindPolicyApprovalPending Kind = "policy.approval.pending"
+	KindPolicyApprovalResolved Kind = "policy.approval.resolved"
+	KindKeyCreated Kind = "key.created"
+	KindKeyDeleted Kind = "key.deleted"
+	KindKeyDelegated Kind = "key.delegated"
+	KindKeyExported Kind = "key.exported"
+	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
+	KindWalletCreated Kind = "wallet.created"
+	KindWalletActivated Kind = "wallet.activated"
+	KindWalletDelegated Kind = "wallet.delegated"
+	KindWalletExported Kind = "wallet.exported"
+	KindWalletSignatureFailed Kind = "wallet.signature.failed"
+	KindWalletSignatureRejected Kind = "wallet.signature.rejected"
+	KindWalletSignatureRequested Kind = "wallet.signature.requested"
+	KindWalletSignatureSigned Kind = "wallet.signature.signed"
+	KindWalletTransactionBroadcasted Kind = "wallet.transaction.broadcasted"
+	KindWalletTransactionConfirmed Kind = "wallet.transaction.confirmed"
+	KindWalletTransactionFailed Kind = "wallet.transaction.failed"
+	KindWalletTransactionRejected Kind = "wallet.transaction.rejected"
+	KindWalletTransactionRequested Kind = "wallet.transaction.requested"
+	KindWalletTransferBroadcasted Kind = "wallet.transfer.broadcasted"
+	KindWalletTransferConfirmed Kind = "wallet.transfer.confirmed"
+	KindWalletTransferFailed Kind = "wallet.transfer.failed"
+	KindWalletTransferRejected Kind = "wallet.transfer.rejected"
+	KindWalletTransferRequested Kind = "wallet.transfer.requested"
+	KindWalletOfferReceived Kind = "wallet.offer.received"
+	KindWalletOfferAccepted Kind = "wallet.offer.accepted"
+	KindWalletOfferRejected Kind = "wallet.offer.rejected"
+	KindWalletOfferWithdrawn Kind = "wallet.offer.withdrawn"
+	KindWalletTagsModified Kind = "wallet.tags.modified"
+	KindPayoutActionRequired Kind = "payout.action.required"
+)
+
+// Status represents the status type.
+type Status string
+
+const (
+	StatusPending Status = "Pending"
+	StatusExecuting Status = "Executing"
+	StatusSigned Status = "Signed"
+	StatusConfirmed Status = "Confirmed"
+	StatusFailed Status = "Failed"
+	StatusRejected Status = "Rejected"
+)
+
 // UserActionServerKind represents the useractionserverkind type.
 type UserActionServerKind string
 
@@ -66,42 +237,6 @@ const (
 	TypeValuePublicKey TypeValue = "public-key"
 )
 
-// Kind represents the kind type.
-type Kind string
-
-const (
-	KindPolicyTriggered Kind = "policy.triggered"
-	KindPolicyApprovalPending Kind = "policy.approval.pending"
-	KindPolicyApprovalResolved Kind = "policy.approval.resolved"
-	KindKeyCreated Kind = "key.created"
-	KindKeyDeleted Kind = "key.deleted"
-	KindKeyDelegated Kind = "key.delegated"
-	KindKeyExported Kind = "key.exported"
-	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
-	KindWalletCreated Kind = "wallet.created"
-	KindWalletActivated Kind = "wallet.activated"
-	KindWalletDelegated Kind = "wallet.delegated"
-	KindWalletExported Kind = "wallet.exported"
-	KindWalletSignatureFailed Kind = "wallet.signature.failed"
-	KindWalletSignatureRejected Kind = "wallet.signature.rejected"
-	KindWalletSignatureRequested Kind = "wallet.signature.requested"
-	KindWalletSignatureSigned Kind = "wallet.signature.signed"
-	KindWalletTransactionBroadcasted Kind = "wallet.transaction.broadcasted"
-	KindWalletTransactionConfirmed Kind = "wallet.transaction.confirmed"
-	KindWalletTransactionFailed Kind = "wallet.transaction.failed"
-	KindWalletTransactionRejected Kind = "wallet.transaction.rejected"
-	KindWalletTransactionRequested Kind = "wallet.transaction.requested"
-	KindWalletTransferBroadcasted Kind = "wallet.transfer.broadcasted"
-	KindWalletTransferConfirmed Kind = "wallet.transfer.confirmed"
-	KindWalletTransferFailed Kind = "wallet.transfer.failed"
-	KindWalletTransferRejected Kind = "wallet.transfer.rejected"
-	KindWalletTransferRequested Kind = "wallet.transfer.requested"
-	KindWalletOfferReceived Kind = "wallet.offer.received"
-	KindWalletOfferAccepted Kind = "wallet.offer.accepted"
-	KindWalletOfferRejected Kind = "wallet.offer.rejected"
-	KindWalletTagsModified Kind = "wallet.tags.modified"
-)
-
 // SocialLoginProviderKind represents the socialloginproviderkind type.
 type SocialLoginProviderKind string
 
@@ -150,124 +285,22 @@ const (
 	ResidentKeyDiscouraged ResidentKey = "discouraged"
 )
 
-// Network represents the network type.
-type Network string
+// KeyScheme represents the keyscheme type.
+type KeyScheme string
 
 const (
-	NetworkAlgorand Network = "Algorand"
-	NetworkAlgorandTestnet Network = "AlgorandTestnet"
-	NetworkAptos Network = "Aptos"
-	NetworkAptosTestnet Network = "AptosTestnet"
-	NetworkArbitrumOne Network = "ArbitrumOne"
-	NetworkArbitrumSepolia Network = "ArbitrumSepolia"
-	NetworkArcTestnet Network = "ArcTestnet"
-	NetworkAvalancheC Network = "AvalancheC"
-	NetworkAvalancheCFuji Network = "AvalancheCFuji"
-	NetworkBabylonGenesis Network = "BabylonGenesis"
-	NetworkBabylonTestnet5 Network = "BabylonTestnet5"
-	NetworkBase Network = "Base"
-	NetworkBaseSepolia Network = "BaseSepolia"
-	NetworkBerachain Network = "Berachain"
-	NetworkBerachainBepolia Network = "BerachainBepolia"
-	NetworkBitcoin Network = "Bitcoin"
-	NetworkBitcoinSignet Network = "BitcoinSignet"
-	NetworkBitcoinTestnet3 Network = "BitcoinTestnet3"
-	NetworkBitcoinCash Network = "BitcoinCash"
-	NetworkBob Network = "Bob"
-	NetworkBobSepolia Network = "BobSepolia"
-	NetworkBsc Network = "Bsc"
-	NetworkBscTestnet Network = "BscTestnet"
-	NetworkCanton Network = "Canton"
-	NetworkCantonTestnet Network = "CantonTestnet"
-	NetworkCardano Network = "Cardano"
-	NetworkCardanoPreprod Network = "CardanoPreprod"
-	NetworkConcordium Network = "Concordium"
-	NetworkConcordiumTestnet Network = "ConcordiumTestnet"
-	NetworkCelo Network = "Celo"
-	NetworkCeloAlfajores Network = "CeloAlfajores"
-	NetworkCodex Network = "Codex"
-	NetworkCodexSepolia Network = "CodexSepolia"
-	NetworkCosmosHub4 Network = "CosmosHub4"
-	NetworkCosmosIcsTestnet Network = "CosmosIcsTestnet"
-	NetworkDogecoin Network = "Dogecoin"
-	NetworkEthereum Network = "Ethereum"
-	NetworkEthereumClassic Network = "EthereumClassic"
-	NetworkEthereumClassicMordor Network = "EthereumClassicMordor"
-	NetworkEthereumGoerli Network = "EthereumGoerli"
-	NetworkEthereumSepolia Network = "EthereumSepolia"
-	NetworkEthereumHolesky Network = "EthereumHolesky"
-	NetworkEthereumHoodi Network = "EthereumHoodi"
-	NetworkFantomOpera Network = "FantomOpera"
-	NetworkFantomTestnet Network = "FantomTestnet"
-	NetworkFlareC Network = "FlareC"
-	NetworkFlareCCoston2 Network = "FlareCCoston2"
-	NetworkFlowEvm Network = "FlowEvm"
-	NetworkFlowEvmTestnet Network = "FlowEvmTestnet"
-	NetworkHedera Network = "Hedera"
-	NetworkHederaTestnet Network = "HederaTestnet"
-	NetworkInk Network = "Ink"
-	NetworkInkSepolia Network = "InkSepolia"
-	NetworkInternetComputer Network = "InternetComputer"
-	NetworkIon Network = "Ion"
-	NetworkIonTestnet Network = "IonTestnet"
-	NetworkIota Network = "Iota"
-	NetworkIotaTestnet Network = "IotaTestnet"
-	NetworkKaspa Network = "Kaspa"
-	NetworkKusama Network = "Kusama"
-	NetworkKusamaAssetHub Network = "KusamaAssetHub"
-	NetworkLitecoin Network = "Litecoin"
-	NetworkNear Network = "Near"
-	NetworkNearTestnet Network = "NearTestnet"
-	NetworkOptimism Network = "Optimism"
-	NetworkOptimismSepolia Network = "OptimismSepolia"
-	NetworkOrigyn Network = "Origyn"
-	NetworkPlasma Network = "Plasma"
-	NetworkPlasmaTestnet Network = "PlasmaTestnet"
-	NetworkPlume Network = "Plume"
-	NetworkPlumeSepolia Network = "PlumeSepolia"
-	NetworkPaseo Network = "Paseo"
-	NetworkPaseoAssetHub Network = "PaseoAssetHub"
-	NetworkPolkadot Network = "Polkadot"
-	NetworkPolkadotAssetHub Network = "PolkadotAssetHub"
-	NetworkPolygon Network = "Polygon"
-	NetworkPolygonAmoy Network = "PolygonAmoy"
-	NetworkPolymesh Network = "Polymesh"
-	NetworkPolymeshTestnet Network = "PolymeshTestnet"
-	NetworkRace Network = "Race"
-	NetworkRaceSepolia Network = "RaceSepolia"
-	NetworkSeiAtlantic2 Network = "SeiAtlantic2"
-	NetworkSeiPacific1 Network = "SeiPacific1"
-	NetworkSolana Network = "Solana"
-	NetworkSolanaDevnet Network = "SolanaDevnet"
-	NetworkStarknet Network = "Starknet"
-	NetworkStarknetSepolia Network = "StarknetSepolia"
-	NetworkStellar Network = "Stellar"
-	NetworkStellarTestnet Network = "StellarTestnet"
-	NetworkSui Network = "Sui"
-	NetworkSuiTestnet Network = "SuiTestnet"
-	NetworkTezos Network = "Tezos"
-	NetworkTezosGhostnet Network = "TezosGhostnet"
-	NetworkTempoAndantino Network = "TempoAndantino"
-	NetworkTsc Network = "Tsc"
-	NetworkTscTestnet1 Network = "TscTestnet1"
-	NetworkTon Network = "Ton"
-	NetworkTonTestnet Network = "TonTestnet"
-	NetworkTron Network = "Tron"
-	NetworkTronNile Network = "TronNile"
-	NetworkWestend Network = "Westend"
-	NetworkWestendAssetHub Network = "WestendAssetHub"
-	NetworkXrpLedger Network = "XrpLedger"
-	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
+	KeySchemeECDSA KeyScheme = "ECDSA"
+	KeySchemeEdDSA KeyScheme = "EdDSA"
+	KeySchemeSchnorr KeyScheme = "Schnorr"
 )
 
-// Scheme represents the scheme type.
-type Scheme string
+// KeyCurve represents the keycurve type.
+type KeyCurve string
 
 const (
-	SchemeDH Scheme = "DH"
-	SchemeECDSA Scheme = "ECDSA"
-	SchemeEdDSA Scheme = "EdDSA"
-	SchemeSchnorr Scheme = "Schnorr"
+	KeyCurveEd25519 KeyCurve = "ed25519"
+	KeyCurveSecp256k1 KeyCurve = "secp256k1"
+	KeyCurveStark KeyCurve = "stark"
 )
 
 // Curve represents the curve type.
@@ -279,16 +312,12 @@ const (
 	CurveStark Curve = "stark"
 )
 
-// Status represents the status type.
-type Status string
+// Provider represents the provider type.
+type Provider string
 
 const (
-	StatusPending Status = "Pending"
-	StatusExecuting Status = "Executing"
-	StatusSigned Status = "Signed"
-	StatusConfirmed Status = "Confirmed"
-	StatusFailed Status = "Failed"
-	StatusRejected Status = "Rejected"
+	ProviderUniswapX Provider = "UniswapX"
+	ProviderUniswapClassic Provider = "UniswapClassic"
 )
 
 // OperationKind represents the operationkind type.
@@ -307,73 +336,27 @@ const (
 	ValueDenied Value = "Denied"
 )
 
-// Provider represents the provider type.
-type Provider string
-
-const (
-	ProviderUniswapX Provider = "UniswapX"
-	ProviderUniswapClassic Provider = "UniswapClassic"
-)
-
-// Protocol represents the protocol type.
-type Protocol string
-
-const (
-	ProtocolN0fns Protocol = "0fns"
-)
-
-// A specific action performed on a allocation investment, such as depositing or withdrawing funds.
-type AllocationAction struct {
+// WebhookEvent represents the WebhookEvent type.
+type WebhookEvent struct {
 	ID string `json:"id"`
-	AllocationID string `json:"allocationId"`
-	ExternalID *string `json:"externalId,omitempty"`
+	Date string `json:"date"`
 	Kind string `json:"kind"`
+	Data map[string]map[string]interface{} `json:"data"`
 	Status string `json:"status"`
-	Requester map[string]interface{} `json:"requester"`
-	RequestBody interface{} `json:"requestBody"`
-	FailureReason *string `json:"failureReason,omitempty"`
-	DateCreated string `json:"dateCreated"`
+	ErrorType *string `json:"error,omitempty"`
+	TimestampSent int64 `json:"timestampSent"`
 }
 
-// A allocation investment representing funds deposited to earn interest from a DeFi protocol.
-type Allocation struct {
+// Webhook represents the Webhook type.
+type Webhook struct {
 	ID string `json:"id"`
-	WalletID string `json:"walletId"`
-	Protocol string `json:"protocol"`
-	Amount map[string]interface{} `json:"amount"`
-	Rewards map[string]interface{} `json:"rewards"`
-	DateCreated string `json:"dateCreated"`
-}
-
-// SwapQuote represents the SwapQuote type.
-type SwapQuote struct {
-	ID string `json:"id"`
-	WalletID string `json:"walletId"`
-	TargetWalletID *string `json:"targetWalletId,omitempty"`
-	Provider string `json:"provider"`
-	SourceAsset map[string]interface{} `json:"sourceAsset"`
-	TargetAsset map[string]interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
-	DateCreated string `json:"dateCreated"`
-	RequestBody interface{} `json:"requestBody"`
-	Requester map[string]interface{} `json:"requester"`
-}
-
-// Swap represents the Swap type.
-type Swap struct {
-	ID string `json:"id"`
-	QuoteID string `json:"quoteId"`
-	Reference interface{} `json:"reference"`
-	WalletID string `json:"walletId"`
-	TargetWalletID string `json:"targetWalletId"`
+	URL string `json:"url"`
+	Events []interface{} `json:"events"`
 	Status string `json:"status"`
-	Provider string `json:"provider"`
-	QuotedSourceAsset map[string]interface{} `json:"quotedSourceAsset"`
-	QuotedTargetAsset map[string]interface{} `json:"quotedTargetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
+	Description *string `json:"description,omitempty"`
 	DateCreated string `json:"dateCreated"`
-	RequestBody interface{} `json:"requestBody"`
-	Requester map[string]interface{} `json:"requester"`
+	DateUpdated string `json:"dateUpdated"`
+	Secret string `json:"secret"`
 }
 
 // Offer represents the Offer type.
@@ -401,7 +384,7 @@ type TransferRequest struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
@@ -417,6 +400,111 @@ type TransferRequest struct {
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 }
 
+// The user who initiated the request.
+type Requester struct {
+	UserID string `json:"userId"`
+	TokenID *string `json:"tokenId,omitempty"`
+}
+
+// TransactionRequest represents the TransactionRequest type.
+type TransactionRequest struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	Network Network `json:"network"`
+	Requester Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	Status string `json:"status"`
+	Reason *string `json:"reason,omitempty"`
+	TxHash *string `json:"txHash,omitempty"`
+	Fee *string `json:"fee,omitempty"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	DateRequested string `json:"dateRequested"`
+	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
+	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
+	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+}
+
+// SwapQuote represents the SwapQuote type.
+type SwapQuote struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	TargetWalletID *string `json:"targetWalletId,omitempty"`
+	Provider string `json:"provider"`
+	SourceAsset map[string]interface{} `json:"sourceAsset"`
+	TargetAsset map[string]interface{} `json:"targetAsset"`
+	SlippageBps float64 `json:"slippageBps"`
+	DateCreated string `json:"dateCreated"`
+	RequestBody interface{} `json:"requestBody"`
+	Requester Requester `json:"requester"`
+}
+
+// Swap represents the Swap type.
+type Swap struct {
+	ID string `json:"id"`
+	QuoteID string `json:"quoteId"`
+	Reference interface{} `json:"reference"`
+	WalletID string `json:"walletId"`
+	TargetWalletID string `json:"targetWalletId"`
+	Status string `json:"status"`
+	Provider string `json:"provider"`
+	QuotedSourceAsset map[string]interface{} `json:"quotedSourceAsset"`
+	QuotedTargetAsset map[string]interface{} `json:"quotedTargetAsset"`
+	SlippageBps float64 `json:"slippageBps"`
+	DateCreated string `json:"dateCreated"`
+	RequestBody interface{} `json:"requestBody"`
+	Requester Requester `json:"requester"`
+	FailureReason *string `json:"failureReason,omitempty"`
+}
+
+// StakeAction represents the StakeAction type.
+type StakeAction struct {
+	ID string `json:"id"`
+	StakeID string `json:"stakeId"`
+	Status string `json:"status"`
+	TransactionID *string `json:"transactionId,omitempty"`
+	SignatureID *string `json:"signatureId,omitempty"`
+	TransactionHash *string `json:"transactionHash,omitempty"`
+	Kind string `json:"kind"`
+	Requester Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	FailureReason *string `json:"failureReason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+}
+
+// PolicyApproval represents the PolicyApproval type.
+type PolicyApproval struct {
+	ID string `json:"id"`
+	InitiatorID string `json:"initiatorId"`
+	Activity interface{} `json:"activity"`
+	Status string `json:"status"`
+	ExpirationDate *string `json:"expirationDate,omitempty"`
+	DateCreated *string `json:"dateCreated,omitempty"`
+	DateUpdated string `json:"dateUpdated"`
+	DateResolved *string `json:"dateResolved,omitempty"`
+	PolicyEvaluations []map[string]interface{} `json:"policyEvaluations"`
+	Decisions []map[string]interface{} `json:"decisions"`
+}
+
+// The user who initiated the change request.
+type ChangeRequestRequester struct {
+	UserID string `json:"userId"`
+	TokenID *string `json:"tokenId,omitempty"`
+	AppID *string `json:"appId,omitempty"`
+}
+
+// Permission represents the Permission type.
+type Permission struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
+	Operations []string `json:"operations"`
+	Status string `json:"status"`
+	IsImmutable bool `json:"isImmutable"`
+	IsArchived bool `json:"isArchived"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
 // CantonValidator represents the CantonValidator type.
 type CantonValidator struct {
 	ID string `json:"id"`
@@ -426,6 +514,57 @@ type CantonValidator struct {
 	Kind string `json:"kind"`
 	DateCreated string `json:"dateCreated"`
 	PartyHint string `json:"partyHint"`
+}
+
+// SignatureRequest represents the SignatureRequest type.
+type SignatureRequest struct {
+	ID string `json:"id"`
+	KeyID string `json:"keyId"`
+	Requester Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	Status string `json:"status"`
+	Reason *string `json:"reason,omitempty"`
+	Signature *map[string]interface{} `json:"signature,omitempty"`
+	Signatures []map[string]interface{} `json:"signatures,omitempty"`
+	SignedData *string `json:"signedData,omitempty"`
+	Network *Network `json:"network,omitempty"`
+	TxHash *string `json:"txHash,omitempty"`
+	Fee *string `json:"fee,omitempty"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	DateRequested string `json:"dateRequested"`
+	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
+	DateSigned *string `json:"dateSigned,omitempty"`
+	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+}
+
+// Key represents the Key type.
+type Key struct {
+	ID string `json:"id"`
+	Scheme KeyScheme `json:"scheme"`
+	Curve KeyCurve `json:"curve"`
+	PublicKey string `json:"publicKey"`
+	MasterKey *bool `json:"masterKey,omitempty"`
+	DerivedFrom *map[string]interface{} `json:"derivedFrom,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Status string `json:"status"`
+	Custodial bool `json:"custodial"`
+	DateCreated string `json:"dateCreated"`
+	Imported *bool `json:"imported,omitempty"`
+	Exported *bool `json:"exported,omitempty"`
+	DateExported *string `json:"dateExported,omitempty"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
+}
+
+// FeeSponsor represents the FeeSponsor type.
+type FeeSponsor struct {
+	ID string `json:"id"`
+	Name *string `json:"name,omitempty"`
+	WalletID string `json:"walletId"`
+	Network Network `json:"network"`
+	Status string `json:"status"`
+	DateCreated string `json:"dateCreated"`
+	AllowEndUser *bool `json:"allowEndUser,omitempty"`
 }
 
 // User represents the User type.
@@ -460,6 +599,35 @@ type Wallet struct {
 	ValidatorID *string `json:"validatorId,omitempty"`
 }
 
+// Credential represents the Credential type.
+type Credential struct {
+	Kind string `json:"kind"`
+	CredentialID string `json:"credentialId"`
+	CredentialUUID string `json:"credentialUuid"`
+	DateCreated string `json:"dateCreated"`
+	IsActive bool `json:"isActive"`
+	Name string `json:"name"`
+	PublicKey string `json:"publicKey"`
+	RelyingPartyID string `json:"relyingPartyId"`
+	Origin string `json:"origin"`
+}
+
+// PersonalAccessToken represents the PersonalAccessToken type.
+type PersonalAccessToken struct {
+	AccessToken *string `json:"accessToken,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	CredID string `json:"credId"`
+	IsActive bool `json:"isActive"`
+	Kind string `json:"kind"`
+	LinkedUserID string `json:"linkedUserId"`
+	LinkedAppID string `json:"linkedAppId"`
+	Name string `json:"name"`
+	OrgID string `json:"orgId"`
+	PermissionAssignments []map[string]interface{} `json:"permissionAssignments"`
+	PublicKey string `json:"publicKey"`
+	TokenID string `json:"tokenId"`
+}
+
 // AuditLog represents the AuditLog type.
 type AuditLog struct {
 	ID interface{} `json:"id"`
@@ -469,4 +637,27 @@ type AuditLog struct {
 	Username interface{} `json:"username"`
 	DatePerformed string `json:"datePerformed"`
 	FirstFactorCredential map[string]interface{} `json:"firstFactorCredential"`
+}
+
+// A specific action performed on a allocation investment, such as depositing or withdrawing funds.
+type AllocationAction struct {
+	ID string `json:"id"`
+	AllocationID string `json:"allocationId"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Kind string `json:"kind"`
+	Status string `json:"status"`
+	Requester Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	FailureReason *string `json:"failureReason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+}
+
+// A allocation investment representing funds deposited to earn interest from a DeFi protocol.
+type Allocation struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	Protocol string `json:"protocol"`
+	Amount map[string]interface{} `json:"amount"`
+	Rewards map[string]interface{} `json:"rewards"`
+	DateCreated string `json:"dateCreated"`
 }
