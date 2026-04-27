@@ -4,20 +4,21 @@ package dfns
 
 import (
 	"github.com/dfns/dfns-sdk-go/v2/internal/client"
+	"github.com/dfns/dfns-sdk-go/v2/agreements"
+	"github.com/dfns/dfns-sdk-go/v2/allocations"
 	"github.com/dfns/dfns-sdk-go/v2/auth"
 	"github.com/dfns/dfns-sdk-go/v2/exchanges"
 	"github.com/dfns/dfns-sdk-go/v2/feesponsors"
 	"github.com/dfns/dfns-sdk-go/v2/keys"
 	"github.com/dfns/dfns-sdk-go/v2/networks"
+	"github.com/dfns/dfns-sdk-go/v2/payouts"
 	"github.com/dfns/dfns-sdk-go/v2/permissions"
 	"github.com/dfns/dfns-sdk-go/v2/policies"
 	"github.com/dfns/dfns-sdk-go/v2/signers"
 	"github.com/dfns/dfns-sdk-go/v2/staking"
+	"github.com/dfns/dfns-sdk-go/v2/swaps"
 	"github.com/dfns/dfns-sdk-go/v2/wallets"
 	"github.com/dfns/dfns-sdk-go/v2/webhooks"
-	"github.com/dfns/dfns-sdk-go/v2/swaps"
-	"github.com/dfns/dfns-sdk-go/v2/agreements"
-	"github.com/dfns/dfns-sdk-go/v2/allocations"
 )
 
 // Options contains configuration for the Dfns client.
@@ -31,20 +32,21 @@ type APIError = client.APIError
 // Client is the main Dfns API client.
 type Client struct {
 	baseClient *client.Client
+	Agreements *agreements.AgreementsClient
+	Allocations *allocations.AllocationsClient
 	Auth *auth.AuthClient
 	Exchanges *exchanges.ExchangesClient
 	FeeSponsors *feesponsors.FeeSponsorsClient
 	Keys *keys.KeysClient
 	Networks *networks.NetworksClient
+	Payouts *payouts.PayoutsClient
 	Permissions *permissions.PermissionsClient
 	Policies *policies.PoliciesClient
 	Signers *signers.SignersClient
 	Staking *staking.StakingClient
+	Swaps *swaps.SwapsClient
 	Wallets *wallets.WalletsClient
 	Webhooks *webhooks.WebhooksClient
-	Swaps *swaps.SwapsClient
-	Agreements *agreements.AgreementsClient
-	Allocations *allocations.AllocationsClient
 }
 
 // NewClient creates a new Dfns API client.
@@ -56,19 +58,20 @@ func NewClient(opts Options) (*Client, error) {
 
 	return &Client{
 		baseClient: c,
+		Agreements: agreements.NewAgreementsClient(c),
+		Allocations: allocations.NewAllocationsClient(c),
 		Auth: auth.NewAuthClient(c),
 		Exchanges: exchanges.NewExchangesClient(c),
 		FeeSponsors: feesponsors.NewFeeSponsorsClient(c),
 		Keys: keys.NewKeysClient(c),
 		Networks: networks.NewNetworksClient(c),
+		Payouts: payouts.NewPayoutsClient(c),
 		Permissions: permissions.NewPermissionsClient(c),
 		Policies: policies.NewPoliciesClient(c),
 		Signers: signers.NewSignersClient(c),
 		Staking: staking.NewStakingClient(c),
+		Swaps: swaps.NewSwapsClient(c),
 		Wallets: wallets.NewWalletsClient(c),
 		Webhooks: webhooks.NewWebhooksClient(c),
-		Swaps: swaps.NewSwapsClient(c),
-		Agreements: agreements.NewAgreementsClient(c),
-		Allocations: allocations.NewAllocationsClient(c),
 	}, nil
 }

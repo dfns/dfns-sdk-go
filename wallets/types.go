@@ -6,6 +6,46 @@ import (
 	"github.com/dfns/dfns-sdk-go/v2/types"
 )
 
+// Abort Transaction
+type AbortTransactionResponse struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	Network types.Network `json:"network"`
+	Requester types.Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	Status string `json:"status"`
+	Reason *string `json:"reason,omitempty"`
+	TxHash *string `json:"txHash,omitempty"`
+	Fee *string `json:"fee,omitempty"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	DateRequested string `json:"dateRequested"`
+	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
+	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
+	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+}
+
+// Abort Transfer
+type AbortTransferResponse struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	Network types.Network `json:"network"`
+	Requester types.Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	Metadata map[string]interface{} `json:"metadata"`
+	Status string `json:"status"`
+	Reason *string `json:"reason,omitempty"`
+	TxHash *string `json:"txHash,omitempty"`
+	Fee *string `json:"fee,omitempty"`
+	DateRequested string `json:"dateRequested"`
+	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
+	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
+	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+}
+
 // ActivateWalletRequest represents the request body for the activateWallet operation.
 type ActivateWalletRequest = any
 
@@ -14,7 +54,7 @@ type ActivateWalletResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -30,14 +70,14 @@ type ActivateWalletResponse struct {
 
 // List Transactions
 type ListTransactionsResponse struct {
-	WalletID string `json:"walletId"`
-	Items []map[string]interface{} `json:"items"`
+	Items []types.TransactionRequest `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
+	WalletID string `json:"walletId"`
 }
 
 // ListTransactionsQuery represents query parameters.
 type ListTransactionsQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
@@ -49,7 +89,7 @@ type SignAndBroadcastTransactionResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -68,7 +108,7 @@ type CancelTransactionResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -87,7 +127,7 @@ type CancelTransferResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -106,7 +146,7 @@ type SpeedUpTransactionResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -125,7 +165,7 @@ type SpeedUpTransferResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -147,7 +187,7 @@ type ListWalletsResponse struct {
 
 // ListWalletsQuery represents query parameters.
 type ListWalletsQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 	Owner *string `json:"owner,omitempty"`
 	OwnerID *string `json:"ownerId,omitempty"`
@@ -163,7 +203,6 @@ type CreateWalletRequest struct {
 	DelayDelegation *bool `json:"delayDelegation,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags,omitempty"`
-	ValidatorID *string `json:"validatorId,omitempty"`
 }
 
 // Create Wallet
@@ -182,99 +221,12 @@ type CreateWalletResponse struct {
 	ValidatorID *string `json:"validatorId,omitempty"`
 }
 
-// Delegate Wallet
-type DelegateWalletRequest struct {
-	UserID string `json:"userId"`
-}
-
-// Delegate Wallet
-type DelegateWalletResponse struct {
-	WalletID string `json:"walletId"`
-	Status string `json:"status"`
-}
-
-// Export Wallet
-type ExportWalletRequest struct {
-	EncryptionKey string `json:"encryptionKey"`
-	SupportedSchemes []map[string]interface{} `json:"supportedSchemes"`
-}
-
-// Export Wallet
-type ExportWalletResponse struct {
-	PublicKey string `json:"publicKey"`
-	Protocol interface{} `json:"protocol"`
-	Curve string `json:"curve"`
-	MinSigners float64 `json:"minSigners"`
-	EncryptedKeyShares []map[string]interface{} `json:"encryptedKeyShares"`
-}
-
-// List Signatures
-type ListSignaturesResponse struct {
-	KeyID string `json:"keyId"`
-	Items []map[string]interface{} `json:"items"`
-	NextPageToken *string `json:"nextPageToken,omitempty"`
-}
-
-// ListSignaturesQuery represents query parameters.
-type ListSignaturesQuery struct {
-	Limit *string `json:"limit,omitempty"`
-	PaginationToken *string `json:"paginationToken,omitempty"`
-}
-
-// GenerateSignatureRequest represents the request body for the generateSignature operation.
-type GenerateSignatureRequest = any
-
-// Generate Signature
-type GenerateSignatureResponse struct {
-	ID string `json:"id"`
-	KeyID string `json:"keyId"`
-	Requester map[string]interface{} `json:"requester"`
-	RequestBody interface{} `json:"requestBody"`
-	Status string `json:"status"`
-	Reason *string `json:"reason,omitempty"`
-	Signature *map[string]interface{} `json:"signature,omitempty"`
-	Signatures []map[string]interface{} `json:"signatures,omitempty"`
-	SignedData *string `json:"signedData,omitempty"`
-	Network string `json:"network"`
-	TxHash *string `json:"txHash,omitempty"`
-	Fee *string `json:"fee,omitempty"`
-	ApprovalID *string `json:"approvalId,omitempty"`
-	DateRequested string `json:"dateRequested"`
-	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
-	DateSigned *string `json:"dateSigned,omitempty"`
-	DateConfirmed *string `json:"dateConfirmed,omitempty"`
-	ExternalID *string `json:"externalId,omitempty"`
-	WalletID string `json:"walletId"`
-}
-
-// Get Signature
-type GetSignatureResponse struct {
-	ID string `json:"id"`
-	KeyID string `json:"keyId"`
-	Requester map[string]interface{} `json:"requester"`
-	RequestBody interface{} `json:"requestBody"`
-	Status string `json:"status"`
-	Reason *string `json:"reason,omitempty"`
-	Signature *map[string]interface{} `json:"signature,omitempty"`
-	Signatures []map[string]interface{} `json:"signatures,omitempty"`
-	SignedData *string `json:"signedData,omitempty"`
-	Network *types.Network `json:"network,omitempty"`
-	TxHash *string `json:"txHash,omitempty"`
-	Fee *string `json:"fee,omitempty"`
-	ApprovalID *string `json:"approvalId,omitempty"`
-	DateRequested string `json:"dateRequested"`
-	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
-	DateSigned *string `json:"dateSigned,omitempty"`
-	DateConfirmed *string `json:"dateConfirmed,omitempty"`
-	ExternalID *string `json:"externalId,omitempty"`
-}
-
 // Get Transaction
 type GetTransactionResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
@@ -293,7 +245,7 @@ type GetTransferResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
@@ -393,7 +345,6 @@ type ImportWalletRequest struct {
 	EncryptedKeyShares []map[string]interface{} `json:"encryptedKeyShares"`
 	Network string `json:"network"`
 	ExternalID *string `json:"externalId,omitempty"`
-	ValidatorID *string `json:"validatorId,omitempty"`
 }
 
 // Import Wallet
@@ -414,14 +365,14 @@ type ImportWalletResponse struct {
 
 // List Transfers
 type ListTransfersResponse struct {
-	WalletID string `json:"walletId"`
 	Items []types.TransferRequest `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
+	WalletID string `json:"walletId"`
 }
 
 // ListTransfersQuery represents query parameters.
 type ListTransfersQuery struct {
-	Limit *string `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
@@ -433,7 +384,7 @@ type TransferAssetResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Network types.Network `json:"network"`
-	Requester map[string]interface{} `json:"requester"`
+	Requester types.Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
@@ -541,8 +492,8 @@ type RejectOfferResponse struct {
 
 // ListOrgWalletHistoryQuery represents query parameters.
 type ListOrgWalletHistoryQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
 	StartTime string `json:"startTime"`
 	EndTime string `json:"endTime"`
-	Limit *string `json:"limit,omitempty"`
-	PaginationToken *string `json:"paginationToken,omitempty"`
 }
