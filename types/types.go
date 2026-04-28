@@ -119,6 +119,8 @@ const (
 	NetworkWestendAssetHub Network = "WestendAssetHub"
 	NetworkXdc Network = "Xdc"
 	NetworkXdcApothem Network = "XdcApothem"
+	NetworkXLayer Network = "XLayer"
+	NetworkXLayerSepolia Network = "XLayerSepolia"
 	NetworkXrpLedger Network = "XrpLedger"
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
