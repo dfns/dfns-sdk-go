@@ -4,6 +4,9 @@ package signers
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+
 	"github.com/dfns/dfns-sdk-go/v2/internal/client"
 )
 
@@ -15,6 +18,29 @@ type SignersClient struct {
 // NewSignersClient creates a new SignersClient.
 func NewSignersClient(c *client.Client) *SignersClient {
 	return &SignersClient{client: c}
+}
+
+// CreateCloneInput create clone input.
+func (c *SignersClient) CreateCloneInput(ctx context.Context, storeID string, body CreateCloneInputRequest) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/clone/input"
+	return c.client.Do(ctx, "POST", path, body, nil, true)
+}
+
+// CreateGenesisInput create genesis input.
+func (c *SignersClient) CreateGenesisInput(ctx context.Context, storeID string, body CreateGenesisInputRequest) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/genesis/input"
+	return c.client.Do(ctx, "POST", path, body, nil, true)
+}
+
+// CreateProofOfControlInput create proof of control input.
+func (c *SignersClient) CreateProofOfControlInput(ctx context.Context, storeID string, body CreateProofOfControlInputRequest) (*CreateProofOfControlInputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/proof-of-control/input"
+	var result CreateProofOfControlInputResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 // ListKeyStores list key stores.
@@ -33,6 +59,39 @@ func (c *SignersClient) ListSigners(ctx context.Context) (*ListSignersResponse, 
 	path := "/signers"
 	var result ListSignersResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// SubmitCloneOutput submit clone output.
+func (c *SignersClient) SubmitCloneOutput(ctx context.Context, storeID string, body SubmitCloneOutputRequest) (*SubmitCloneOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/clone/output"
+	var result SubmitCloneOutputResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// SubmitGenesisOutput submit genesis output.
+func (c *SignersClient) SubmitGenesisOutput(ctx context.Context, storeID string, body SubmitGenesisOutputRequest) (*SubmitGenesisOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/genesis/output"
+	var result SubmitGenesisOutputResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// SubmitProofOfControlOutput submit proof of control output.
+func (c *SignersClient) SubmitProofOfControlOutput(ctx context.Context, storeID string, body SubmitProofOfControlOutputRequest) (*SubmitProofOfControlOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/proof-of-control/output"
+	var result SubmitProofOfControlOutputResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}
