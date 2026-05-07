@@ -2,6 +2,27 @@
 
 package signers
 
+// Create Clone Input
+type CreateCloneInputRequest struct {
+	Kind string `json:"kind"`
+	HsmSourceSerial string `json:"hsmSourceSerial"`
+	HsmTargetSerial string `json:"hsmTargetSerial"`
+}
+
+// Create Genesis Input
+type CreateGenesisInputRequest struct {
+	Kind string `json:"kind"`
+	NumProvisioners int64 `json:"numProvisioners"`
+	NumSecp256k1 *int64 `json:"numSecp256k1,omitempty"`
+	NumEd25519 *int64 `json:"numEd25519,omitempty"`
+	HsmGenesisSerial string `json:"hsmGenesisSerial"`
+}
+
+// Create Proof Of Control Input
+type CreateProofOfControlInputRequest struct {
+	WalletIDs []string `json:"walletIds"`
+}
+
 // List Key Stores
 type ListKeyStoresResponse struct {
 	Items []map[string]interface{} `json:"items"`
@@ -10,4 +31,34 @@ type ListKeyStoresResponse struct {
 // List Signers
 type ListSignersResponse struct {
 	Clusters []map[string]interface{} `json:"clusters"`
+}
+
+// Submit Clone Output
+type SubmitCloneOutputRequest struct {
+	FileChecksum string `json:"fileChecksum"`
+	OutputJSON map[string]interface{} `json:"outputJson"`
+}
+
+// Submit Clone Output
+type SubmitCloneOutputResponse struct {
+}
+
+// Submit Genesis Output
+type SubmitGenesisOutputRequest struct {
+	FileChecksum string `json:"fileChecksum"`
+	OutputJSON map[string]interface{} `json:"outputJson"`
+}
+
+// Submit Genesis Output
+type SubmitGenesisOutputResponse struct {
+}
+
+// Submit Proof Of Control Output
+type SubmitProofOfControlOutputRequest struct {
+	FileChecksum string `json:"fileChecksum"`
+	OutputJSON map[string]interface{} `json:"outputJson"`
+}
+
+// Submit Proof Of Control Output
+type SubmitProofOfControlOutputResponse struct {
 }
