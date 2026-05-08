@@ -119,6 +119,8 @@ const (
 	NetworkWestendAssetHub Network = "WestendAssetHub"
 	NetworkXdc Network = "Xdc"
 	NetworkXdcApothem Network = "XdcApothem"
+	NetworkXLayer Network = "XLayer"
+	NetworkXLayerSepolia Network = "XLayerSepolia"
 	NetworkXrpLedger Network = "XrpLedger"
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
@@ -334,6 +336,13 @@ type Value string
 const (
 	ValueApproved Value = "Approved"
 	ValueDenied Value = "Denied"
+)
+
+// Version represents the version type.
+type Version int64
+
+const (
+	VersionN1 Version = 1
 )
 
 // WebhookEvent represents the WebhookEvent type.
