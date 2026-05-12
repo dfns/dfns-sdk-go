@@ -141,6 +141,13 @@ type CancelTransferResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 }
 
+// Proxy a request to the Canton Ledger API
+type ProxyARequestToTheCantonLedgerAPIRequest struct {
+	RequestMethod string `json:"requestMethod"`
+	Resource string `json:"resource"`
+	Body map[string]interface{} `json:"body,omitempty"`
+}
+
 // Speed Up Transaction
 type SpeedUpTransactionResponse struct {
 	ID string `json:"id"`
