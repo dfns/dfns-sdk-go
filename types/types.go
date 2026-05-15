@@ -119,6 +119,8 @@ const (
 	NetworkWestendAssetHub Network = "WestendAssetHub"
 	NetworkXdc Network = "Xdc"
 	NetworkXdcApothem Network = "XdcApothem"
+	NetworkXLayer Network = "XLayer"
+	NetworkXLayerSepolia Network = "XLayerSepolia"
 	NetworkXrpLedger Network = "XrpLedger"
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
@@ -334,6 +336,29 @@ type Value string
 const (
 	ValueApproved Value = "Approved"
 	ValueDenied Value = "Denied"
+)
+
+// HsmGenesisFirmwareVersion represents the hsmgenesisfirmwareversion type.
+type HsmGenesisFirmwareVersion string
+
+const (
+	HsmGenesisFirmwareVersionN22 HsmGenesisFirmwareVersion = "2.2"
+	HsmGenesisFirmwareVersionN24 HsmGenesisFirmwareVersion = "2.4"
+)
+
+// Version represents the version type.
+type Version int64
+
+const (
+	VersionN1 Version = 1
+)
+
+// RequestMethod represents the requestmethod type.
+type RequestMethod string
+
+const (
+	RequestMethodGET RequestMethod = "GET"
+	RequestMethodPOST RequestMethod = "POST"
 )
 
 // WebhookEvent represents the WebhookEvent type.
