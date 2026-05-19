@@ -23,6 +23,7 @@ type AbortTransactionResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Abort Transfer
@@ -44,6 +45,7 @@ type AbortTransferResponse struct {
 	ApprovalID *string `json:"approvalId,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // ActivateWalletRequest represents the request body for the activateWallet operation.
@@ -66,6 +68,7 @@ type ActivateWalletResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // List Transactions
@@ -101,6 +104,7 @@ type SignAndBroadcastTransactionResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Cancel Transaction
@@ -120,6 +124,7 @@ type CancelTransactionResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Cancel Transfer
@@ -139,6 +144,14 @@ type CancelTransferResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+}
+
+// Proxy a request to the Canton Ledger API
+type ProxyARequestToTheCantonLedgerAPIRequest struct {
+	RequestMethod string `json:"requestMethod"`
+	Resource string `json:"resource"`
+	Body map[string]interface{} `json:"body,omitempty"`
 }
 
 // Speed Up Transaction
@@ -158,6 +171,7 @@ type SpeedUpTransactionResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Speed Up Transfer
@@ -177,6 +191,7 @@ type SpeedUpTransferResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // List Wallets
@@ -238,6 +253,7 @@ type GetTransactionResponse struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Get Transfer
@@ -259,6 +275,7 @@ type GetTransferResponse struct {
 	ApprovalID *string `json:"approvalId,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Get Wallet
@@ -398,6 +415,7 @@ type TransferAssetResponse struct {
 	ApprovalID *string `json:"approvalId,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
 }
 
 // Tag Wallet
