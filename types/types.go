@@ -31,6 +31,7 @@ const (
 	NetworkBitcoin Network = "Bitcoin"
 	NetworkBitcoinSignet Network = "BitcoinSignet"
 	NetworkBitcoinTestnet3 Network = "BitcoinTestnet3"
+	NetworkBitcoinTestnet4 Network = "BitcoinTestnet4"
 	NetworkBitcoinCash Network = "BitcoinCash"
 	NetworkBob Network = "Bob"
 	NetworkBobSepolia Network = "BobSepolia"
@@ -107,6 +108,7 @@ const (
 	NetworkSuiTestnet Network = "SuiTestnet"
 	NetworkTezos Network = "Tezos"
 	NetworkTezosGhostnet Network = "TezosGhostnet"
+	NetworkTezosShadownet Network = "TezosShadownet"
 	NetworkTempo Network = "Tempo"
 	NetworkTempoModerato Network = "TempoModerato"
 	NetworkTsc Network = "Tsc"
@@ -119,6 +121,8 @@ const (
 	NetworkWestendAssetHub Network = "WestendAssetHub"
 	NetworkXdc Network = "Xdc"
 	NetworkXdcApothem Network = "XdcApothem"
+	NetworkXLayer Network = "XLayer"
+	NetworkXLayerSepolia Network = "XLayerSepolia"
 	NetworkXrpLedger Network = "XrpLedger"
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
@@ -336,6 +340,29 @@ const (
 	ValueDenied Value = "Denied"
 )
 
+// HsmGenesisFirmwareVersion represents the hsmgenesisfirmwareversion type.
+type HsmGenesisFirmwareVersion string
+
+const (
+	HsmGenesisFirmwareVersionN22 HsmGenesisFirmwareVersion = "2.2"
+	HsmGenesisFirmwareVersionN24 HsmGenesisFirmwareVersion = "2.4"
+)
+
+// Version represents the version type.
+type Version int64
+
+const (
+	VersionN1 Version = 1
+)
+
+// RequestMethod represents the requestmethod type.
+type RequestMethod string
+
+const (
+	RequestMethodGET RequestMethod = "GET"
+	RequestMethodPOST RequestMethod = "POST"
+)
+
 // WebhookEvent represents the WebhookEvent type.
 type WebhookEvent struct {
 	ID string `json:"id"`
@@ -398,6 +425,8 @@ type TransferRequest struct {
 	ApprovalID *string `json:"approvalId,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // The user who initiated the request.
@@ -423,6 +452,8 @@ type TransactionRequest struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // SwapQuote represents the SwapQuote type.
@@ -536,6 +567,7 @@ type SignatureRequest struct {
 	DateSigned *string `json:"dateSigned,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // Key represents the Key type.
