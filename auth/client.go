@@ -154,6 +154,17 @@ func (c *AuthClient) ActivateCredential(ctx context.Context, body ActivateCreden
 	return &result, nil
 }
 
+// Delete a specific credential.
+func (c *AuthClient) DeleteCredential(ctx context.Context, credentialUUID string) (*DeleteCredentialResponse, error) {
+	path := "/auth/credentials/" + url.PathEscape(credentialUUID)
+	var result DeleteCredentialResponse
+	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Deactivates a credential that was previously active. If the credential is already deactivated no action is taken.
 func (c *AuthClient) DeactivateCredential(ctx context.Context, body DeactivateCredentialRequest) (*DeactivateCredentialResponse, error) {
 	path := "/auth/credentials/deactivate"
