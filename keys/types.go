@@ -183,6 +183,7 @@ type GenerateSignatureResponse struct {
 	DateSigned *string `json:"dateSigned,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // Get Signature
@@ -205,6 +206,7 @@ type GetSignatureResponse struct {
 	DateSigned *string `json:"dateSigned,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // Import Key
