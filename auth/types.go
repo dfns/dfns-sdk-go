@@ -110,6 +110,10 @@ type ActivateCredentialResponse struct {
 	Message string `json:"message"`
 }
 
+// Delete Credential
+type DeleteCredentialResponse struct {
+}
+
 // Deactivate Credential
 type DeactivateCredentialRequest struct {
 	CredentialUUID string `json:"credentialUuid"`
