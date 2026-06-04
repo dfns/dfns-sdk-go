@@ -154,6 +154,17 @@ func (c *AuthClient) ActivateCredential(ctx context.Context, body ActivateCreden
 	return &result, nil
 }
 
+// Delete a specific credential.
+func (c *AuthClient) DeleteCredential(ctx context.Context, credentialUUID string) (*DeleteCredentialResponse, error) {
+	path := "/auth/credentials/" + url.PathEscape(credentialUUID)
+	var result DeleteCredentialResponse
+	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Deactivates a credential that was previously active. If the credential is already deactivated no action is taken.
 func (c *AuthClient) DeactivateCredential(ctx context.Context, body DeactivateCredentialRequest) (*DeactivateCredentialResponse, error) {
 	path := "/auth/credentials/deactivate"
@@ -462,7 +473,7 @@ func (c *AuthClient) CreateSocialRegistrationChallenge(ctx context.Context, body
 
 // Completes the user registration process and creates the user's initial credentials.
 // 
-// The type of credentials being registered is determined by the `credentialKind` field in the nested objects (`firstFactorCredential` , `secondFactorCredential` and `RecoveryCredential`). Supported credential kinds are:
+// All credentials submitted in this call (`firstFactorCredential`, `secondFactorCredential`, `recoveryCredential`) sign the same challenge returned by the registration init endpoint ([Create Registration Challenge](https://docs.dfns.co/api-reference/auth/create-registration-challenge), [Create Delegated Registration Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-registration-challenge), or [Create Social Registration Challenge](https://docs.dfns.co/api-reference/auth/create-social-registration-challenge)).
 func (c *AuthClient) CompleteUserRegistration(ctx context.Context, body CompleteUserRegistrationRequest) (*CompleteUserRegistrationResponse, error) {
 	path := "/auth/registration"
 	var result CompleteUserRegistrationResponse
@@ -475,7 +486,7 @@ func (c *AuthClient) CompleteUserRegistration(ctx context.Context, body Complete
 
 // Completes the end user registration process and creates the user's initial credentials along with delegated wallets for the new end user.
 // 
-// The type of credentials being registered is determined by the `credentialKind` field in the nested objects (`firstFactorCredential` , `secondFactorCredential` and `RecoveryCredential`). Supported credential kinds are:
+// All credentials submitted in this call (`firstFactorCredential`, `secondFactorCredential`, `recoveryCredential`) sign the same challenge returned by the registration init endpoint ([Create Delegated Registration Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-registration-challenge) or [Create Social Registration Challenge](https://docs.dfns.co/api-reference/auth/create-social-registration-challenge)).
 func (c *AuthClient) CompleteEndUserRegistrationWithWallets(ctx context.Context, body CompleteEndUserRegistrationWithWalletsRequest) (*CompleteEndUserRegistrationWithWalletsResponse, error) {
 	path := "/auth/registration/enduser"
 	var result CompleteEndUserRegistrationWithWalletsResponse
