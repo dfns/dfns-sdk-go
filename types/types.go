@@ -31,6 +31,7 @@ const (
 	NetworkBitcoin Network = "Bitcoin"
 	NetworkBitcoinSignet Network = "BitcoinSignet"
 	NetworkBitcoinTestnet3 Network = "BitcoinTestnet3"
+	NetworkBitcoinTestnet4 Network = "BitcoinTestnet4"
 	NetworkBitcoinCash Network = "BitcoinCash"
 	NetworkBob Network = "Bob"
 	NetworkBobSepolia Network = "BobSepolia"
@@ -107,6 +108,7 @@ const (
 	NetworkSuiTestnet Network = "SuiTestnet"
 	NetworkTezos Network = "Tezos"
 	NetworkTezosGhostnet Network = "TezosGhostnet"
+	NetworkTezosShadownet Network = "TezosShadownet"
 	NetworkTempo Network = "Tempo"
 	NetworkTempoModerato Network = "TempoModerato"
 	NetworkTsc Network = "Tsc"
@@ -119,6 +121,8 @@ const (
 	NetworkWestendAssetHub Network = "WestendAssetHub"
 	NetworkXdc Network = "Xdc"
 	NetworkXdcApothem Network = "XdcApothem"
+	NetworkXLayer Network = "XLayer"
+	NetworkXLayerSepolia Network = "XLayerSepolia"
 	NetworkXrpLedger Network = "XrpLedger"
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
@@ -336,6 +340,29 @@ const (
 	ValueDenied Value = "Denied"
 )
 
+// HsmGenesisFirmwareVersion represents the hsmgenesisfirmwareversion type.
+type HsmGenesisFirmwareVersion string
+
+const (
+	HsmGenesisFirmwareVersionN22 HsmGenesisFirmwareVersion = "2.2"
+	HsmGenesisFirmwareVersionN24 HsmGenesisFirmwareVersion = "2.4"
+)
+
+// Version represents the version type.
+type Version int64
+
+const (
+	VersionN1 Version = 1
+)
+
+// RequestMethod represents the requestmethod type.
+type RequestMethod string
+
+const (
+	RequestMethodGET RequestMethod = "GET"
+	RequestMethodPOST RequestMethod = "POST"
+)
+
 // WebhookEvent represents the WebhookEvent type.
 type WebhookEvent struct {
 	ID string `json:"id"`
@@ -347,6 +374,18 @@ type WebhookEvent struct {
 	TimestampSent int64 `json:"timestampSent"`
 }
 
+// WebhookWithSecret represents the WebhookWithSecret type.
+type WebhookWithSecret struct {
+	ID string `json:"id"`
+	URL string `json:"url"`
+	Events []interface{} `json:"events"`
+	Status string `json:"status"`
+	Description *string `json:"description,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+	Secret string `json:"secret"`
+}
+
 // Webhook represents the Webhook type.
 type Webhook struct {
 	ID string `json:"id"`
@@ -356,7 +395,6 @@ type Webhook struct {
 	Description *string `json:"description,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
-	Secret string `json:"secret"`
 }
 
 // Offer represents the Offer type.
@@ -398,6 +436,8 @@ type TransferRequest struct {
 	ApprovalID *string `json:"approvalId,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // The user who initiated the request.
@@ -423,6 +463,8 @@ type TransactionRequest struct {
 	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // SwapQuote represents the SwapQuote type.
@@ -536,6 +578,7 @@ type SignatureRequest struct {
 	DateSigned *string `json:"dateSigned,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
 // Key represents the Key type.
@@ -574,7 +617,8 @@ type User struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -597,6 +641,14 @@ type Wallet struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+}
+
+// Register a recovery key. See [Account Recovery](https://docs.dfns.co/api-reference/auth/account-recovery) for more details.
+type RecoveryKeyAttestation struct {
+	CredentialKind string `json:"credentialKind"`
+	CredentialInfo map[string]interface{} `json:"credentialInfo"`
+	EncryptedPrivateKey *string `json:"encryptedPrivateKey,omitempty"`
+	CredentialName *string `json:"credentialName,omitempty"`
 }
 
 // Credential represents the Credential type.
