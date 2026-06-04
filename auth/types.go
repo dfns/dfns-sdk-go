@@ -110,6 +110,10 @@ type ActivateCredentialResponse struct {
 	Message string `json:"message"`
 }
 
+// Delete Credential
+type DeleteCredentialResponse struct {
+}
+
 // Deactivate Credential
 type DeactivateCredentialRequest struct {
 	CredentialUUID string `json:"credentialUuid"`
@@ -156,7 +160,8 @@ type CreateCredentialWithCodeResponse struct {
 // Create Login Challenge
 type CreateLoginChallengeRequest struct {
 	Username *string `json:"username,omitempty"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	LoginCode *string `json:"loginCode,omitempty"`
 }
 
@@ -202,7 +207,8 @@ type LogoutResponse struct {
 // Send Login Code
 type SendLoginCodeRequest struct {
 	Username string `json:"username"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 }
 
 // Send Login Code
@@ -399,7 +405,8 @@ type RecoverUserResponse struct {
 type CreateRecoveryChallengeRequest struct {
 	Username string `json:"username"`
 	VerificationCode string `json:"verificationCode"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	CredentialID string `json:"credentialId"`
 }
 
@@ -421,7 +428,8 @@ type CreateRecoveryChallengeResponse struct {
 // Send Recovery Code Email
 type SendRecoveryCodeEmailRequest struct {
 	Username string `json:"username"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 }
 
 // Send Recovery Code Email
@@ -452,7 +460,8 @@ type CreateDelegatedRegistrationChallengeResponse struct {
 
 // Create Registration Challenge
 type CreateRegistrationChallengeRequest struct {
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Username string `json:"username"`
 	RegistrationCode string `json:"registrationCode"`
 }
@@ -496,7 +505,7 @@ type CreateSocialRegistrationChallengeResponse struct {
 type CompleteUserRegistrationRequest struct {
 	FirstFactorCredential interface{} `json:"firstFactorCredential"`
 	SecondFactorCredential interface{} `json:"secondFactorCredential,omitempty"`
-	RecoveryCredential *map[string]interface{} `json:"recoveryCredential,omitempty"`
+	RecoveryCredential *types.RecoveryKeyAttestation `json:"recoveryCredential,omitempty"`
 }
 
 // Complete User Registration
@@ -509,7 +518,7 @@ type CompleteUserRegistrationResponse struct {
 type CompleteEndUserRegistrationWithWalletsRequest struct {
 	FirstFactorCredential interface{} `json:"firstFactorCredential"`
 	SecondFactorCredential interface{} `json:"secondFactorCredential,omitempty"`
-	RecoveryCredential *map[string]interface{} `json:"recoveryCredential,omitempty"`
+	RecoveryCredential *types.RecoveryKeyAttestation `json:"recoveryCredential,omitempty"`
 	Wallets []map[string]interface{} `json:"wallets"`
 }
 
@@ -524,7 +533,8 @@ type CompleteEndUserRegistrationWithWalletsResponse struct {
 // Resend Registration Code
 type ResendRegistrationCodeRequest struct {
 	Username string `json:"username"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 }
 
 // Resend Registration Code
@@ -605,7 +615,8 @@ type ActivateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -621,7 +632,8 @@ type DeactivateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -637,7 +649,8 @@ type GetUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -658,7 +671,8 @@ type UpdateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -674,7 +688,8 @@ type DeleteUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -712,7 +727,8 @@ type CreateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
