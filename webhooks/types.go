@@ -8,7 +8,7 @@ import (
 
 // List Webhooks
 type ListWebhooksResponse struct {
-	Items []map[string]interface{} `json:"items"`
+	Items []types.Webhook `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
@@ -47,7 +47,6 @@ type GetWebhookResponse struct {
 	Description *string `json:"description,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
-	Secret string `json:"secret"`
 }
 
 // Update Webhook
@@ -67,7 +66,6 @@ type UpdateWebhookResponse struct {
 	Description *string `json:"description,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
-	Secret string `json:"secret"`
 }
 
 // Delete Webhook
