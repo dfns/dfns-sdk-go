@@ -437,7 +437,7 @@ func (c *WalletsClient) RejectOffer(ctx context.Context, walletID string, offerI
 	return &result, nil
 }
 
-// Retrieve the transaction history across all wallets within a specified timeframe.
+// Retrieve the transaction history across all wallets within a specified timeframe. The time range is unbounded, but the CSV export is capped at 100,000 rows.
 func (c *WalletsClient) ListOrgWalletHistory(ctx context.Context, query *ListOrgWalletHistoryQuery) (interface{}, error) {
 	path := "/wallets/all/history"
 	if query != nil {
