@@ -77,6 +77,8 @@ const (
 	NetworkKusamaAssetHub Network = "KusamaAssetHub"
 	NetworkLitecoin Network = "Litecoin"
 	NetworkLitecoinTestnet Network = "LitecoinTestnet"
+	NetworkMovement Network = "Movement"
+	NetworkMovementTestnet Network = "MovementTestnet"
 	NetworkNear Network = "Near"
 	NetworkNearTestnet Network = "NearTestnet"
 	NetworkOptimism Network = "Optimism"
