@@ -46,9 +46,9 @@ func (c *AuthClient) CreateUserActionChallenge(ctx context.Context, body CreateU
 	return &result, nil
 }
 
-// Gets all signature events which have occurred in the over the timeframe.  The max range the API supports is 7 days.
+// Gets all signature events which have occurred in the over the timeframe. The time range is unbounded, but the export is capped at 100,000 rows. When the result is truncated, the `X-Dfns-Result-Truncated: true` response header is set and a trailing `# TRUNCATED ...` line is appended to the CSV; narrow the time range to retrieve all data.
 // 
-// StartTime and EndTime are URL-encoded UTC ISO timestamps:    
+// StartTime and EndTime are URL-encoded UTC ISO timestamps:
 func (c *AuthClient) ListAuditLogs(ctx context.Context, query *ListAuditLogsQuery) error {
 	path := "/auth/action/logs"
 	if query != nil {
@@ -681,6 +681,17 @@ func (c *AuthClient) ListUsers(ctx context.Context, query *ListUsersQuery) (*Lis
 func (c *AuthClient) CreateUser(ctx context.Context, body CreateUserRequest) (*CreateUserResponse, error) {
 	path := "/auth/users"
 	var result CreateUserResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Invite an existing Account User in the caller's org. The invited Account User starts without any permissions within the org.
+func (c *AuthClient) InviteAccountUser(ctx context.Context, body InviteAccountUserRequest) (*InviteAccountUserResponse, error) {
+	path := "/auth/users/invite"
+	var result InviteAccountUserResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
