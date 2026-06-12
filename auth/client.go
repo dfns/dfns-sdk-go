@@ -687,3 +687,14 @@ func (c *AuthClient) CreateUser(ctx context.Context, body CreateUserRequest) (*C
 	}
 	return &result, nil
 }
+
+// Invite an existing Account User in the caller's org. The invited Account User starts without any permissions within the org.
+func (c *AuthClient) InviteAccountUser(ctx context.Context, body InviteAccountUserRequest) (*InviteAccountUserResponse, error) {
+	path := "/auth/users/invite"
+	var result InviteAccountUserResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
