@@ -736,3 +736,13 @@ type CreateUserResponse struct {
 	IsSSORequired bool `json:"isSSORequired"`
 	PermissionAssignments []map[string]interface{} `json:"permissionAssignments"`
 }
+
+// Invite Account User
+type InviteAccountUserRequest struct {
+	Email string `json:"email"`
+	Kind string `json:"kind"`
+}
+
+// Invite Account User
+type InviteAccountUserResponse struct {
+}
