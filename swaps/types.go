@@ -18,17 +18,8 @@ type ListSwapsQuery struct {
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
-// Create Swap
-type CreateSwapRequest struct {
-	QuoteID string `json:"quoteId"`
-	Reference *string `json:"reference,omitempty"`
-	Provider string `json:"provider"`
-	WalletID string `json:"walletId"`
-	TargetWalletID *string `json:"targetWalletId,omitempty"`
-	SlippageBps float64 `json:"slippageBps"`
-	SourceAsset interface{} `json:"sourceAsset"`
-	TargetAsset interface{} `json:"targetAsset"`
-}
+// CreateSwapRequest represents the request body for the createSwap operation.
+type CreateSwapRequest = any
 
 // Create Swap
 type CreateSwapResponse struct {
@@ -46,17 +37,11 @@ type CreateSwapResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Requester types.Requester `json:"requester"`
 	FailureReason *string `json:"failureReason,omitempty"`
+	ProtocolStatus *string `json:"protocolStatus,omitempty"`
 }
 
-// Request Swap Quote
-type RequestSwapQuoteRequest struct {
-	Provider string `json:"provider"`
-	WalletID string `json:"walletId"`
-	TargetWalletID *string `json:"targetWalletId,omitempty"`
-	SourceAsset interface{} `json:"sourceAsset"`
-	TargetAsset interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
-}
+// RequestSwapQuoteRequest represents the request body for the requestSwapQuote operation.
+type RequestSwapQuoteRequest = any
 
 // Request Swap Quote
 type RequestSwapQuoteResponse struct {
@@ -66,7 +51,8 @@ type RequestSwapQuoteResponse struct {
 	Provider string `json:"provider"`
 	SourceAsset map[string]interface{} `json:"sourceAsset"`
 	TargetAsset map[string]interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
+	SlippageBps int64 `json:"slippageBps"`
+	Fee *string `json:"fee,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
 	Requester types.Requester `json:"requester"`
@@ -88,6 +74,7 @@ type GetSwapResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Requester types.Requester `json:"requester"`
 	FailureReason *string `json:"failureReason,omitempty"`
+	ProtocolStatus *string `json:"protocolStatus,omitempty"`
 }
 
 // Get Swap Quote
@@ -98,7 +85,8 @@ type GetSwapQuoteResponse struct {
 	Provider string `json:"provider"`
 	SourceAsset map[string]interface{} `json:"sourceAsset"`
 	TargetAsset map[string]interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
+	SlippageBps int64 `json:"slippageBps"`
+	Fee *string `json:"fee,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
 	Requester types.Requester `json:"requester"`
