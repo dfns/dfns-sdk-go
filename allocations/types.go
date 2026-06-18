@@ -50,7 +50,7 @@ type CreateAllocationActionRequest struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	SourceAsset map[string]interface{} `json:"sourceAsset"`
 	TargetAsset map[string]interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
+	SlippageBps int64 `json:"slippageBps"`
 }
 
 // Create Allocation Action
