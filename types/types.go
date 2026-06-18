@@ -324,6 +324,7 @@ type Provider string
 const (
 	ProviderUniswapX Provider = "UniswapX"
 	ProviderUniswapClassic Provider = "UniswapClassic"
+	ProviderCircleCctp Provider = "CircleCctp"
 )
 
 // OperationKind represents the operationkind type.
@@ -477,7 +478,8 @@ type SwapQuote struct {
 	Provider string `json:"provider"`
 	SourceAsset map[string]interface{} `json:"sourceAsset"`
 	TargetAsset map[string]interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
+	SlippageBps int64 `json:"slippageBps"`
+	Fee *string `json:"fee,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
 	Requester Requester `json:"requester"`
@@ -499,6 +501,7 @@ type Swap struct {
 	RequestBody interface{} `json:"requestBody"`
 	Requester Requester `json:"requester"`
 	FailureReason *string `json:"failureReason,omitempty"`
+	ProtocolStatus *string `json:"protocolStatus,omitempty"`
 }
 
 // StakeAction represents the StakeAction type.
