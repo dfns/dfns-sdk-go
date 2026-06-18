@@ -251,6 +251,16 @@ type InitiateSsoLoginResponse struct {
 	SsoRedirectURL string `json:"ssoRedirectUrl"`
 }
 
+// Exchange Access Token
+type ExchangeAccessTokenRequest struct {
+	Target string `json:"target"`
+}
+
+// Exchange Access Token
+type ExchangeAccessTokenResponse struct {
+	Token string `json:"token"`
+}
+
 // List Personal Access Tokens
 type ListPersonalAccessTokensResponse struct {
 	Items []types.PersonalAccessToken `json:"items"`
@@ -735,4 +745,14 @@ type CreateUserResponse struct {
 	IsRegistered bool `json:"isRegistered"`
 	IsSSORequired bool `json:"isSSORequired"`
 	PermissionAssignments []map[string]interface{} `json:"permissionAssignments"`
+}
+
+// Invite Account User
+type InviteAccountUserRequest struct {
+	Email string `json:"email"`
+	Kind string `json:"kind"`
+}
+
+// Invite Account User
+type InviteAccountUserResponse struct {
 }
