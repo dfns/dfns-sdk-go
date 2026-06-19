@@ -311,6 +311,17 @@ func (c *AuthClient) InitiateSsoLogin(ctx context.Context, body InitiateSsoLogin
 	return &result, nil
 }
 
+// Exchanges the current user access token, for an org-bound or tenant-bound token. The user must have access to the target org / tenant. The new access token expiration won't exceed the current token's one.
+func (c *AuthClient) ExchangeAccessToken(ctx context.Context, body ExchangeAccessTokenRequest) (*ExchangeAccessTokenResponse, error) {
+	path := "/auth/tokens"
+	var result ExchangeAccessTokenResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Retrieve the list of your Personal Access Tokens.
 func (c *AuthClient) ListPersonalAccessTokens(ctx context.Context) (*ListPersonalAccessTokensResponse, error) {
 	path := "/auth/pats"
@@ -681,6 +692,17 @@ func (c *AuthClient) ListUsers(ctx context.Context, query *ListUsersQuery) (*Lis
 func (c *AuthClient) CreateUser(ctx context.Context, body CreateUserRequest) (*CreateUserResponse, error) {
 	path := "/auth/users"
 	var result CreateUserResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Invite an existing Account User in the caller's org. The invited Account User starts without any permissions within the org.
+func (c *AuthClient) InviteAccountUser(ctx context.Context, body InviteAccountUserRequest) (*InviteAccountUserResponse, error) {
+	path := "/auth/users/invite"
+	var result InviteAccountUserResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
