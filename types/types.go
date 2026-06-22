@@ -7,6 +7,21 @@ type Protocol string
 
 const (
 	ProtocolN0fns Protocol = "0fns"
+	ProtocolSkySusds Protocol = "SkySusds"
+	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
+	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
+	ProtocolGauntletUsdcPrimeBase Protocol = "GauntletUsdcPrimeBase"
+	ProtocolSteakhouseUsdcBase Protocol = "SteakhouseUsdcBase"
+	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
+)
+
+// Provider represents the provider type.
+type Provider string
+
+const (
+	ProviderUniswapX Provider = "UniswapX"
+	ProviderUniswapClassic Provider = "UniswapClassic"
+	ProviderCircleCctp Provider = "CircleCctp"
 )
 
 // Network represents the network type.
@@ -318,14 +333,6 @@ const (
 	CurveStark Curve = "stark"
 )
 
-// Provider represents the provider type.
-type Provider string
-
-const (
-	ProviderUniswapX Provider = "UniswapX"
-	ProviderUniswapClassic Provider = "UniswapClassic"
-)
-
 // OperationKind represents the operationkind type.
 type OperationKind string
 
@@ -477,7 +484,8 @@ type SwapQuote struct {
 	Provider string `json:"provider"`
 	SourceAsset map[string]interface{} `json:"sourceAsset"`
 	TargetAsset map[string]interface{} `json:"targetAsset"`
-	SlippageBps float64 `json:"slippageBps"`
+	SlippageBps int64 `json:"slippageBps"`
+	Fee *string `json:"fee,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	RequestBody interface{} `json:"requestBody"`
 	Requester Requester `json:"requester"`
@@ -499,6 +507,7 @@ type Swap struct {
 	RequestBody interface{} `json:"requestBody"`
 	Requester Requester `json:"requester"`
 	FailureReason *string `json:"failureReason,omitempty"`
+	ProtocolStatus *string `json:"protocolStatus,omitempty"`
 }
 
 // StakeAction represents the StakeAction type.
@@ -620,7 +629,7 @@ type User struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	AccountID *string `json:"accountId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -711,6 +720,7 @@ type Allocation struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Protocol string `json:"protocol"`
+	Provider *string `json:"provider,omitempty"`
 	Amount map[string]interface{} `json:"amount"`
 	Rewards map[string]interface{} `json:"rewards"`
 	DateCreated string `json:"dateCreated"`
