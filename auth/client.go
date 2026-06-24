@@ -311,6 +311,17 @@ func (c *AuthClient) InitiateSsoLogin(ctx context.Context, body InitiateSsoLogin
 	return &result, nil
 }
 
+// Only for TenantUsers - Exchanges the current user access token, for an org-bound or tenant-bound token. The user must have access to the target org / tenant. The new access token expiration won't exceed the current token's one.
+func (c *AuthClient) ExchangeAccessToken(ctx context.Context, body ExchangeAccessTokenRequest) (*ExchangeAccessTokenResponse, error) {
+	path := "/auth/tokens"
+	var result ExchangeAccessTokenResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Retrieve the list of your Personal Access Tokens.
 func (c *AuthClient) ListPersonalAccessTokens(ctx context.Context) (*ListPersonalAccessTokensResponse, error) {
 	path := "/auth/pats"
@@ -681,6 +692,17 @@ func (c *AuthClient) ListUsers(ctx context.Context, query *ListUsersQuery) (*Lis
 func (c *AuthClient) CreateUser(ctx context.Context, body CreateUserRequest) (*CreateUserResponse, error) {
 	path := "/auth/users"
 	var result CreateUserResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Invite an existing Tenant User in the caller's org. The invited Tenant User starts without any permissions within the org.
+func (c *AuthClient) InviteTenantUser(ctx context.Context, body InviteTenantUserRequest) (*InviteTenantUserResponse, error) {
+	path := "/auth/users/invite"
+	var result InviteTenantUserResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
