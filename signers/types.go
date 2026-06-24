@@ -2,11 +2,19 @@
 
 package signers
 
+// Create Add Mac User Input
+type CreateAddMacUserInputRequest struct {
+	Kind string `json:"kind"`
+	MacTargetSerial string `json:"macTargetSerial"`
+	HsmTargetSerial string `json:"hsmTargetSerial"`
+}
+
 // Create Clone Input
 type CreateCloneInputRequest struct {
 	Kind string `json:"kind"`
 	HsmSourceSerial string `json:"hsmSourceSerial"`
 	HsmTargetSerial string `json:"hsmTargetSerial"`
+	MacTargetSerial *string `json:"macTargetSerial,omitempty"`
 }
 
 // Create Genesis Input
@@ -16,6 +24,7 @@ type CreateGenesisInputRequest struct {
 	NumSecp256k1 int64 `json:"numSecp256k1"`
 	NumEd25519 int64 `json:"numEd25519"`
 	HsmGenesisSerial string `json:"hsmGenesisSerial"`
+	MacGenesisSerial *string `json:"macGenesisSerial,omitempty"`
 	HsmGenesisFirmwareVersion *string `json:"hsmGenesisFirmwareVersion,omitempty"`
 }
 
