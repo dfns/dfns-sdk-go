@@ -5,12 +5,16 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/dfns/dfns-sdk-go/v2/signer"
@@ -104,6 +108,133 @@ func (c *Client) Do(ctx context.Context, method, path string, body interface{}, 
 		}
 		req.Header.Set("X-DFNS-USERACTION", userActionToken)
 	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(io.LimitReader(resp.Body, 10<<20))
+	if err != nil {
+		return fmt.Errorf("failed to read response: %w", err)
+	}
+
+	if resp.StatusCode >= 400 {
+		return &APIError{
+			StatusCode: resp.StatusCode,
+			Body:       string(respBody),
+		}
+	}
+
+	if result != nil && len(respBody) > 0 {
+		if err := json.Unmarshal(respBody, result); err != nil {
+			return fmt.Errorf("failed to unmarshal response: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// MultipartFile is a binary file uploaded as the "file" part of a multipart/form-data request.
+type MultipartFile struct {
+	// Bytes is the raw file content.
+	Bytes []byte
+
+	// Name is the file name sent in the multipart part (defaults to "upload.bin").
+	Name string
+}
+
+// DoMultipart performs a multipart/form-data upload. The JSON body is sent as the
+// "data" part (with the file's "fileChecksum" injected, matching the API contract),
+// and the bytes are sent as the "file" part. When a signature is required, the "data"
+// payload is what gets signed.
+func (c *Client) DoMultipart(ctx context.Context, method, path string, body interface{}, file MultipartFile, result interface{}, requiresSignature bool) error {
+	url := c.opts.BaseURL + path
+
+	// Build the "data" object: the JSON body plus the file checksum the API expects.
+	data := map[string]interface{}{}
+	if body != nil {
+		bodyBytes, err := json.Marshal(body)
+		if err != nil {
+			return fmt.Errorf("failed to marshal request body: %w", err)
+		}
+		if err := json.Unmarshal(bodyBytes, &data); err != nil {
+			return fmt.Errorf("failed to build multipart data: %w", err)
+		}
+	}
+	checksum := sha256.Sum256(file.Bytes)
+	data["fileChecksum"] = hex.EncodeToString(checksum[:])
+
+	dataBytes, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("failed to marshal multipart data: %w", err)
+	}
+
+	// Strip CR/LF from the caller-supplied name to prevent multipart header injection.
+	fileName := strings.ReplaceAll(strings.ReplaceAll(file.Name, "\r", ""), "\n", "")
+	if fileName == "" {
+		fileName = "upload.bin"
+	}
+
+	// Stream the multipart body through an io.Pipe instead of buffering the whole
+	// payload (data + file) in a bytes.Buffer. The file content is already in memory
+	// because we must hash it for the signed "fileChecksum" above, so this avoids a
+	// second full-size copy and keeps peak memory flat for large uploads.
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
+	// Always close the read end when we return. A compliant http.Transport already
+	// closes the request body, but a custom Options.HTTPClient that errors without
+	// reading/closing it would otherwise strand the writer goroutine on a pipe write.
+	// Closing pr makes any pending write return ErrClosedPipe so the goroutine exits.
+	defer pr.Close()
+
+	req, err := http.NewRequestWithContext(ctx, method, url, pr)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+c.opts.AuthToken)
+
+	// User action signing covers the "data" payload (matching the JSON body path).
+	if requiresSignature {
+		if c.opts.Signer == nil {
+			return errors.New("signer is required for this operation but not configured")
+		}
+		userActionToken, err := c.getUserActionToken(ctx, method, path, dataBytes)
+		if err != nil {
+			return fmt.Errorf("failed to get user action token: %w", err)
+		}
+		req.Header.Set("X-DFNS-USERACTION", userActionToken)
+	}
+
+	// Write the multipart body in the background; httpClient.Do reads it from the pipe.
+	// Launched only here, after the early returns above, so a bail-out can't leak a
+	// goroutine blocked on the unbuffered pipe. The deferred pr.Close() above guarantees
+	// this goroutine is unblocked when DoMultipart returns, even if a custom transport
+	// neither drains nor closes the request body.
+	go func() {
+		// Surface any encoding error to the HTTP client via the pipe reader.
+		if err := writer.WriteField("data", string(dataBytes)); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to write data part: %w", err))
+			return
+		}
+		part, err := writer.CreateFormFile("file", fileName)
+		if err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to create file part: %w", err))
+			return
+		}
+		if _, err := part.Write(file.Bytes); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to write file part: %w", err))
+			return
+		}
+		if err := writer.Close(); err != nil {
+			pw.CloseWithError(fmt.Errorf("failed to finalize multipart body: %w", err))
+			return
+		}
+		pw.Close()
+	}()
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
