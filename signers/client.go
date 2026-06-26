@@ -19,6 +19,12 @@ func NewSignersClient(c *client.Client) *SignersClient {
 	return &SignersClient{client: c}
 }
 
+// CreateAddMacUserInput create add mac user input.
+func (c *SignersClient) CreateAddMacUserInput(ctx context.Context, storeID string, body CreateAddMacUserInputRequest) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/input"
+	return c.client.Do(ctx, "POST", path, body, nil, true)
+}
+
 // CreateCloneInput create clone input.
 func (c *SignersClient) CreateCloneInput(ctx context.Context, storeID string, body CreateCloneInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/clone/input"
@@ -59,6 +65,17 @@ func (c *SignersClient) ListSigners(ctx context.Context) (*ListSignersResponse, 
 	path := "/signers"
 	var result ListSignersResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// SubmitAddMacUserOutput submit add mac user output.
+func (c *SignersClient) SubmitAddMacUserOutput(ctx context.Context, storeID string, body SubmitAddMacUserOutputRequest) (*SubmitAddMacUserOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/output"
+	var result SubmitAddMacUserOutputResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}
