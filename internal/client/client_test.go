@@ -2,6 +2,8 @@ package client
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io"
@@ -554,5 +556,400 @@ func TestAPIError_Error(t *testing.T) {
 	expected := "API error (status 404): not found"
 	if e.Error() != expected {
 		t.Fatalf("expected %q, got %q", expected, e.Error())
+	}
+}
+
+// readMultipartParts streams a multipart/form-data request body without
+// ParseMultipartForm (which gosec flags as unbounded), returning the "data"
+// field and the "file" part's name and bytes.
+func readMultipartParts(t *testing.T, r *http.Request) (string, string, []byte) {
+	t.Helper()
+
+	var (
+		data, fileName string
+		fileContent    []byte
+	)
+
+	mr, err := r.MultipartReader()
+	if err != nil {
+		t.Fatalf("failed to read multipart body: %v", err)
+	}
+
+	for {
+		part, err := mr.NextPart()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+
+		if err != nil {
+			t.Fatalf("failed to read multipart part: %v", err)
+		}
+
+		content, _ := io.ReadAll(io.LimitReader(part, 1<<20))
+
+		switch part.FormName() {
+		case "data":
+			data = string(content)
+		case "file":
+			fileName = part.FileName()
+			fileContent = content
+		}
+	}
+
+	return data, fileName, fileContent
+}
+
+func TestDoMultipart_Success(t *testing.T) {
+	t.Parallel()
+
+	fileBytes := []byte("hello-file-contents")
+	wantChecksum := sha256.Sum256(fileBytes)
+
+	var (
+		gotData, gotFileName string
+		gotFileContent       []byte
+	)
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST, got %s", r.Method)
+		}
+
+		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
+			t.Errorf("expected multipart/form-data Content-Type, got %s", ct)
+		}
+
+		if r.Header.Get("Authorization") != "Bearer test-token" {
+			t.Errorf("expected Authorization Bearer test-token, got %s", r.Header.Get("Authorization"))
+		}
+
+		gotData, gotFileName, gotFileContent = readMultipartParts(t, r)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	var result struct {
+		OK bool `json:"ok"`
+	}
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload",
+		map[string]string{"network": "Eth"},
+		MultipartFile{Bytes: fileBytes, Name: "doc.pdf"},
+		&result, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !result.OK {
+		t.Fatal("expected ok=true")
+	}
+
+	if gotFileName != "doc.pdf" {
+		t.Errorf("expected file name doc.pdf, got %s", gotFileName)
+	}
+
+	if string(gotFileContent) != string(fileBytes) {
+		t.Errorf("file content mismatch: got %q", gotFileContent)
+	}
+
+	// The "data" part must carry the JSON body plus the injected fileChecksum.
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(gotData), &data); err != nil {
+		t.Fatalf("data part is not valid JSON: %v", err)
+	}
+
+	if data["network"] != "Eth" {
+		t.Errorf("expected network=Eth in data part, got %v", data["network"])
+	}
+
+	if data["fileChecksum"] != hex.EncodeToString(wantChecksum[:]) {
+		t.Errorf("expected fileChecksum %s, got %v", hex.EncodeToString(wantChecksum[:]), data["fileChecksum"])
+	}
+}
+
+func TestDoMultipart_DefaultFileName(t *testing.T) {
+	t.Parallel()
+
+	var gotFileName string
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, gotFileName, _ = readMultipartParts(t, r)
+
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, nil, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotFileName != "upload.bin" {
+		t.Errorf("expected default file name upload.bin, got %s", gotFileName)
+	}
+}
+
+func TestDoMultipart_FileNameSanitized(t *testing.T) {
+	t.Parallel()
+
+	var gotFileName string
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, gotFileName, _ = readMultipartParts(t, r)
+
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	// CR/LF must be stripped to prevent multipart header injection.
+	err := c.DoMultipart(context.Background(), "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x"), Name: "a\r\nb.bin"}, nil, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotFileName != "ab.bin" {
+		t.Errorf("expected CR/LF-stripped file name ab.bin, got %q", gotFileName)
+	}
+}
+
+func TestDoMultipart_RequiresSignature_FullFlow(t *testing.T) {
+	t.Parallel()
+
+	var gotUserActionHeader string
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/auth/action/init", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(signer.UserActionChallenge{
+			ChallengeIdentifier: "challenge-123",
+			Challenge:           "dGVzdC1jaGFsbGVuZ2U",
+		})
+	})
+	mux.HandleFunc("/auth/action", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"userAction":"user-action-token-xyz"}`))
+	})
+	mux.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+		gotUserActionHeader = r.Header.Get("X-DFNS-USERACTION")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"result":"ok"}`))
+	})
+
+	server := httptest.NewTLSServer(mux)
+	defer server.Close()
+
+	ms := &mockSigner{
+		signFn: func(c *signer.UserActionChallenge) (*signer.CredentialAssertion, error) {
+			if c.ChallengeIdentifier != "challenge-123" {
+				t.Errorf("expected challenge-123, got %s", c.ChallengeIdentifier)
+			}
+
+			return &signer.CredentialAssertion{
+				Kind: "Key",
+				CredentialAssertion: signer.CredentialAssertionData{
+					CredID:     "cred-1",
+					ClientData: "Y2xpZW50LWRhdGE",
+					Signature:  "c2lnbmF0dXJl",
+				},
+			}, nil
+		},
+	}
+
+	c := newTestClient(t, server, ms)
+
+	var result struct {
+		Result string `json:"result"`
+	}
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload",
+		map[string]string{"k": "v"},
+		MultipartFile{Bytes: []byte("file-bytes"), Name: "f.bin"},
+		&result, true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotUserActionHeader != "user-action-token-xyz" {
+		t.Fatalf("expected X-DFNS-USERACTION=user-action-token-xyz, got %s", gotUserActionHeader)
+	}
+
+	if result.Result != "ok" {
+		t.Fatalf("expected result=ok, got %s", result.Result)
+	}
+}
+
+func TestDoMultipart_RequiresSignature_NoSigner(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		t.Error("server should not be called when the signer is missing")
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, nil, true)
+	if err == nil {
+		t.Fatal("expected an error when signature is required but no signer is configured")
+	}
+}
+
+func TestDoMultipart_APIError(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`bad request`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, nil, false)
+	if err == nil {
+		t.Fatal("expected an API error")
+	}
+
+	var apiErr *APIError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("expected *APIError, got %T", err)
+	}
+
+	if apiErr.StatusCode != http.StatusBadRequest {
+		t.Errorf("expected status 400, got %d", apiErr.StatusCode)
+	}
+}
+
+func TestDoMultipart_BodyMarshalError(t *testing.T) {
+	t.Parallel()
+
+	c := newTestClient(t, httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		t.Error("server should not be called when the body fails to marshal")
+	})), nil)
+
+	// A channel cannot be marshalled to JSON.
+	err := c.DoMultipart(context.Background(), "POST", "/upload",
+		map[string]interface{}{"bad": make(chan int)},
+		MultipartFile{Bytes: []byte("x")}, nil, false)
+	if err == nil {
+		t.Fatal("expected a marshal error for an unmarshalable body")
+	}
+}
+
+func TestDoMultipart_BodyNotObject(t *testing.T) {
+	t.Parallel()
+
+	c := newTestClient(t, httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		t.Error("server should not be called when the body is not a JSON object")
+	})), nil)
+
+	// A non-object body cannot be merged into the "data" map.
+	err := c.DoMultipart(context.Background(), "POST", "/upload",
+		[]string{"not", "an", "object"},
+		MultipartFile{Bytes: []byte("x")}, nil, false)
+	if err == nil {
+		t.Fatal("expected an error when the body does not unmarshal into an object")
+	}
+}
+
+func TestDoMultipart_SignerError(t *testing.T) {
+	t.Parallel()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/auth/action/init", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(signer.UserActionChallenge{
+			ChallengeIdentifier: "challenge-123",
+			Challenge:           "dGVzdC1jaGFsbGVuZ2U",
+		})
+	})
+
+	server := httptest.NewTLSServer(mux)
+	defer server.Close()
+
+	ms := &mockSigner{
+		signFn: func(_ *signer.UserActionChallenge) (*signer.CredentialAssertion, error) {
+			return nil, errors.New("signing failed")
+		},
+	}
+
+	c := newTestClient(t, server, ms)
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, nil, true)
+	if err == nil {
+		t.Fatal("expected an error when the signer fails")
+	}
+}
+
+func TestDoMultipart_RequestFailed(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // canceled before the request is sent → httpClient.Do fails
+
+	err := c.DoMultipart(ctx, "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, nil, false)
+	if err == nil {
+		t.Fatal("expected an error when the request fails")
+	}
+}
+
+func TestDoMultipart_InvalidJSONResponse(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`not-valid-json`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	var result struct {
+		OK bool `json:"ok"`
+	}
+
+	err := c.DoMultipart(context.Background(), "POST", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, &result, false)
+	if err == nil {
+		t.Fatal("expected an error when the response is not valid JSON")
+	}
+}
+
+func TestDoMultipart_InvalidMethod(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		t.Error("server should not be called when the request cannot be built")
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	// An invalid HTTP method makes http.NewRequestWithContext fail.
+	err := c.DoMultipart(context.Background(), "BAD METHOD", "/upload", nil,
+		MultipartFile{Bytes: []byte("x")}, nil, false)
+	if err == nil {
+		t.Fatal("expected an error when the request cannot be built")
 	}
 }
