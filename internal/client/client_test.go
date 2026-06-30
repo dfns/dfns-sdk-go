@@ -976,6 +976,7 @@ func TestDoMultipart_ResponseBodyReadError(t *testing.T) {
 			Transport: rtFunc(func(req *http.Request) (*http.Response, error) {
 				// Drain the request body so the streaming writer goroutine completes.
 				_, _ = io.Copy(io.Discard, req.Body)
+
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       errReadCloser{},
@@ -995,6 +996,32 @@ func TestDoMultipart_ResponseBodyReadError(t *testing.T) {
 	}
 }
 
+func TestDo_ResponseBodyReadError(t *testing.T) {
+	t.Parallel()
+
+	c, err := New(Options{
+		BaseURL:   "https://example.com",
+		AuthToken: "token",
+		HTTPClient: &http.Client{
+			Transport: rtFunc(func(_ *http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       errReadCloser{},
+					Header:     make(http.Header),
+				}, nil
+			}),
+		},
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+
+	err = c.Do(context.Background(), "GET", "/x", nil, nil, false)
+	if err == nil {
+		t.Fatal("expected an error when the response body cannot be read")
+	}
+}
+
 // failingMultipartWriter is an io.Writer that fails the Write which first brings
 // trigger into the cumulative output (or the very first Write, when trigger is
 // empty). It lets writeMultipartBody's error branches be exercised
@@ -1009,11 +1036,14 @@ func (w *failingMultipartWriter) Write(p []byte) (int, error) {
 	if w.done {
 		return 0, errors.New("writer already failed")
 	}
+
 	w.seen.Write(p)
+
 	if w.trigger == "" || strings.Contains(w.seen.String(), w.trigger) {
 		w.done = true
 		return 0, errors.New("simulated write failure")
 	}
+
 	return len(p), nil
 }
 
@@ -1042,10 +1072,12 @@ func TestWriteMultipartBody_Errors(t *testing.T) {
 			t.Parallel()
 
 			w := multipart.NewWriter(&failingMultipartWriter{trigger: tc.trigger})
+
 			err := writeMultipartBody(w, []byte("DATA"), "doc.bin", []byte("FILECONTENT"))
 			if err == nil {
 				t.Fatalf("expected an error for the %q stage", tc.name)
 			}
+
 			if !strings.Contains(err.Error(), tc.wantMsg) {
 				t.Fatalf("error = %q, want it to contain %q", err.Error(), tc.wantMsg)
 			}
@@ -1059,10 +1091,12 @@ func TestWriteMultipartBody_Success(t *testing.T) {
 	t.Parallel()
 
 	var buf strings.Builder
+
 	w := multipart.NewWriter(&buf)
 	if err := writeMultipartBody(w, []byte("DATA"), "doc.bin", []byte("FILECONTENT")); err != nil {
 		t.Fatalf("writeMultipartBody: %v", err)
 	}
+
 	out := buf.String()
 	for _, want := range []string{`name="data"`, `name="file"`, "doc.bin", "FILECONTENT"} {
 		if !strings.Contains(out, want) {
