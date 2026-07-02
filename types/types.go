@@ -108,6 +108,8 @@ const (
 	NetworkPolymeshTestnet Network = "PolymeshTestnet"
 	NetworkRace Network = "Race"
 	NetworkRaceSepolia Network = "RaceSepolia"
+	NetworkRobinhood Network = "Robinhood"
+	NetworkRobinhoodSepolia Network = "RobinhoodSepolia"
 	NetworkSeiAtlantic2 Network = "SeiAtlantic2"
 	NetworkSeiPacific1 Network = "SeiPacific1"
 	NetworkSolana Network = "Solana"
