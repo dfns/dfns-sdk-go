@@ -7,21 +7,6 @@ type Protocol string
 
 const (
 	ProtocolN0fns Protocol = "0fns"
-	ProtocolSkySusds Protocol = "SkySusds"
-	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
-	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
-	ProtocolGauntletUsdcPrimeBase Protocol = "GauntletUsdcPrimeBase"
-	ProtocolSteakhouseUsdcBase Protocol = "SteakhouseUsdcBase"
-	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
-)
-
-// Provider represents the provider type.
-type Provider string
-
-const (
-	ProviderUniswapX Provider = "UniswapX"
-	ProviderUniswapClassic Provider = "UniswapClassic"
-	ProviderCircleCctp Provider = "CircleCctp"
 )
 
 // Network represents the network type.
@@ -45,6 +30,7 @@ const (
 	NetworkBerachainBepolia Network = "BerachainBepolia"
 	NetworkBitcoin Network = "Bitcoin"
 	NetworkBitcoinSignet Network = "BitcoinSignet"
+	NetworkBitcoinTestnet3 Network = "BitcoinTestnet3"
 	NetworkBitcoinTestnet4 Network = "BitcoinTestnet4"
 	NetworkBitcoinCash Network = "BitcoinCash"
 	NetworkBob Network = "Bob"
@@ -69,7 +55,10 @@ const (
 	NetworkEthereumClassic Network = "EthereumClassic"
 	NetworkEthereumClassicMordor Network = "EthereumClassicMordor"
 	NetworkEthereumSepolia Network = "EthereumSepolia"
+	NetworkEthereumHolesky Network = "EthereumHolesky"
 	NetworkEthereumHoodi Network = "EthereumHoodi"
+	NetworkFantomOpera Network = "FantomOpera"
+	NetworkFantomTestnet Network = "FantomTestnet"
 	NetworkFlareC Network = "FlareC"
 	NetworkFlareCCoston2 Network = "FlareCCoston2"
 	NetworkFlowEvm Network = "FlowEvm"
@@ -83,6 +72,7 @@ const (
 	NetworkIonTestnet Network = "IonTestnet"
 	NetworkIota Network = "Iota"
 	NetworkIotaTestnet Network = "IotaTestnet"
+	NetworkKaspa Network = "Kaspa"
 	NetworkKusama Network = "Kusama"
 	NetworkKusamaAssetHub Network = "KusamaAssetHub"
 	NetworkLitecoin Network = "Litecoin"
@@ -112,8 +102,6 @@ const (
 	NetworkSeiPacific1 Network = "SeiPacific1"
 	NetworkSolana Network = "Solana"
 	NetworkSolanaDevnet Network = "SolanaDevnet"
-	NetworkSonic Network = "Sonic"
-	NetworkSonicTestnet Network = "SonicTestnet"
 	NetworkStarknet Network = "Starknet"
 	NetworkStarknetSepolia Network = "StarknetSepolia"
 	NetworkStellar Network = "Stellar"
@@ -153,7 +141,6 @@ const (
 	KindKeyDelegated Kind = "key.delegated"
 	KindKeyExported Kind = "key.exported"
 	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
-	KindWalletBlockchainEventTransferIncluded Kind = "wallet.blockchain_event.transfer.included"
 	KindWalletCreated Kind = "wallet.created"
 	KindWalletActivated Kind = "wallet.activated"
 	KindWalletDelegated Kind = "wallet.delegated"
@@ -329,6 +316,15 @@ const (
 	CurveEd25519 Curve = "ed25519"
 	CurveSecp256k1 Curve = "secp256k1"
 	CurveStark Curve = "stark"
+)
+
+// Provider represents the provider type.
+type Provider string
+
+const (
+	ProviderUniswapX Provider = "UniswapX"
+	ProviderUniswapClassic Provider = "UniswapClassic"
+	ProviderCircleCctp Provider = "CircleCctp"
 )
 
 // OperationKind represents the operationkind type.
@@ -627,7 +623,7 @@ type User struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -718,7 +714,6 @@ type Allocation struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Protocol string `json:"protocol"`
-	Provider *string `json:"provider,omitempty"`
 	Amount map[string]interface{} `json:"amount"`
 	Rewards map[string]interface{} `json:"rewards"`
 	DateCreated string `json:"dateCreated"`

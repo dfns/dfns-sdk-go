@@ -161,7 +161,7 @@ type CreateCredentialWithCodeResponse struct {
 type CreateLoginChallengeRequest struct {
 	Username *string `json:"username,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	LoginCode *string `json:"loginCode,omitempty"`
 }
 
@@ -208,7 +208,7 @@ type LogoutResponse struct {
 type SendLoginCodeRequest struct {
 	Username string `json:"username"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 }
 
 // Send Login Code
@@ -416,7 +416,7 @@ type CreateRecoveryChallengeRequest struct {
 	Username string `json:"username"`
 	VerificationCode string `json:"verificationCode"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	CredentialID string `json:"credentialId"`
 }
 
@@ -439,7 +439,7 @@ type CreateRecoveryChallengeResponse struct {
 type SendRecoveryCodeEmailRequest struct {
 	Username string `json:"username"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 }
 
 // Send Recovery Code Email
@@ -471,7 +471,7 @@ type CreateDelegatedRegistrationChallengeResponse struct {
 // Create Registration Challenge
 type CreateRegistrationChallengeRequest struct {
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Username string `json:"username"`
 	RegistrationCode string `json:"registrationCode"`
 }
@@ -544,7 +544,7 @@ type CompleteEndUserRegistrationWithWalletsResponse struct {
 type ResendRegistrationCodeRequest struct {
 	Username string `json:"username"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 }
 
 // Resend Registration Code
@@ -626,7 +626,7 @@ type ActivateUserResponse struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -643,7 +643,7 @@ type DeactivateUserResponse struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -660,7 +660,7 @@ type GetUserResponse struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -682,7 +682,7 @@ type UpdateUserResponse struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -699,7 +699,7 @@ type DeleteUserResponse struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -738,7 +738,7 @@ type CreateUserResponse struct {
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
 	OrgID *string `json:"orgId,omitempty"`
-	TenantID *string `json:"tenantId,omitempty"`
+	AccountID *string `json:"accountId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
 	IsActive bool `json:"isActive"`
 	IsServiceAccount bool `json:"isServiceAccount"`
@@ -747,12 +747,12 @@ type CreateUserResponse struct {
 	PermissionAssignments []map[string]interface{} `json:"permissionAssignments"`
 }
 
-// Invite Tenant User
-type InviteTenantUserRequest struct {
+// Invite Account User
+type InviteAccountUserRequest struct {
 	Email string `json:"email"`
 	Kind string `json:"kind"`
 }
 
-// Invite Tenant User
-type InviteTenantUserResponse struct {
+// Invite Account User
+type InviteAccountUserResponse struct {
 }

@@ -7,17 +7,6 @@ coverage:
       default:
         target: auto
 
-# Go's coverage profile reports every file under the full module path, which for
-# this repo includes the /v2 major-version suffix, e.g.
-#   github.com/dfns/dfns-sdk-go/v2/agreements/client.go
-# Codecov matches the repo-relative `ignore` patterns below against those paths,
-# so without stripping the module prefix none of them match: the entire generated
-# SDK gets counted as 0%-covered, dragging project coverage from ~98% (signer +
-# internal, the hand-written runtime) down to ~68% and failing project + patch on
-# every sync PR. Strip the prefix so paths are repo-relative and `ignore` applies.
-fixes:
-  - "github.com/dfns/dfns-sdk-go/v2/::"
-
 ignore:
   - "agreements/**"
   - "allocations/**"
