@@ -26,7 +26,6 @@ type CreateAllocationResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Protocol string `json:"protocol"`
-	Provider *string `json:"provider,omitempty"`
 	Amount map[string]interface{} `json:"amount"`
 	Rewards map[string]interface{} `json:"rewards"`
 	DateCreated string `json:"dateCreated"`
@@ -45,15 +44,20 @@ type ListAllocationActionsQuery struct {
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
-// CreateAllocationActionRequest represents the request body for the createAllocationAction operation.
-type CreateAllocationActionRequest = any
+// Create Allocation Action
+type CreateAllocationActionRequest struct {
+	Kind string `json:"kind"`
+	ExternalID *string `json:"externalId,omitempty"`
+	SourceAsset map[string]interface{} `json:"sourceAsset"`
+	TargetAsset map[string]interface{} `json:"targetAsset"`
+	SlippageBps int64 `json:"slippageBps"`
+}
 
 // Create Allocation Action
 type CreateAllocationActionResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Protocol string `json:"protocol"`
-	Provider *string `json:"provider,omitempty"`
 	Amount map[string]interface{} `json:"amount"`
 	Rewards map[string]interface{} `json:"rewards"`
 	DateCreated string `json:"dateCreated"`
@@ -65,7 +69,6 @@ type GetAllocationResponse struct {
 	ID string `json:"id"`
 	WalletID string `json:"walletId"`
 	Protocol string `json:"protocol"`
-	Provider *string `json:"provider,omitempty"`
 	Amount map[string]interface{} `json:"amount"`
 	Rewards map[string]interface{} `json:"rewards"`
 	DateCreated string `json:"dateCreated"`
