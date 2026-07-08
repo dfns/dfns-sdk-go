@@ -64,7 +64,7 @@ func (c *NetworksClient) GetCantonValidator(ctx context.Context, network string,
 
 // Update an existing Canton Validator configuration.
 //   
-//   Read details about the process [here](https://docs.dfns.co/networks/canton-validators).
+//   Read details about the process [here](https://docs.dfns.co/networks/canton).
 func (c *NetworksClient) UpdateCantonValidator(ctx context.Context, network string, validatorID string, body UpdateCantonValidatorRequest) (*UpdateCantonValidatorResponse, error) {
 	path := "/networks/" + url.PathEscape(network) + "/validators/" + url.PathEscape(validatorID)
 	var result UpdateCantonValidatorResponse

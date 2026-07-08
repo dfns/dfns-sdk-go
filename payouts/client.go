@@ -37,6 +37,9 @@ func (c *PayoutsClient) ListPayouts(ctx context.Context, query *ListPayoutsQuery
 		if len(query.Status) > 0 {
 			q.Set("status", fmt.Sprintf("%v", query.Status))
 		}
+		if len(query.Provider) > 0 {
+			q.Set("provider", fmt.Sprintf("%v", query.Provider))
+		}
 		if len(q) > 0 {
 			path += "?" + q.Encode()
 		}

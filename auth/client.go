@@ -22,7 +22,7 @@ func NewAuthClient(c *client.Client) *AuthClient {
 
 // Completes the user action signing process and provides a signing token that can be used to verify the user intended to perform the action.
 // 
-// This is the first step of the [User Action Signing flow](http://docs.dfns.co/api-reference/auth/signing-flows).
+// This is the first step of the [User Action Signing flow](https://docs.dfns.co/api-reference/auth/signing-flows).
 func (c *AuthClient) CreateUserActionSignature(ctx context.Context, body CreateUserActionSignatureRequest) (*CreateUserActionSignatureResponse, error) {
 	path := "/auth/action"
 	var result CreateUserActionSignatureResponse
@@ -35,7 +35,7 @@ func (c *AuthClient) CreateUserActionSignature(ctx context.Context, body CreateU
 
 // Starts a user action signing session, returning a challenge that will be used to verify the user's intent to perform an action.
 //   
-//   This is the first step of the [User Action Signing flow](http://docs.dfns.co/api-reference/auth/signing-flows).
+//   This is the first step of the [User Action Signing flow](https://docs.dfns.co/api-reference/auth/signing-flows).
 func (c *AuthClient) CreateUserActionChallenge(ctx context.Context, body CreateUserActionChallengeRequest) (*CreateUserActionChallengeResponse, error) {
 	path := "/auth/action/init"
 	var result CreateUserActionChallengeResponse
@@ -79,7 +79,7 @@ func (c *AuthClient) GetAuditLog(ctx context.Context, id string) (*GetAuditLogRe
 }
 
 // <Warning>
-//   Applications are deprecated and will be removed in a future release. See details [here](https://docs.dfns.co/developers/guides/applications-deprecation).
+//   Applications are deprecated and will be removed in a future release. See details [here](https://docs.dfns.co/deprecation/applications-deprecation).
 //   </Warning>
 // Deprecated: This endpoint is deprecated.
 func (c *AuthClient) ListApplications(ctx context.Context) (*ListApplicationsResponse, error) {
@@ -93,7 +93,7 @@ func (c *AuthClient) ListApplications(ctx context.Context) (*ListApplicationsRes
 }
 
 // <Warning>
-//   Applications are deprecated and will be removed in a future release. See details [here](https://docs.dfns.co/developers/guides/applications-deprecation).
+//   Applications are deprecated and will be removed in a future release. See details [here](https://docs.dfns.co/deprecation/applications-deprecation).
 //   </Warning>
 // Deprecated: This endpoint is deprecated.
 func (c *AuthClient) GetApplication(ctx context.Context, appID string) (*GetApplicationResponse, error) {
@@ -278,7 +278,7 @@ func (c *AuthClient) SendLoginCode(ctx context.Context, body SendLoginCodeReques
 	return &result, nil
 }
 
-// Completes the login process and provides the authenticated user with their authentication token.
+// Logs a user in with a JWT id token issued by a social login provider and provides the authenticated user with their authentication token.
 func (c *AuthClient) SocialLogin(ctx context.Context, body SocialLoginRequest) (*SocialLoginResponse, error) {
 	path := "/auth/login/social"
 	var result SocialLoginResponse
@@ -289,7 +289,7 @@ func (c *AuthClient) SocialLogin(ctx context.Context, body SocialLoginRequest) (
 	return &result, nil
 }
 
-// Completes the login process and provides the authenticated user with their authentication token.
+// Completes the SSO login process by exchanging the authorization code obtained from the identity provider for the user's authentication token.
 func (c *AuthClient) CompleteSsoLogin(ctx context.Context, body CompleteSsoLoginRequest) (*CompleteSsoLoginResponse, error) {
 	path := "/auth/login/sso"
 	var result CompleteSsoLoginResponse
@@ -388,7 +388,7 @@ func (c *AuthClient) ActivatePersonalAccessToken(ctx context.Context, tokenID st
 	return &result, nil
 }
 
-// Deactivates a credential that was previously active. If the credential is already deactivated no action is taken.
+// Deactivates a personal access token that was previously active. If the token is already deactivated no action is taken.
 func (c *AuthClient) DeactivatePersonalAccessToken(ctx context.Context, tokenID string) (*DeactivatePersonalAccessTokenResponse, error) {
 	path := "/auth/pats/" + url.PathEscape(tokenID) + "/deactivate"
 	var result DeactivatePersonalAccessTokenResponse
@@ -460,7 +460,7 @@ func (c *AuthClient) CreateDelegatedRegistrationChallenge(ctx context.Context, b
 	return &result, nil
 }
 
-// Starts a user registration session. It returns a challenge that will need to be signed by a passkey and used to perform the step [Complete User Registration](/api-reference/auth/register)
+// Starts a user registration session. It returns a challenge that will need to be signed by a passkey and used to perform the step [Complete User Registration](/api-reference/auth/complete-user-registration)
 func (c *AuthClient) CreateRegistrationChallenge(ctx context.Context, body CreateRegistrationChallengeRequest) (*CreateRegistrationChallengeResponse, error) {
 	path := "/auth/registration/init"
 	var result CreateRegistrationChallengeResponse
@@ -471,7 +471,7 @@ func (c *AuthClient) CreateRegistrationChallenge(ctx context.Context, body Creat
 	return &result, nil
 }
 
-// Starts an end-user registration session by passing a JWT obtained by an IdP. It returns a challenge that will need to be signed by a passkey and used to perform [Complete End User Registration with Wallets](/api-reference/auth/register-end-user).
+// Starts an end-user registration session by passing a JWT obtained by an IdP. It returns a challenge that will need to be signed by a passkey and used to perform [Complete End User Registration with Wallets](/api-reference/auth/complete-end-user-registration-with-wallets).
 func (c *AuthClient) CreateSocialRegistrationChallenge(ctx context.Context, body CreateSocialRegistrationChallengeRequest) (*CreateSocialRegistrationChallengeResponse, error) {
 	path := "/auth/registration/social"
 	var result CreateSocialRegistrationChallengeResponse

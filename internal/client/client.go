@@ -73,11 +73,9 @@ func New(opts Options) (*Client, error) {
 	}, nil
 }
 
-// Do performs an HTTP request to the Dfns API.
+// Do performs an HTTP request to the Dfns API. When requiresSignature is true, it obtains a
+// user action token inline via the configured Signer before issuing the request.
 func (c *Client) Do(ctx context.Context, method, path string, body interface{}, result interface{}, requiresSignature bool) error {
-	url := c.opts.BaseURL + path
-
-	var bodyReader io.Reader
 	var bodyBytes []byte
 	if body != nil {
 		var err error
@@ -85,6 +83,46 @@ func (c *Client) Do(ctx context.Context, method, path string, body interface{}, 
 		if err != nil {
 			return fmt.Errorf("failed to marshal request body: %w", err)
 		}
+	}
+
+	var userActionToken string
+	if requiresSignature {
+		if c.opts.Signer == nil {
+			return errors.New("signer is required for this operation but not configured")
+		}
+		token, err := c.getUserActionToken(ctx, method, path, bodyBytes)
+		if err != nil {
+			return fmt.Errorf("failed to get user action token: %w", err)
+		}
+		userActionToken = token
+	}
+
+	return c.doRequest(ctx, method, path, bodyBytes, result, userActionToken)
+}
+
+// DoWithUserActionToken performs a request attaching a pre-obtained user action token,
+// bypassing the local Signer. It backs the delegated clients, whose challenges are signed
+// out-of-band (e.g. by an end user's device) rather than by a Signer held in this process.
+func (c *Client) DoWithUserActionToken(ctx context.Context, method, path string, body interface{}, result interface{}, userActionToken string) error {
+	var bodyBytes []byte
+	if body != nil {
+		var err error
+		bodyBytes, err = json.Marshal(body)
+		if err != nil {
+			return fmt.Errorf("failed to marshal request body: %w", err)
+		}
+	}
+
+	return c.doRequest(ctx, method, path, bodyBytes, result, userActionToken)
+}
+
+// doRequest issues an HTTP request with an already-serialized body and an optional user
+// action token, then decodes the response. Shared by Do and DoWithUserActionToken.
+func (c *Client) doRequest(ctx context.Context, method, path string, bodyBytes []byte, result interface{}, userActionToken string) error {
+	url := c.opts.BaseURL + path
+
+	var bodyReader io.Reader
+	if bodyBytes != nil {
 		bodyReader = bytes.NewReader(bodyBytes)
 	}
 
@@ -96,16 +134,7 @@ func (c *Client) Do(ctx context.Context, method, path string, body interface{}, 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.opts.AuthToken)
-
-	// Handle user action signing if required
-	if requiresSignature {
-		if c.opts.Signer == nil {
-			return errors.New("signer is required for this operation but not configured")
-		}
-		userActionToken, err := c.getUserActionToken(ctx, method, path, bodyBytes)
-		if err != nil {
-			return fmt.Errorf("failed to get user action token: %w", err)
-		}
+	if userActionToken != "" {
 		req.Header.Set("X-DFNS-USERACTION", userActionToken)
 	}
 
@@ -317,6 +346,29 @@ func (c *Client) completeUserActionSigning(ctx context.Context, challengeID stri
 	}
 
 	return resp.UserAction, nil
+}
+
+// CreateUserActionChallenge starts a delegated user action signing flow: it returns the
+// challenge to sign for (method, path, body) without signing it locally. The caller signs
+// the challenge out-of-band and passes the resulting assertion to CompleteUserActionSigning.
+// The (method, path, body) here must match the request later issued via DoWithUserActionToken.
+func (c *Client) CreateUserActionChallenge(ctx context.Context, method, path string, body interface{}) (*signer.UserActionChallenge, error) {
+	var bodyBytes []byte
+	if body != nil {
+		b, err := json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+		}
+		bodyBytes = b
+	}
+
+	return c.createUserActionChallenge(ctx, method, path, bodyBytes)
+}
+
+// CompleteUserActionSigning submits an externally-signed challenge assertion and returns the
+// user action token to attach to the subsequent request (via DoWithUserActionToken).
+func (c *Client) CompleteUserActionSigning(ctx context.Context, challengeID string, assertion *signer.CredentialAssertion) (string, error) {
+	return c.completeUserActionSigning(ctx, challengeID, assertion)
 }
 
 // APIError represents an error response from the Dfns API.

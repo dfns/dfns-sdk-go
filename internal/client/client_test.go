@@ -1104,3 +1104,309 @@ func TestWriteMultipartBody_Success(t *testing.T) {
 		}
 	}
 }
+
+// --- Tests for delegated user action signing (init / complete) ---
+//
+// The delegated flow splits signing so a challenge can be signed out-of-band (e.g. by an
+// end user's device) instead of by a Signer held in this process: CreateUserActionChallenge
+// returns the challenge, CompleteUserActionSigning exchanges the signed assertion for a
+// user action token, and DoWithUserActionToken issues the request with that token.
+
+func TestCreateUserActionChallenge(t *testing.T) {
+	t.Parallel()
+
+	var gotInit map[string]interface{}
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/auth/action/init" {
+			t.Errorf("expected /auth/action/init, got %s", r.URL.Path)
+		}
+
+		body, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &gotInit)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"challengeIdentifier":"ch-1","challenge":"c2ln"}`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	challenge, err := c.CreateUserActionChallenge(context.Background(), "POST", "/wallets", map[string]string{"network": "Eth"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if challenge.ChallengeIdentifier != "ch-1" {
+		t.Errorf("expected challengeIdentifier ch-1, got %s", challenge.ChallengeIdentifier)
+	}
+
+	if challenge.Challenge != "c2ln" {
+		t.Errorf("expected challenge c2ln, got %s", challenge.Challenge)
+	}
+
+	// The init request encodes the method, path and JSON-serialized body that will be signed.
+	if gotInit["userActionHttpMethod"] != "POST" {
+		t.Errorf("expected userActionHttpMethod POST, got %v", gotInit["userActionHttpMethod"])
+	}
+
+	if gotInit["userActionHttpPath"] != "/wallets" {
+		t.Errorf("expected userActionHttpPath /wallets, got %v", gotInit["userActionHttpPath"])
+	}
+
+	if gotInit["userActionServerKind"] != "Api" {
+		t.Errorf("expected userActionServerKind Api, got %v", gotInit["userActionServerKind"])
+	}
+
+	rawPayload, ok := gotInit["userActionPayload"].(string)
+	if !ok {
+		t.Fatalf("userActionPayload is not a string, got %T", gotInit["userActionPayload"])
+	}
+
+	var payload map[string]interface{}
+
+	if err := json.Unmarshal([]byte(rawPayload), &payload); err != nil {
+		t.Fatalf("userActionPayload is not JSON: %v", err)
+	}
+
+	if payload["network"] != "Eth" {
+		t.Errorf("expected payload network Eth, got %v", payload["network"])
+	}
+}
+
+func TestCreateUserActionChallenge_MarshalError(t *testing.T) {
+	t.Parallel()
+
+	c := newTestClient(t, httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		t.Error("server should not be called when the body fails to marshal")
+	})), nil)
+
+	// A channel cannot be marshalled to JSON.
+	_, err := c.CreateUserActionChallenge(context.Background(), "POST", "/wallets", map[string]interface{}{"bad": make(chan int)})
+	if err == nil {
+		t.Fatal("expected a marshal error for an unmarshalable body")
+	}
+}
+
+func TestCreateUserActionChallenge_APIError(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`nope`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+	if _, err := c.CreateUserActionChallenge(context.Background(), "POST", "/wallets", nil); err == nil {
+		t.Fatal("expected an API error")
+	}
+}
+
+func TestCompleteUserActionSigning(t *testing.T) {
+	t.Parallel()
+
+	var gotBody map[string]interface{}
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/auth/action" {
+			t.Errorf("expected /auth/action, got %s", r.URL.Path)
+		}
+
+		body, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &gotBody)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"userAction":"ua-token"}`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+	assertion := &signer.CredentialAssertion{
+		Kind:                "Key",
+		CredentialAssertion: signer.CredentialAssertionData{CredID: "cred-1", ClientData: "Y2Q", Signature: "c2ln"},
+	}
+
+	token, err := c.CompleteUserActionSigning(context.Background(), "ch-1", assertion)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if token != "ua-token" {
+		t.Errorf("expected token ua-token, got %s", token)
+	}
+
+	if gotBody["challengeIdentifier"] != "ch-1" {
+		t.Errorf("expected challengeIdentifier ch-1, got %v", gotBody["challengeIdentifier"])
+	}
+
+	if _, ok := gotBody["firstFactor"]; !ok {
+		t.Error("expected firstFactor in the /auth/action request body")
+	}
+}
+
+func TestCompleteUserActionSigning_APIError(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+	if _, err := c.CompleteUserActionSigning(context.Background(), "ch-1", &signer.CredentialAssertion{}); err == nil {
+		t.Fatal("expected an API error")
+	}
+}
+
+func TestDoWithUserActionToken_Success(t *testing.T) {
+	t.Parallel()
+
+	var (
+		gotHeader string
+		gotBody   map[string]interface{}
+	)
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotHeader = r.Header.Get("X-DFNS-USERACTION")
+		body, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &gotBody)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	// No signer configured — a delegated request carries a pre-obtained token instead.
+	c := newTestClient(t, server, nil)
+
+	var result struct {
+		OK bool `json:"ok"`
+	}
+
+	err := c.DoWithUserActionToken(context.Background(), "POST", "/wallets", map[string]string{"network": "Eth"}, &result, "ua-token")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !result.OK {
+		t.Fatal("expected ok=true")
+	}
+
+	if gotHeader != "ua-token" {
+		t.Errorf("expected X-DFNS-USERACTION ua-token, got %s", gotHeader)
+	}
+
+	if gotBody["network"] != "Eth" {
+		t.Errorf("expected body network Eth, got %v", gotBody["network"])
+	}
+}
+
+func TestDoWithUserActionToken_EmptyTokenOmitsHeader(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Go canonicalizes the header name to "X-Dfns-Useraction".
+		if _, ok := r.Header["X-Dfns-Useraction"]; ok {
+			t.Error("expected no X-DFNS-USERACTION header for an empty token")
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+	if err := c.DoWithUserActionToken(context.Background(), "POST", "/x", nil, nil, ""); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestDoWithUserActionToken_MarshalError(t *testing.T) {
+	t.Parallel()
+
+	c := newTestClient(t, httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		t.Error("server should not be called when the body fails to marshal")
+	})), nil)
+
+	err := c.DoWithUserActionToken(context.Background(), "POST", "/x", map[string]interface{}{"bad": make(chan int)}, nil, "ua")
+	if err == nil {
+		t.Fatal("expected a marshal error for an unmarshalable body")
+	}
+}
+
+func TestDoWithUserActionToken_APIError(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`bad`))
+	}))
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+	err := c.DoWithUserActionToken(context.Background(), "POST", "/x", nil, nil, "ua")
+
+	var apiErr *APIError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("expected *APIError, got %T", err)
+	}
+}
+
+// TestDelegatedFlow_EndToEnd exercises the whole init -> sign -> complete cycle without a
+// local Signer: it obtains a challenge, simulates an out-of-band signature, exchanges it for
+// a token, and confirms the final request carries that token.
+func TestDelegatedFlow_EndToEnd(t *testing.T) {
+	t.Parallel()
+
+	var gotUserAction string
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/auth/action/init", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(signer.UserActionChallenge{ChallengeIdentifier: "ch-1", Challenge: "dGVzdA"})
+	})
+	mux.HandleFunc("/auth/action", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"userAction":"ua-token"}`))
+	})
+	mux.HandleFunc("/wallets", func(w http.ResponseWriter, r *http.Request) {
+		gotUserAction = r.Header.Get("X-DFNS-USERACTION")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"id":"wa-1"}`))
+	})
+
+	server := httptest.NewTLSServer(mux)
+	defer server.Close()
+
+	c := newTestClient(t, server, nil)
+
+	body := map[string]string{"network": "Eth"}
+
+	challenge, err := c.CreateUserActionChallenge(context.Background(), "POST", "/wallets", body)
+	if err != nil {
+		t.Fatalf("init failed: %v", err)
+	}
+
+	// Signing happens out-of-band; simulate the returned assertion.
+	assertion := &signer.CredentialAssertion{Kind: "Key"}
+
+	token, err := c.CompleteUserActionSigning(context.Background(), challenge.ChallengeIdentifier, assertion)
+	if err != nil {
+		t.Fatalf("complete failed: %v", err)
+	}
+
+	var result struct {
+		ID string `json:"id"`
+	}
+	if err := c.DoWithUserActionToken(context.Background(), "POST", "/wallets", body, &result, token); err != nil {
+		t.Fatalf("request failed: %v", err)
+	}
+
+	if result.ID != "wa-1" {
+		t.Errorf("expected wallet id wa-1, got %s", result.ID)
+	}
+
+	if gotUserAction != "ua-token" {
+		t.Errorf("expected X-DFNS-USERACTION ua-token on the final request, got %s", gotUserAction)
+	}
+}

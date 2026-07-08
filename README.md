@@ -105,6 +105,64 @@ func main() {
 }
 ```
 
+## Delegated Signing
+
+In some setups you want your **server** to talk to Dfns on behalf of a user, while the user
+keeps signing every request themselves (e.g. with a WebAuthn credential in a web app). The
+`DelegatedClient` supports this: it holds **no `Signer`**, and every operation that needs a
+user action signature is split into an `...Init` / `...Complete` pair.
+
+- `...Init` takes the request payload and returns a `*signer.UserActionChallenge` to be
+  signed out-of-band (typically by the end user in the browser).
+- `...Complete` takes the same payload, the challenge identifier, and the signed assertion,
+  and performs the request.
+
+A typical flow: the server calls `...Init` and sends the challenge to the user; the user
+signs it with their credential and returns the assertion; the server calls `...Complete`.
+
+```go
+package main
+
+import (
+    "context"
+    "log"
+
+    dfns "github.com/dfns/dfns-sdk-go/v2"
+    "github.com/dfns/dfns-sdk-go/v2/signer"
+    "github.com/dfns/dfns-sdk-go/v2/wallets"
+)
+
+func main() {
+    // No Signer needed — challenges are signed out-of-band (e.g. by the end user).
+    dfnsClient, err := dfns.NewDelegatedClient(dfns.Options{
+        AuthToken: "user-auth-token",
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    ctx := context.Background()
+    body := wallets.CreateWalletRequest{Network: "EthereumSepolia"}
+
+    // Step 1 (server): start the action, get a challenge.
+    challenge, err := dfnsClient.Wallets.CreateWalletInit(ctx, body)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Step 2 (client): the user signs `challenge` with their credential and returns the
+    // signed assertion to the server. `assertion` is a *signer.CredentialAssertion.
+    var assertion *signer.CredentialAssertion = signChallengeOutOfBand(challenge)
+
+    // Step 3 (server): complete the action with the signed challenge.
+    wallet, err := dfnsClient.Wallets.CreateWalletComplete(ctx, body, challenge.ChallengeIdentifier, assertion)
+    if err != nil {
+        log.Fatal(err)
+    }
+    _ = wallet
+}
+```
+
 ## Available Domains
 
 The client provides access to the following API domains:

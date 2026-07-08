@@ -14,6 +14,7 @@ type ListPayoutsQuery struct {
 	PaginationToken *string `json:"paginationToken,omitempty"`
 	WalletID *string `json:"walletId,omitempty"`
 	Status []string `json:"status,omitempty"`
+	Provider []string `json:"provider,omitempty"`
 }
 
 // CreatePayoutRequest represents the request body for the createPayout operation.

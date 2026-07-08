@@ -241,7 +241,8 @@ type CompleteSsoLoginResponse struct {
 
 // Initiate SSO Login
 type InitiateSsoLoginRequest struct {
-	OrgID string `json:"orgId"`
+	OrgID *string `json:"orgId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
 	ClientID string `json:"clientId"`
 	RedirectURI string `json:"redirectUri"`
 }
