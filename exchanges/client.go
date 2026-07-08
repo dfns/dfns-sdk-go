@@ -122,7 +122,7 @@ func (c *ExchangesClient) ListAccountAssets(ctx context.Context, exchangeID stri
 	return &result, nil
 }
 
-// ListAssetWithdrawalNetworks list asset withdrawal networks.
+// Lists the networks to which the given asset can be withdrawn from an exchange account.
 func (c *ExchangesClient) ListAssetWithdrawalNetworks(ctx context.Context, exchangeID string, accountID string, asset string) (interface{}, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/assets/" + url.PathEscape(asset) + "/withdrawal-networks"
 	var result interface{}

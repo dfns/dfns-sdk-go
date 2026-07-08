@@ -19,37 +19,37 @@ func NewSignersClient(c *client.Client) *SignersClient {
 	return &SignersClient{client: c}
 }
 
-// CreateAddMacUserInput create add mac user input.
+// Creates the input archive for an add-mac-user fleet operation, which registers a new Mac operator machine with an HSM in the key store's trust set.
 func (c *SignersClient) CreateAddMacUserInput(ctx context.Context, storeID string, body CreateAddMacUserInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/input"
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
-// CreateCloneInput create clone input.
+// Creates the input archive for a clone fleet operation, which replicates a key store from a source HSM to a target HSM.
 func (c *SignersClient) CreateCloneInput(ctx context.Context, storeID string, body CreateCloneInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/clone/input"
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
-// CreateGenesisInput create genesis input.
+// Creates the input archive for a genesis fleet operation, which provisions a new offline signer fleet and generates the key store's initial signing keys.
 func (c *SignersClient) CreateGenesisInput(ctx context.Context, storeID string, body CreateGenesisInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/genesis/input"
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
-// CreateOnchainSignInput create onchain sign input.
+// Creates the input archive for an onchain-sign operation covering the key store's pending signature requests.
 func (c *SignersClient) CreateOnchainSignInput(ctx context.Context, storeID string, body CreateOnchainSignInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/onchain-sign/input"
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
-// CreateProofOfControlInput create proof of control input.
+// Creates the input archive for a proof-of-control operation covering the keys of the specified wallets.
 func (c *SignersClient) CreateProofOfControlInput(ctx context.Context, storeID string, body CreateProofOfControlInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/proof-of-control/input"
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
-// ListKeyStores list key stores.
+// Lists the key stores of your organization.
 func (c *SignersClient) ListKeyStores(ctx context.Context) (*ListKeyStoresResponse, error) {
 	path := "/key-stores"
 	var result ListKeyStoresResponse
@@ -60,7 +60,7 @@ func (c *SignersClient) ListKeyStores(ctx context.Context) (*ListKeyStoresRespon
 	return &result, nil
 }
 
-// ListSigners list signers.
+// Lists the signer clusters of your key store, including each signer's ID and encryption public key.
 func (c *SignersClient) ListSigners(ctx context.Context) (*ListSignersResponse, error) {
 	path := "/signers"
 	var result ListSignersResponse
@@ -71,7 +71,7 @@ func (c *SignersClient) ListSigners(ctx context.Context) (*ListSignersResponse, 
 	return &result, nil
 }
 
-// SubmitAddMacUserOutput submit add mac user output.
+// Submits the output archive produced by the offline signer fleet for an add-mac-user operation.
 func (c *SignersClient) SubmitAddMacUserOutput(ctx context.Context, storeID string, body SubmitAddMacUserOutputRequest, file client.MultipartFile) (*SubmitAddMacUserOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/output"
 	var result SubmitAddMacUserOutputResponse
@@ -82,7 +82,7 @@ func (c *SignersClient) SubmitAddMacUserOutput(ctx context.Context, storeID stri
 	return &result, nil
 }
 
-// SubmitCloneOutput submit clone output.
+// Submits the output archive produced by the offline signer fleet for a clone operation.
 func (c *SignersClient) SubmitCloneOutput(ctx context.Context, storeID string, body SubmitCloneOutputRequest, file client.MultipartFile) (*SubmitCloneOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/clone/output"
 	var result SubmitCloneOutputResponse
@@ -93,7 +93,7 @@ func (c *SignersClient) SubmitCloneOutput(ctx context.Context, storeID string, b
 	return &result, nil
 }
 
-// SubmitGenesisOutput submit genesis output.
+// Submits the output archive produced by the offline signer fleet for a genesis operation.
 func (c *SignersClient) SubmitGenesisOutput(ctx context.Context, storeID string, body SubmitGenesisOutputRequest, file client.MultipartFile) (*SubmitGenesisOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/genesis/output"
 	var result SubmitGenesisOutputResponse
@@ -104,7 +104,7 @@ func (c *SignersClient) SubmitGenesisOutput(ctx context.Context, storeID string,
 	return &result, nil
 }
 
-// SubmitOnchainSignOutput submit onchain sign output.
+// Submits the output archive produced by the offline signer fleet for an onchain-sign operation.
 func (c *SignersClient) SubmitOnchainSignOutput(ctx context.Context, storeID string, body SubmitOnchainSignOutputRequest, file client.MultipartFile) (*SubmitOnchainSignOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/onchain-sign/output"
 	var result SubmitOnchainSignOutputResponse
@@ -115,7 +115,7 @@ func (c *SignersClient) SubmitOnchainSignOutput(ctx context.Context, storeID str
 	return &result, nil
 }
 
-// SubmitProofOfControlOutput submit proof of control output.
+// Submits the output archive produced by the offline signer fleet for a proof-of-control operation.
 func (c *SignersClient) SubmitProofOfControlOutput(ctx context.Context, storeID string, body SubmitProofOfControlOutputRequest, file client.MultipartFile) (*SubmitProofOfControlOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/proof-of-control/output"
 	var result SubmitProofOfControlOutputResponse

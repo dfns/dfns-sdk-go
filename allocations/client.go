@@ -20,7 +20,7 @@ func NewAllocationsClient(c *client.Client) *AllocationsClient {
 	return &AllocationsClient{client: c}
 }
 
-// ListAllocations list allocations.
+// Lists the allocations of your organization.
 func (c *AllocationsClient) ListAllocations(ctx context.Context, query *ListAllocationsQuery) (*ListAllocationsResponse, error) {
 	path := "/allocations"
 	if query != nil {
