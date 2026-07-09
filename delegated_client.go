@@ -11,12 +11,14 @@ import (
 	"github.com/dfns/dfns-sdk-go/v2/feesponsors"
 	"github.com/dfns/dfns-sdk-go/v2/keys"
 	"github.com/dfns/dfns-sdk-go/v2/networks"
+	"github.com/dfns/dfns-sdk-go/v2/payins"
 	"github.com/dfns/dfns-sdk-go/v2/payouts"
 	"github.com/dfns/dfns-sdk-go/v2/permissions"
 	"github.com/dfns/dfns-sdk-go/v2/policies"
 	"github.com/dfns/dfns-sdk-go/v2/signers"
 	"github.com/dfns/dfns-sdk-go/v2/staking"
 	"github.com/dfns/dfns-sdk-go/v2/swaps"
+	"github.com/dfns/dfns-sdk-go/v2/vaults"
 	"github.com/dfns/dfns-sdk-go/v2/wallets"
 	"github.com/dfns/dfns-sdk-go/v2/webhooks"
 )
@@ -33,12 +35,14 @@ type DelegatedClient struct {
 	FeeSponsors *feesponsors.DelegatedFeeSponsorsClient
 	Keys *keys.DelegatedKeysClient
 	Networks *networks.DelegatedNetworksClient
+	Payins *payins.DelegatedPayinsClient
 	Payouts *payouts.DelegatedPayoutsClient
 	Permissions *permissions.DelegatedPermissionsClient
 	Policies *policies.DelegatedPoliciesClient
 	Signers *signers.DelegatedSignersClient
 	Staking *staking.DelegatedStakingClient
 	Swaps *swaps.DelegatedSwapsClient
+	Vaults *vaults.DelegatedVaultsClient
 	Wallets *wallets.DelegatedWalletsClient
 	Webhooks *webhooks.DelegatedWebhooksClient
 }
@@ -60,12 +64,14 @@ func NewDelegatedClient(opts Options) (*DelegatedClient, error) {
 		FeeSponsors: feesponsors.NewDelegatedFeeSponsorsClient(c),
 		Keys: keys.NewDelegatedKeysClient(c),
 		Networks: networks.NewDelegatedNetworksClient(c),
+		Payins: payins.NewDelegatedPayinsClient(c),
 		Payouts: payouts.NewDelegatedPayoutsClient(c),
 		Permissions: permissions.NewDelegatedPermissionsClient(c),
 		Policies: policies.NewDelegatedPoliciesClient(c),
 		Signers: signers.NewDelegatedSignersClient(c),
 		Staking: staking.NewDelegatedStakingClient(c),
 		Swaps: swaps.NewDelegatedSwapsClient(c),
+		Vaults: vaults.NewDelegatedVaultsClient(c),
 		Wallets: wallets.NewDelegatedWalletsClient(c),
 		Webhooks: webhooks.NewDelegatedWebhooksClient(c),
 	}, nil
