@@ -26,6 +26,17 @@ type CreateGenesisInputRequest struct {
 	HsmGenesisSerial string `json:"hsmGenesisSerial"`
 	MacGenesisSerial *string `json:"macGenesisSerial,omitempty"`
 	HsmGenesisFirmwareVersion *string `json:"hsmGenesisFirmwareVersion,omitempty"`
+	DebugOptions map[string]map[string]interface{} `json:"debugOptions,omitempty"`
+}
+
+// Create Key Harvest Input
+type CreateKeyHarvestInputRequest struct {
+	Kind string `json:"kind"`
+	HsmTargetSerial string `json:"hsmTargetSerial"`
+	MacTargetSerial string `json:"macTargetSerial"`
+	MacTargetUsername string `json:"macTargetUsername"`
+	NumSecp256k1 *int64 `json:"numSecp256k1,omitempty"`
+	NumEd25519 *int64 `json:"numEd25519,omitempty"`
 }
 
 // Create Onchain Sign Input
@@ -77,6 +88,17 @@ type SubmitGenesisOutputRequest struct {
 
 // Submit Genesis Output
 type SubmitGenesisOutputResponse struct {
+	Message string `json:"message"`
+}
+
+// Submit Key Harvest Output
+type SubmitKeyHarvestOutputRequest struct {
+	FileChecksum string `json:"fileChecksum"`
+	OutputJSON map[string]interface{} `json:"outputJson"`
+}
+
+// Submit Key Harvest Output
+type SubmitKeyHarvestOutputResponse struct {
 	Message string `json:"message"`
 }
 

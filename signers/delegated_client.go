@@ -83,6 +83,26 @@ func (c *DelegatedSignersClient) CreateGenesisInputComplete(ctx context.Context,
 	return c.client.DoWithUserActionToken(ctx, "POST", path, body, nil, userAction)
 }
 
+// CreateKeyHarvestInputInit starts delegated user action signing for the createKeyHarvestInput operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreateKeyHarvestInputComplete
+// along with the same arguments given here.
+func (c *DelegatedSignersClient) CreateKeyHarvestInputInit(ctx context.Context, storeID string, body CreateKeyHarvestInputRequest) (*signer.UserActionChallenge, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/key-harvest/input"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// CreateKeyHarvestInputComplete finishes delegated signing for the createKeyHarvestInput operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the CreateKeyHarvestInputInit challenge.
+func (c *DelegatedSignersClient) CreateKeyHarvestInputComplete(ctx context.Context, storeID string, body CreateKeyHarvestInputRequest, challengeID string, assertion *signer.CredentialAssertion) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/key-harvest/input"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return err
+	}
+	return c.client.DoWithUserActionToken(ctx, "POST", path, body, nil, userAction)
+}
+
 // CreateOnchainSignInputInit starts delegated user action signing for the createOnchainSignInput operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to CreateOnchainSignInputComplete
 // along with the same arguments given here.
@@ -171,6 +191,17 @@ func (c *DelegatedSignersClient) SubmitCloneOutput(ctx context.Context, storeID 
 func (c *DelegatedSignersClient) SubmitGenesisOutput(ctx context.Context, storeID string, body SubmitGenesisOutputRequest, file client.MultipartFile) (*SubmitGenesisOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/genesis/output"
 	var result SubmitGenesisOutputResponse
+	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// SubmitKeyHarvestOutput submit key harvest output.
+func (c *DelegatedSignersClient) SubmitKeyHarvestOutput(ctx context.Context, storeID string, body SubmitKeyHarvestOutputRequest, file client.MultipartFile) (*SubmitKeyHarvestOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/key-harvest/output"
+	var result SubmitKeyHarvestOutputResponse
 	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
 	if err != nil {
 		return nil, err

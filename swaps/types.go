@@ -30,6 +30,7 @@ type CreateSwapResponse struct {
 	TargetWalletID string `json:"targetWalletId"`
 	Status string `json:"status"`
 	Provider string `json:"provider"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	QuotedSourceAsset map[string]interface{} `json:"quotedSourceAsset"`
 	QuotedTargetAsset map[string]interface{} `json:"quotedTargetAsset"`
 	SlippageBps float64 `json:"slippageBps"`
@@ -67,6 +68,7 @@ type GetSwapResponse struct {
 	TargetWalletID string `json:"targetWalletId"`
 	Status string `json:"status"`
 	Provider string `json:"provider"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	QuotedSourceAsset map[string]interface{} `json:"quotedSourceAsset"`
 	QuotedTargetAsset map[string]interface{} `json:"quotedTargetAsset"`
 	SlippageBps float64 `json:"slippageBps"`

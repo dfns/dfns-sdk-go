@@ -181,6 +181,10 @@ const (
 	KindWalletOfferRejected Kind = "wallet.offer.rejected"
 	KindWalletOfferWithdrawn Kind = "wallet.offer.withdrawn"
 	KindWalletTagsModified Kind = "wallet.tags.modified"
+	KindVaultCreated Kind = "vault.created"
+	KindVaultUpdated Kind = "vault.updated"
+	KindVaultTagsModified Kind = "vault.tags.modified"
+	KindVaultEventCreated Kind = "vault.event.created"
 	KindPayoutActionRequired Kind = "payout.action.required"
 )
 
@@ -335,6 +339,14 @@ const (
 	CurveStark Curve = "stark"
 )
 
+// Currency represents the currency type.
+type Currency string
+
+const (
+	CurrencyUSD Currency = "USD"
+	CurrencyEUR Currency = "EUR"
+)
+
 // OperationKind represents the operationkind type.
 type OperationKind string
 
@@ -428,6 +440,66 @@ type Offer struct {
 	DateSettled *string `json:"dateSettled,omitempty"`
 }
 
+// TransactionRequest represents the TransactionRequest type.
+type TransactionRequest struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	Network Network `json:"network"`
+	Requester Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	Status string `json:"status"`
+	Reason *string `json:"reason,omitempty"`
+	TxHash *string `json:"txHash,omitempty"`
+	Fee *string `json:"fee,omitempty"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	DateRequested string `json:"dateRequested"`
+	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
+	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
+	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+	Details map[string]map[string]interface{} `json:"details,omitempty"`
+}
+
+// The user who initiated the request.
+type Requester struct {
+	UserID string `json:"userId"`
+	TokenID *string `json:"tokenId,omitempty"`
+}
+
+// Vault balance entry object.
+type VaultBalanceEntry struct {
+	ID string `json:"id"`
+	Kind string `json:"kind"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	TransferID *string `json:"transferId,omitempty"`
+	QuarantineID *string `json:"quarantineId,omitempty"`
+}
+
+// Vault net worth in fiat, broken down by balance kind plus a total.
+type VaultNetWorth struct {
+	Available map[string]interface{} `json:"available"`
+	Quarantined map[string]interface{} `json:"quarantined"`
+	Locked map[string]interface{} `json:"locked"`
+	Total map[string]interface{} `json:"total"`
+}
+
+// Vault asset with balances broken down by kind and USD unit price.
+type VaultAsset struct {
+	Kind string `json:"kind"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Decimals float64 `json:"decimals"`
+	Symbol *string `json:"symbol,omitempty"`
+	Verified *bool `json:"verified,omitempty"`
+	AvailableBalance string `json:"availableBalance"`
+	QuarantinedBalance string `json:"quarantinedBalance"`
+	LockedBalance string `json:"lockedBalance"`
+	Quotes *map[string]interface{} `json:"quotes,omitempty"`
+}
+
 // TransferRequest represents the TransferRequest type.
 type TransferRequest struct {
 	ID string `json:"id"`
@@ -451,31 +523,23 @@ type TransferRequest struct {
 	Details map[string]map[string]interface{} `json:"details,omitempty"`
 }
 
-// The user who initiated the request.
-type Requester struct {
-	UserID string `json:"userId"`
-	TokenID *string `json:"tokenId,omitempty"`
+// Vault address object.
+type VaultAddress struct {
+	WalletID string `json:"walletId"`
+	Network string `json:"network"`
+	Address string `json:"address"`
 }
 
-// TransactionRequest represents the TransactionRequest type.
-type TransactionRequest struct {
+// Vault object.
+type Vault struct {
 	ID string `json:"id"`
-	WalletID string `json:"walletId"`
-	Network Network `json:"network"`
-	Requester Requester `json:"requester"`
-	RequestBody interface{} `json:"requestBody"`
-	Status string `json:"status"`
-	Reason *string `json:"reason,omitempty"`
-	TxHash *string `json:"txHash,omitempty"`
-	Fee *string `json:"fee,omitempty"`
-	ApprovalID *string `json:"approvalId,omitempty"`
-	DateRequested string `json:"dateRequested"`
-	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
-	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
-	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	OrgID string `json:"orgId"`
+	Name *string `json:"name,omitempty"`
+	Tags []string `json:"tags"`
 	ExternalID *string `json:"externalId,omitempty"`
-	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+	Addresses []VaultAddress `json:"addresses,omitempty"`
 }
 
 // SwapQuote represents the SwapQuote type.
@@ -502,6 +566,7 @@ type Swap struct {
 	TargetWalletID string `json:"targetWalletId"`
 	Status string `json:"status"`
 	Provider string `json:"provider"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	QuotedSourceAsset map[string]interface{} `json:"quotedSourceAsset"`
 	QuotedTargetAsset map[string]interface{} `json:"quotedTargetAsset"`
 	SlippageBps float64 `json:"slippageBps"`
