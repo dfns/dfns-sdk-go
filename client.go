@@ -11,12 +11,14 @@ import (
 	"github.com/dfns/dfns-sdk-go/v2/feesponsors"
 	"github.com/dfns/dfns-sdk-go/v2/keys"
 	"github.com/dfns/dfns-sdk-go/v2/networks"
+	"github.com/dfns/dfns-sdk-go/v2/payins"
 	"github.com/dfns/dfns-sdk-go/v2/payouts"
 	"github.com/dfns/dfns-sdk-go/v2/permissions"
 	"github.com/dfns/dfns-sdk-go/v2/policies"
 	"github.com/dfns/dfns-sdk-go/v2/signers"
 	"github.com/dfns/dfns-sdk-go/v2/staking"
 	"github.com/dfns/dfns-sdk-go/v2/swaps"
+	"github.com/dfns/dfns-sdk-go/v2/vaults"
 	"github.com/dfns/dfns-sdk-go/v2/wallets"
 	"github.com/dfns/dfns-sdk-go/v2/webhooks"
 )
@@ -39,12 +41,14 @@ type Client struct {
 	FeeSponsors *feesponsors.FeeSponsorsClient
 	Keys *keys.KeysClient
 	Networks *networks.NetworksClient
+	Payins *payins.PayinsClient
 	Payouts *payouts.PayoutsClient
 	Permissions *permissions.PermissionsClient
 	Policies *policies.PoliciesClient
 	Signers *signers.SignersClient
 	Staking *staking.StakingClient
 	Swaps *swaps.SwapsClient
+	Vaults *vaults.VaultsClient
 	Wallets *wallets.WalletsClient
 	Webhooks *webhooks.WebhooksClient
 }
@@ -65,12 +69,14 @@ func NewClient(opts Options) (*Client, error) {
 		FeeSponsors: feesponsors.NewFeeSponsorsClient(c),
 		Keys: keys.NewKeysClient(c),
 		Networks: networks.NewNetworksClient(c),
+		Payins: payins.NewPayinsClient(c),
 		Payouts: payouts.NewPayoutsClient(c),
 		Permissions: permissions.NewPermissionsClient(c),
 		Policies: policies.NewPoliciesClient(c),
 		Signers: signers.NewSignersClient(c),
 		Staking: staking.NewStakingClient(c),
 		Swaps: swaps.NewSwapsClient(c),
+		Vaults: vaults.NewVaultsClient(c),
 		Wallets: wallets.NewWalletsClient(c),
 		Webhooks: webhooks.NewWebhooksClient(c),
 	}, nil

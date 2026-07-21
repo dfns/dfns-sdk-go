@@ -37,6 +37,12 @@ func (c *SignersClient) CreateGenesisInput(ctx context.Context, storeID string, 
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
+// CreateKeyHarvestInput create key harvest input.
+func (c *SignersClient) CreateKeyHarvestInput(ctx context.Context, storeID string, body CreateKeyHarvestInputRequest) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/key-harvest/input"
+	return c.client.Do(ctx, "POST", path, body, nil, true)
+}
+
 // Creates the input archive for an onchain-sign operation covering the key store's pending signature requests.
 func (c *SignersClient) CreateOnchainSignInput(ctx context.Context, storeID string, body CreateOnchainSignInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/onchain-sign/input"
@@ -97,6 +103,17 @@ func (c *SignersClient) SubmitCloneOutput(ctx context.Context, storeID string, b
 func (c *SignersClient) SubmitGenesisOutput(ctx context.Context, storeID string, body SubmitGenesisOutputRequest, file client.MultipartFile) (*SubmitGenesisOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/genesis/output"
 	var result SubmitGenesisOutputResponse
+	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// SubmitKeyHarvestOutput submit key harvest output.
+func (c *SignersClient) SubmitKeyHarvestOutput(ctx context.Context, storeID string, body SubmitKeyHarvestOutputRequest, file client.MultipartFile) (*SubmitKeyHarvestOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/key-harvest/output"
+	var result SubmitKeyHarvestOutputResponse
 	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
 	if err != nil {
 		return nil, err
