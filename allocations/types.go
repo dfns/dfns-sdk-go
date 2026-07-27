@@ -71,3 +71,14 @@ type GetAllocationResponse struct {
 	DateCreated string `json:"dateCreated"`
 	Actions []types.AllocationAction `json:"actions"`
 }
+
+// Get Allocations Info
+type GetAllocationsInfoResponse struct {
+	Ofns *map[string]interface{} `json:"0fns,omitempty"`
+	SkySusds *map[string]interface{} `json:"SkySusds,omitempty"`
+	GauntletUsdcPrime *map[string]interface{} `json:"GauntletUsdcPrime,omitempty"`
+	SteakhouseUsdt *map[string]interface{} `json:"SteakhouseUsdt,omitempty"`
+	GauntletUsdcPrimeBase *map[string]interface{} `json:"GauntletUsdcPrimeBase,omitempty"`
+	SteakhouseUsdcBase *map[string]interface{} `json:"SteakhouseUsdcBase,omitempty"`
+	SentoraPyusdMain *map[string]interface{} `json:"SentoraPyusdMain,omitempty"`
+}

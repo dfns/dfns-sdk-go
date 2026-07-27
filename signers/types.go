@@ -2,10 +2,41 @@
 
 package signers
 
+// Cancel Fleet Operation
+type CancelFleetOperationRequest struct {
+	GroupID string `json:"groupId"`
+	Reason *string `json:"reason,omitempty"`
+}
+
+// Cancel Fleet Operation
+type CancelFleetOperationResponse struct {
+	GroupID string `json:"groupId"`
+	StoreID string `json:"storeId"`
+	OrgID string `json:"orgId"`
+	Status string `json:"status"`
+	CreatedBy string `json:"createdBy"`
+	SubmittedBy interface{} `json:"submittedBy"`
+	DateSubmitted interface{} `json:"dateSubmitted"`
+	ReviewedBy interface{} `json:"reviewedBy"`
+	DateReviewed interface{} `json:"dateReviewed"`
+	CanceledBy interface{} `json:"canceledBy"`
+	DateCanceled interface{} `json:"dateCanceled"`
+	Reason interface{} `json:"reason"`
+	DateCreated string `json:"dateCreated"`
+	Operations []map[string]interface{} `json:"operations"`
+}
+
 // Create Add Mac User Input
 type CreateAddMacUserInputRequest struct {
 	Kind string `json:"kind"`
 	MacTargetSerial string `json:"macTargetSerial"`
+	HsmTargetSerial string `json:"hsmTargetSerial"`
+}
+
+// Create Add Provisioner Input
+type CreateAddProvisionerInputRequest struct {
+	Kind string `json:"kind"`
+	YubikeySerial string `json:"yubikeySerial"`
 	HsmTargetSerial string `json:"hsmTargetSerial"`
 }
 
@@ -66,6 +97,17 @@ type SubmitAddMacUserOutputRequest struct {
 
 // Submit Add Mac User Output
 type SubmitAddMacUserOutputResponse struct {
+	Message string `json:"message"`
+}
+
+// Submit Add Provisioner Output
+type SubmitAddProvisionerOutputRequest struct {
+	FileChecksum string `json:"fileChecksum"`
+	OutputJSON map[string]interface{} `json:"outputJson"`
+}
+
+// Submit Add Provisioner Output
+type SubmitAddProvisionerOutputResponse struct {
 	Message string `json:"message"`
 }
 

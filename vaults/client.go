@@ -54,7 +54,7 @@ func (c *VaultsClient) CreateVault(ctx context.Context, body CreateVaultRequest)
 	return &result, nil
 }
 
-// Creates a vault address (managed wallet) on an EVM network.
+// Creates a vault address (managed wallet) on an EVM or Bitcoin network.
 func (c *VaultsClient) CreateVaultAddress(ctx context.Context, vaultID string, body CreateVaultAddressRequest) (*CreateVaultAddressResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/addresses"
 	var result CreateVaultAddressResponse
@@ -153,6 +153,17 @@ func (c *VaultsClient) ListVaultBalances(ctx context.Context, vaultID string, qu
 	return &result, nil
 }
 
+// Releases quarantined funds into the available balance.
+func (c *VaultsClient) ReleaseQuarantine(ctx context.Context, vaultID string, quarantineID string, body ReleaseQuarantineRequest) (*ReleaseQuarantineResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID) + "/release"
+	var result ReleaseQuarantineResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Add tags to a vault.
 func (c *VaultsClient) TagVault(ctx context.Context, vaultID string, body TagVaultRequest) (*TagVaultResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/tags"
@@ -168,17 +179,6 @@ func (c *VaultsClient) TagVault(ctx context.Context, vaultID string, body TagVau
 func (c *VaultsClient) UntagVault(ctx context.Context, vaultID string, body UntagVaultRequest) (*UntagVaultResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/tags"
 	var result UntagVaultResponse
-	err := c.client.Do(ctx, "DELETE", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// Releases quarantined funds into the available balance.
-func (c *VaultsClient) Unquarantine(ctx context.Context, vaultID string, quarantineID string, body UnquarantineRequest) (*UnquarantineResponse, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID)
-	var result UnquarantineResponse
 	err := c.client.Do(ctx, "DELETE", path, body, &result, true)
 	if err != nil {
 		return nil, err

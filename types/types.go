@@ -6,7 +6,7 @@ package types
 type Protocol string
 
 const (
-	ProtocolN0fns Protocol = "0fns"
+	ProtocolOfns Protocol = "0fns"
 	ProtocolSkySusds Protocol = "SkySusds"
 	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
 	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
@@ -158,6 +158,7 @@ const (
 	KindKeyExported Kind = "key.exported"
 	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
 	KindWalletBlockchainEventTransferIncluded Kind = "wallet.blockchain_event.transfer.included"
+	KindWalletBlockchainEventContractConfirmed Kind = "wallet.blockchain_event.contract.confirmed"
 	KindWalletCreated Kind = "wallet.created"
 	KindWalletActivated Kind = "wallet.activated"
 	KindWalletDelegated Kind = "wallet.delegated"
