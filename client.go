@@ -4,6 +4,7 @@ package dfns
 
 import (
 	"github.com/dfns/dfns-sdk-go/v2/internal/client"
+	"github.com/dfns/dfns-sdk-go/v2/addresswatches"
 	"github.com/dfns/dfns-sdk-go/v2/agreements"
 	"github.com/dfns/dfns-sdk-go/v2/allocations"
 	"github.com/dfns/dfns-sdk-go/v2/auth"
@@ -34,6 +35,7 @@ type APIError = client.APIError
 // Client is the main Dfns API client.
 type Client struct {
 	baseClient *client.Client
+	AddressWatches *addresswatches.AddressWatchesClient
 	Agreements *agreements.AgreementsClient
 	Allocations *allocations.AllocationsClient
 	Auth *auth.AuthClient
@@ -62,6 +64,7 @@ func NewClient(opts Options) (*Client, error) {
 
 	return &Client{
 		baseClient: c,
+		AddressWatches: addresswatches.NewAddressWatchesClient(c),
 		Agreements: agreements.NewAgreementsClient(c),
 		Allocations: allocations.NewAllocationsClient(c),
 		Auth: auth.NewAuthClient(c),

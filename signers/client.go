@@ -19,9 +19,26 @@ func NewSignersClient(c *client.Client) *SignersClient {
 	return &SignersClient{client: c}
 }
 
+// CancelFleetOperation cancel fleet operation.
+func (c *SignersClient) CancelFleetOperation(ctx context.Context, storeID string, body CancelFleetOperationRequest) (*CancelFleetOperationResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/fleet-operations/cancel"
+	var result CancelFleetOperationResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Creates the input archive for an add-mac-user fleet operation, which registers a new Mac operator machine with an HSM in the key store's trust set.
 func (c *SignersClient) CreateAddMacUserInput(ctx context.Context, storeID string, body CreateAddMacUserInputRequest) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/input"
+	return c.client.Do(ctx, "POST", path, body, nil, true)
+}
+
+// Creates the input archive for an add-provisioner fleet operation, which registers a new provisioner YubiKey into the key store's governance set.
+func (c *SignersClient) CreateAddProvisionerInput(ctx context.Context, storeID string, body CreateAddProvisionerInputRequest) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-provisioner/input"
 	return c.client.Do(ctx, "POST", path, body, nil, true)
 }
 
@@ -81,6 +98,17 @@ func (c *SignersClient) ListSigners(ctx context.Context) (*ListSignersResponse, 
 func (c *SignersClient) SubmitAddMacUserOutput(ctx context.Context, storeID string, body SubmitAddMacUserOutputRequest, file client.MultipartFile) (*SubmitAddMacUserOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/output"
 	var result SubmitAddMacUserOutputResponse
+	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Submits the output archive produced by the offline signer fleet for an add-provisioner operation.
+func (c *SignersClient) SubmitAddProvisionerOutput(ctx context.Context, storeID string, body SubmitAddProvisionerOutputRequest, file client.MultipartFile) (*SubmitAddProvisionerOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-provisioner/output"
+	var result SubmitAddProvisionerOutputResponse
 	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
 	if err != nil {
 		return nil, err
