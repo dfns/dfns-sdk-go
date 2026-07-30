@@ -23,6 +23,30 @@ func NewDelegatedSignersClient(c *client.Client) *DelegatedSignersClient {
 	return &DelegatedSignersClient{client: c}
 }
 
+// CancelFleetOperationInit starts delegated user action signing for the cancelFleetOperation operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CancelFleetOperationComplete
+// along with the same arguments given here.
+func (c *DelegatedSignersClient) CancelFleetOperationInit(ctx context.Context, storeID string, body CancelFleetOperationRequest) (*signer.UserActionChallenge, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/fleet-operations/cancel"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// CancelFleetOperationComplete finishes delegated signing for the cancelFleetOperation operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the CancelFleetOperationInit challenge.
+func (c *DelegatedSignersClient) CancelFleetOperationComplete(ctx context.Context, storeID string, body CancelFleetOperationRequest, challengeID string, assertion *signer.CredentialAssertion) (*CancelFleetOperationResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/fleet-operations/cancel"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result CancelFleetOperationResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // CreateAddMacUserInputInit starts delegated user action signing for the createAddMacUserInput operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to CreateAddMacUserInputComplete
 // along with the same arguments given here.
@@ -36,6 +60,26 @@ func (c *DelegatedSignersClient) CreateAddMacUserInputInit(ctx context.Context, 
 // ChallengeIdentifier from the CreateAddMacUserInputInit challenge.
 func (c *DelegatedSignersClient) CreateAddMacUserInputComplete(ctx context.Context, storeID string, body CreateAddMacUserInputRequest, challengeID string, assertion *signer.CredentialAssertion) error {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/input"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return err
+	}
+	return c.client.DoWithUserActionToken(ctx, "POST", path, body, nil, userAction)
+}
+
+// CreateAddProvisionerInputInit starts delegated user action signing for the createAddProvisionerInput operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreateAddProvisionerInputComplete
+// along with the same arguments given here.
+func (c *DelegatedSignersClient) CreateAddProvisionerInputInit(ctx context.Context, storeID string, body CreateAddProvisionerInputRequest) (*signer.UserActionChallenge, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-provisioner/input"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// CreateAddProvisionerInputComplete finishes delegated signing for the createAddProvisionerInput operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the CreateAddProvisionerInputInit challenge.
+func (c *DelegatedSignersClient) CreateAddProvisionerInputComplete(ctx context.Context, storeID string, body CreateAddProvisionerInputRequest, challengeID string, assertion *signer.CredentialAssertion) error {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-provisioner/input"
 	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
 	if err != nil {
 		return err
@@ -169,6 +213,17 @@ func (c *DelegatedSignersClient) ListSigners(ctx context.Context) (*ListSignersR
 func (c *DelegatedSignersClient) SubmitAddMacUserOutput(ctx context.Context, storeID string, body SubmitAddMacUserOutputRequest, file client.MultipartFile) (*SubmitAddMacUserOutputResponse, error) {
 	path := "/key-stores/" + url.PathEscape(storeID) + "/add-mac-user/output"
 	var result SubmitAddMacUserOutputResponse
+	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Submits the output archive produced by the offline signer fleet for an add-provisioner operation.
+func (c *DelegatedSignersClient) SubmitAddProvisionerOutput(ctx context.Context, storeID string, body SubmitAddProvisionerOutputRequest, file client.MultipartFile) (*SubmitAddProvisionerOutputResponse, error) {
+	path := "/key-stores/" + url.PathEscape(storeID) + "/add-provisioner/output"
+	var result SubmitAddProvisionerOutputResponse
 	err := c.client.DoMultipart(ctx, "POST", path, body, file, &result, true)
 	if err != nil {
 		return nil, err

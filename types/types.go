@@ -2,28 +2,6 @@
 
 package types
 
-// Protocol represents the protocol type.
-type Protocol string
-
-const (
-	ProtocolN0fns Protocol = "0fns"
-	ProtocolSkySusds Protocol = "SkySusds"
-	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
-	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
-	ProtocolGauntletUsdcPrimeBase Protocol = "GauntletUsdcPrimeBase"
-	ProtocolSteakhouseUsdcBase Protocol = "SteakhouseUsdcBase"
-	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
-)
-
-// Provider represents the provider type.
-type Provider string
-
-const (
-	ProviderUniswapX Provider = "UniswapX"
-	ProviderUniswapClassic Provider = "UniswapClassic"
-	ProviderCircleCctp Provider = "CircleCctp"
-)
-
 // Network represents the network type.
 type Network string
 
@@ -145,6 +123,40 @@ const (
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
 
+// Status represents the status type.
+type Status string
+
+const (
+	StatusPending Status = "Pending"
+	StatusExecuting Status = "Executing"
+	StatusSigned Status = "Signed"
+	StatusConfirmed Status = "Confirmed"
+	StatusFailed Status = "Failed"
+	StatusRejected Status = "Rejected"
+)
+
+// Protocol represents the protocol type.
+type Protocol string
+
+const (
+	ProtocolOfns Protocol = "0fns"
+	ProtocolSkySusds Protocol = "SkySusds"
+	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
+	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
+	ProtocolGauntletUsdcPrimeBase Protocol = "GauntletUsdcPrimeBase"
+	ProtocolSteakhouseUsdcBase Protocol = "SteakhouseUsdcBase"
+	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
+)
+
+// Provider represents the provider type.
+type Provider string
+
+const (
+	ProviderUniswapX Provider = "UniswapX"
+	ProviderUniswapClassic Provider = "UniswapClassic"
+	ProviderCircleCctp Provider = "CircleCctp"
+)
+
 // Kind represents the kind type.
 type Kind string
 
@@ -158,6 +170,7 @@ const (
 	KindKeyExported Kind = "key.exported"
 	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
 	KindWalletBlockchainEventTransferIncluded Kind = "wallet.blockchain_event.transfer.included"
+	KindWalletBlockchainEventMiscConfirmed Kind = "wallet.blockchain_event.misc.confirmed"
 	KindWalletCreated Kind = "wallet.created"
 	KindWalletActivated Kind = "wallet.activated"
 	KindWalletDelegated Kind = "wallet.delegated"
@@ -185,19 +198,9 @@ const (
 	KindVaultUpdated Kind = "vault.updated"
 	KindVaultTagsModified Kind = "vault.tags.modified"
 	KindVaultEventCreated Kind = "vault.event.created"
+	KindAddressWatchBlockchainEventTransferConfirmed Kind = "address_watch.blockchain_event.transfer.confirmed"
+	KindAddressWatchBlockchainEventMiscConfirmed Kind = "address_watch.blockchain_event.misc.confirmed"
 	KindPayoutActionRequired Kind = "payout.action.required"
-)
-
-// Status represents the status type.
-type Status string
-
-const (
-	StatusPending Status = "Pending"
-	StatusExecuting Status = "Executing"
-	StatusSigned Status = "Signed"
-	StatusConfirmed Status = "Confirmed"
-	StatusFailed Status = "Failed"
-	StatusRejected Status = "Rejected"
 )
 
 // UserActionServerKind represents the useractionserverkind type.
@@ -791,4 +794,31 @@ type Allocation struct {
 	Amount map[string]interface{} `json:"amount"`
 	Rewards map[string]interface{} `json:"rewards"`
 	DateCreated string `json:"dateCreated"`
+}
+
+// AddressWatchBlockchainEvent represents the AddressWatchBlockchainEvent type.
+type AddressWatchBlockchainEvent struct {
+	ID string `json:"id"`
+	AddressWatchID string `json:"addressWatchId"`
+	Network Network `json:"network"`
+	Name string `json:"name"`
+	BlockNumber float64 `json:"blockNumber"`
+	TxHash string `json:"txHash"`
+	Index string `json:"index"`
+	Timestamp string `json:"timestamp"`
+	Status string `json:"status"`
+	Data map[string]map[string]interface{} `json:"data"`
+}
+
+// AddressWatch represents the AddressWatch type.
+type AddressWatch struct {
+	ID string `json:"id"`
+	Network Network `json:"network"`
+	Address string `json:"address"`
+	Name *string `json:"name,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Tags []string `json:"tags"`
+	Status string `json:"status"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }

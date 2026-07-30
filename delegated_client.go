@@ -4,6 +4,7 @@ package dfns
 
 import (
 	"github.com/dfns/dfns-sdk-go/v2/internal/client"
+	"github.com/dfns/dfns-sdk-go/v2/addresswatches"
 	"github.com/dfns/dfns-sdk-go/v2/agreements"
 	"github.com/dfns/dfns-sdk-go/v2/allocations"
 	"github.com/dfns/dfns-sdk-go/v2/auth"
@@ -28,6 +29,7 @@ import (
 // out-of-band (e.g. by an end user) rather than by a Signer held in this process.
 type DelegatedClient struct {
 	baseClient *client.Client
+	AddressWatches *addresswatches.DelegatedAddressWatchesClient
 	Agreements *agreements.DelegatedAgreementsClient
 	Allocations *allocations.DelegatedAllocationsClient
 	Auth *auth.DelegatedAuthClient
@@ -57,6 +59,7 @@ func NewDelegatedClient(opts Options) (*DelegatedClient, error) {
 
 	return &DelegatedClient{
 		baseClient: c,
+		AddressWatches: addresswatches.NewDelegatedAddressWatchesClient(c),
 		Agreements: agreements.NewDelegatedAgreementsClient(c),
 		Allocations: allocations.NewDelegatedAllocationsClient(c),
 		Auth: auth.NewDelegatedAuthClient(c),

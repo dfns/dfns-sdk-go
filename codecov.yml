@@ -8,6 +8,7 @@ coverage:
         target: auto
 
 ignore:
+  - "addresswatches/**"
   - "agreements/**"
   - "allocations/**"
   - "auth/**"

@@ -98,3 +98,14 @@ func (c *AllocationsClient) GetAllocation(ctx context.Context, allocationID stri
 	}
 	return &result, nil
 }
+
+// Retrieve the current reward rate (APY) for each supported allocation protocol.
+func (c *AllocationsClient) GetAllocationsInfo(ctx context.Context) (*GetAllocationsInfoResponse, error) {
+	path := "/allocations/info"
+	var result GetAllocationsInfoResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
