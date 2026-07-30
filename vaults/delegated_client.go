@@ -209,6 +209,30 @@ func (c *DelegatedVaultsClient) ListVaultBalances(ctx context.Context, vaultID s
 	return &result, nil
 }
 
+// ReleaseQuarantineInit starts delegated user action signing for the releaseQuarantine operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to ReleaseQuarantineComplete
+// along with the same arguments given here.
+func (c *DelegatedVaultsClient) ReleaseQuarantineInit(ctx context.Context, vaultID string, quarantineID string, body ReleaseQuarantineRequest) (*signer.UserActionChallenge, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID) + "/release"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// ReleaseQuarantineComplete finishes delegated signing for the releaseQuarantine operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the ReleaseQuarantineInit challenge.
+func (c *DelegatedVaultsClient) ReleaseQuarantineComplete(ctx context.Context, vaultID string, quarantineID string, body ReleaseQuarantineRequest, challengeID string, assertion *signer.CredentialAssertion) (*ReleaseQuarantineResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID) + "/release"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result ReleaseQuarantineResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // TagVaultInit starts delegated user action signing for the tagVault operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to TagVaultComplete
 // along with the same arguments given here.
@@ -251,30 +275,6 @@ func (c *DelegatedVaultsClient) UntagVaultComplete(ctx context.Context, vaultID 
 		return nil, err
 	}
 	var result UntagVaultResponse
-	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, body, &result, userAction); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// UnquarantineInit starts delegated user action signing for the unquarantine operation.
-// It returns the challenge to sign out-of-band; pass the signed assertion to UnquarantineComplete
-// along with the same arguments given here.
-func (c *DelegatedVaultsClient) UnquarantineInit(ctx context.Context, vaultID string, quarantineID string, body UnquarantineRequest) (*signer.UserActionChallenge, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID)
-	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, body)
-}
-
-// UnquarantineComplete finishes delegated signing for the unquarantine operation:
-// it submits the externally-signed challenge and issues the request. challengeID is the
-// ChallengeIdentifier from the UnquarantineInit challenge.
-func (c *DelegatedVaultsClient) UnquarantineComplete(ctx context.Context, vaultID string, quarantineID string, body UnquarantineRequest, challengeID string, assertion *signer.CredentialAssertion) (*UnquarantineResponse, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID)
-	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
-	if err != nil {
-		return nil, err
-	}
-	var result UnquarantineResponse
 	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
