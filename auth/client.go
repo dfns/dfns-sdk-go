@@ -265,6 +265,28 @@ func (c *AuthClient) Logout(ctx context.Context, body LogoutRequest) (*LogoutRes
 	return &result, nil
 }
 
+// Completes the OIDC login process by exchanging the authorization code obtained from the identity provider. If the verified user has no active first-factor credential yet, it returns a registration challenge to complete via [Complete User Registration](/api-reference/auth/complete-user-registration); otherwise it returns the user's authentication token.
+func (c *AuthClient) CompleteOidcLogin(ctx context.Context, body CompleteOidcLoginRequest) (interface{}, error) {
+	path := "/auth/login/oidc"
+	var result interface{}
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// Initialize the OIDC login process by returning the identity provider authorization URL to redirect the user to.
+func (c *AuthClient) InitiateOidcLogin(ctx context.Context, body InitiateOidcLoginRequest) (*InitiateOidcLoginResponse, error) {
+	path := "/auth/login/oidc/init"
+	var result InitiateOidcLoginResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Sends a temporary one time code to the user that can be used during login flow.
 // 
 // If the user has a credential of kind `PasswordProtectedKey` a temporary one time code needs to be passed in the `loginCode` field. That's because the [Create Login Challenge](https://docs.dfns.co/api-reference/auth/create-login-challenge) is unauthenticated and returns the encrypted private key of the user. So we need a first step to verify the identity of the user to prevent anybody from fetching the encrypted private key and trying to brute force it offline.

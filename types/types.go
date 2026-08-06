@@ -479,6 +479,7 @@ type VaultBalanceEntry struct {
 	Amount string `json:"amount"`
 	TransferID *string `json:"transferId,omitempty"`
 	QuarantineID *string `json:"quarantineId,omitempty"`
+	LockID *string `json:"lockId,omitempty"`
 }
 
 // Vault net worth in fiat, broken down by balance kind plus a total.
@@ -524,6 +525,20 @@ type TransferRequest struct {
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
 	Details map[string]map[string]interface{} `json:"details,omitempty"`
+}
+
+// Vault lock object: funds manually locked for off-chain settlement or escrow.
+type VaultLock struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
 // Vault address object.
