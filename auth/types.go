@@ -204,6 +204,24 @@ type LogoutResponse struct {
 	Message string `json:"message"`
 }
 
+// Complete OIDC Login
+type CompleteOidcLoginRequest struct {
+	Code string `json:"code"`
+	State string `json:"state"`
+}
+
+// Initiate OIDC Login
+type InitiateOidcLoginRequest struct {
+	OrgID *string `json:"orgId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
+	RedirectURI string `json:"redirectUri"`
+}
+
+// Initiate OIDC Login
+type InitiateOidcLoginResponse struct {
+	RedirectURL string `json:"redirectUrl"`
+}
+
 // Send Login Code
 type SendLoginCodeRequest struct {
 	Username string `json:"username"`

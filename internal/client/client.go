@@ -22,7 +22,8 @@ import (
 
 // Options contains configuration for the Dfns client.
 type Options struct {
-	// BaseURL is the Dfns API base URL (default: https://api.dfns.io)
+	// BaseURL is the complete Dfns API transport base URL, including any path prefix
+	// (default: https://api.dfns.io).
 	BaseURL string
 
 	// AuthToken is the bearer token for authentication
@@ -47,7 +48,8 @@ func New(opts Options) (*Client, error) {
 		opts.BaseURL = "https://api.dfns.io"
 	}
 
-	// Validate BaseURL scheme to prevent SSRF
+	// Validate and normalize BaseURL once so every request joins canonical API paths
+	// onto the complete transport base without dropping an optional path prefix.
 	parsedURL, err := url.Parse(opts.BaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid BaseURL: %w", err)
@@ -55,6 +57,18 @@ func New(opts Options) (*Client, error) {
 	if parsedURL.Scheme != "https" {
 		return nil, errors.New("BaseURL must use https scheme")
 	}
+	if parsedURL.Host == "" {
+		return nil, errors.New("BaseURL must include a host")
+	}
+	if parsedURL.ForceQuery || parsedURL.RawQuery != "" {
+		return nil, errors.New("BaseURL must not include a query")
+	}
+	if strings.Contains(opts.BaseURL, "#") {
+		return nil, errors.New("BaseURL must not include a fragment")
+	}
+	parsedURL.Path = strings.TrimRight(parsedURL.Path, "/")
+	parsedURL.RawPath = strings.TrimRight(parsedURL.RawPath, "/")
+	opts.BaseURL = parsedURL.String()
 
 	if opts.AuthToken == "" {
 		return nil, errors.New("AuthToken is required")
@@ -119,14 +133,17 @@ func (c *Client) DoWithUserActionToken(ctx context.Context, method, path string,
 // doRequest issues an HTTP request with an already-serialized body and an optional user
 // action token, then decodes the response. Shared by Do and DoWithUserActionToken.
 func (c *Client) doRequest(ctx context.Context, method, path string, bodyBytes []byte, result interface{}, userActionToken string) error {
-	url := c.opts.BaseURL + path
+	requestURL, err := buildTransportURL(c.opts.BaseURL, path)
+	if err != nil {
+		return err
+	}
 
 	var bodyReader io.Reader
 	if bodyBytes != nil {
 		bodyReader = bytes.NewReader(bodyBytes)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
+	req, err := http.NewRequestWithContext(ctx, method, requestURL, bodyReader)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -179,7 +196,10 @@ type MultipartFile struct {
 // and the bytes are sent as the "file" part. When a signature is required, the "data"
 // payload is what gets signed.
 func (c *Client) DoMultipart(ctx context.Context, method, path string, body interface{}, file MultipartFile, result interface{}, requiresSignature bool) error {
-	url := c.opts.BaseURL + path
+	requestURL, err := buildTransportURL(c.opts.BaseURL, path)
+	if err != nil {
+		return err
+	}
 
 	// Build the "data" object: the JSON body plus the file checksum the API expects.
 	data := map[string]interface{}{}
@@ -218,7 +238,7 @@ func (c *Client) DoMultipart(ctx context.Context, method, path string, body inte
 	// Closing pr makes any pending write return ErrClosedPipe so the goroutine exits.
 	defer pr.Close()
 
-	req, err := http.NewRequestWithContext(ctx, method, url, pr)
+	req, err := http.NewRequestWithContext(ctx, method, requestURL, pr)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -318,7 +338,7 @@ func (c *Client) createUserActionChallenge(ctx context.Context, method, path str
 	reqBody := map[string]string{
 		"userActionPayload":    string(body),
 		"userActionHttpMethod": method,
-		"userActionHttpPath":   path,
+		"userActionHttpPath":   canonicalRequestPath(path),
 		"userActionServerKind": "Api",
 	}
 
@@ -346,6 +366,26 @@ func (c *Client) completeUserActionSigning(ctx context.Context, challengeID stri
 	}
 
 	return resp.UserAction, nil
+}
+
+// buildTransportURL appends a canonical API path (and its optional query string)
+// to the normalized complete transport base. It intentionally does not use
+// url.ResolveReference because root-relative API paths would discard BaseURL's path.
+func buildTransportURL(baseURL, path string) (string, error) {
+	if !strings.HasPrefix(path, "/") || strings.HasPrefix(path, "//") {
+		return "", errors.New("request path must be root-relative")
+	}
+	return baseURL + path, nil
+}
+
+// canonicalRequestPath removes the transport query from the path bound into a
+// user-action challenge. Query parameters are transported but are not part of
+// the canonical Dfns userActionHttpPath.
+func canonicalRequestPath(path string) string {
+	if queryIndex := strings.IndexByte(path, '?'); queryIndex >= 0 {
+		return path[:queryIndex]
+	}
+	return path
 }
 
 // CreateUserActionChallenge starts a delegated user action signing flow: it returns the

@@ -49,6 +49,43 @@ type CreateVaultAddressResponse struct {
 	Address string `json:"address"`
 }
 
+// List Vault Locks
+type ListVaultLocksResponse struct {
+	Items []types.VaultLock `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListVaultLocksQuery represents query parameters.
+type ListVaultLocksQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+	Network *string `json:"network,omitempty"`
+	Tid *string `json:"tid,omitempty"`
+}
+
+// Create Vault Lock
+type CreateVaultLockRequest struct {
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+}
+
+// Create Vault Lock
+type CreateVaultLockResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
+}
+
 // Create Vault Transfer
 type CreateVaultTransferRequest struct {
 	Network interface{} `json:"network"`
@@ -79,6 +116,34 @@ type CreateVaultTransferResponse struct {
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
 	Details map[string]map[string]interface{} `json:"details,omitempty"`
+}
+
+// Get Vault Lock
+type GetVaultLockResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
+}
+
+// Delete Vault Lock
+type DeleteVaultLockResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
 // Get Vault
