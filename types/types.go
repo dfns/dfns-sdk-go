@@ -2,6 +2,102 @@
 
 package types
 
+// AddressWatchNetwork represents the addresswatchnetwork type.
+type AddressWatchNetwork string
+
+const (
+	AddressWatchNetworkArbitrumOne AddressWatchNetwork = "ArbitrumOne"
+	AddressWatchNetworkArbitrumSepolia AddressWatchNetwork = "ArbitrumSepolia"
+	AddressWatchNetworkArcTestnet AddressWatchNetwork = "ArcTestnet"
+	AddressWatchNetworkAvalancheC AddressWatchNetwork = "AvalancheC"
+	AddressWatchNetworkAvalancheCFuji AddressWatchNetwork = "AvalancheCFuji"
+	AddressWatchNetworkBase AddressWatchNetwork = "Base"
+	AddressWatchNetworkBaseSepolia AddressWatchNetwork = "BaseSepolia"
+	AddressWatchNetworkBerachain AddressWatchNetwork = "Berachain"
+	AddressWatchNetworkBerachainBepolia AddressWatchNetwork = "BerachainBepolia"
+	AddressWatchNetworkBob AddressWatchNetwork = "Bob"
+	AddressWatchNetworkBobSepolia AddressWatchNetwork = "BobSepolia"
+	AddressWatchNetworkBsc AddressWatchNetwork = "Bsc"
+	AddressWatchNetworkBscTestnet AddressWatchNetwork = "BscTestnet"
+	AddressWatchNetworkCelo AddressWatchNetwork = "Celo"
+	AddressWatchNetworkCeloAlfajores AddressWatchNetwork = "CeloAlfajores"
+	AddressWatchNetworkCodex AddressWatchNetwork = "Codex"
+	AddressWatchNetworkCodexSepolia AddressWatchNetwork = "CodexSepolia"
+	AddressWatchNetworkEthereum AddressWatchNetwork = "Ethereum"
+	AddressWatchNetworkEthereumClassic AddressWatchNetwork = "EthereumClassic"
+	AddressWatchNetworkEthereumClassicMordor AddressWatchNetwork = "EthereumClassicMordor"
+	AddressWatchNetworkEthereumSepolia AddressWatchNetwork = "EthereumSepolia"
+	AddressWatchNetworkEthereumHoodi AddressWatchNetwork = "EthereumHoodi"
+	AddressWatchNetworkFlareC AddressWatchNetwork = "FlareC"
+	AddressWatchNetworkFlareCCoston2 AddressWatchNetwork = "FlareCCoston2"
+	AddressWatchNetworkFlowEvm AddressWatchNetwork = "FlowEvm"
+	AddressWatchNetworkFlowEvmTestnet AddressWatchNetwork = "FlowEvmTestnet"
+	AddressWatchNetworkInk AddressWatchNetwork = "Ink"
+	AddressWatchNetworkInkSepolia AddressWatchNetwork = "InkSepolia"
+	AddressWatchNetworkOptimism AddressWatchNetwork = "Optimism"
+	AddressWatchNetworkOptimismSepolia AddressWatchNetwork = "OptimismSepolia"
+	AddressWatchNetworkPlasma AddressWatchNetwork = "Plasma"
+	AddressWatchNetworkPlasmaTestnet AddressWatchNetwork = "PlasmaTestnet"
+	AddressWatchNetworkPlume AddressWatchNetwork = "Plume"
+	AddressWatchNetworkPlumeSepolia AddressWatchNetwork = "PlumeSepolia"
+	AddressWatchNetworkPolygon AddressWatchNetwork = "Polygon"
+	AddressWatchNetworkPolygonAmoy AddressWatchNetwork = "PolygonAmoy"
+	AddressWatchNetworkRace AddressWatchNetwork = "Race"
+	AddressWatchNetworkRaceSepolia AddressWatchNetwork = "RaceSepolia"
+	AddressWatchNetworkRayls AddressWatchNetwork = "Rayls"
+	AddressWatchNetworkRaylsTestnet AddressWatchNetwork = "RaylsTestnet"
+	AddressWatchNetworkRobinhood AddressWatchNetwork = "Robinhood"
+	AddressWatchNetworkRobinhoodSepolia AddressWatchNetwork = "RobinhoodSepolia"
+	AddressWatchNetworkSeiAtlantic2 AddressWatchNetwork = "SeiAtlantic2"
+	AddressWatchNetworkSeiPacific1 AddressWatchNetwork = "SeiPacific1"
+	AddressWatchNetworkSolana AddressWatchNetwork = "Solana"
+	AddressWatchNetworkSolanaDevnet AddressWatchNetwork = "SolanaDevnet"
+	AddressWatchNetworkSonic AddressWatchNetwork = "Sonic"
+	AddressWatchNetworkSonicTestnet AddressWatchNetwork = "SonicTestnet"
+	AddressWatchNetworkTempo AddressWatchNetwork = "Tempo"
+	AddressWatchNetworkTempoModerato AddressWatchNetwork = "TempoModerato"
+	AddressWatchNetworkTsc AddressWatchNetwork = "Tsc"
+	AddressWatchNetworkTscTestnet1 AddressWatchNetwork = "TscTestnet1"
+	AddressWatchNetworkXdc AddressWatchNetwork = "Xdc"
+	AddressWatchNetworkXdcApothem AddressWatchNetwork = "XdcApothem"
+	AddressWatchNetworkXLayer AddressWatchNetwork = "XLayer"
+	AddressWatchNetworkXLayerSepolia AddressWatchNetwork = "XLayerSepolia"
+)
+
+// Status represents the status type.
+type Status string
+
+const (
+	StatusPending Status = "Pending"
+	StatusExecuting Status = "Executing"
+	StatusSigned Status = "Signed"
+	StatusConfirmed Status = "Confirmed"
+	StatusFailed Status = "Failed"
+	StatusRejected Status = "Rejected"
+)
+
+// Protocol represents the protocol type.
+type Protocol string
+
+const (
+	ProtocolOfns Protocol = "0fns"
+	ProtocolSkySusds Protocol = "SkySusds"
+	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
+	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
+	ProtocolGauntletUsdcPrimeBase Protocol = "GauntletUsdcPrimeBase"
+	ProtocolSteakhouseUsdcBase Protocol = "SteakhouseUsdcBase"
+	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
+)
+
+// Provider represents the provider type.
+type Provider string
+
+const (
+	ProviderUniswapX Provider = "UniswapX"
+	ProviderUniswapClassic Provider = "UniswapClassic"
+	ProviderCircleCctp Provider = "CircleCctp"
+)
+
 // Network represents the network type.
 type Network string
 
@@ -121,40 +217,6 @@ const (
 	NetworkXLayerSepolia Network = "XLayerSepolia"
 	NetworkXrpLedger Network = "XrpLedger"
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
-)
-
-// Status represents the status type.
-type Status string
-
-const (
-	StatusPending Status = "Pending"
-	StatusExecuting Status = "Executing"
-	StatusSigned Status = "Signed"
-	StatusConfirmed Status = "Confirmed"
-	StatusFailed Status = "Failed"
-	StatusRejected Status = "Rejected"
-)
-
-// Protocol represents the protocol type.
-type Protocol string
-
-const (
-	ProtocolOfns Protocol = "0fns"
-	ProtocolSkySusds Protocol = "SkySusds"
-	ProtocolGauntletUsdcPrime Protocol = "GauntletUsdcPrime"
-	ProtocolSteakhouseUsdt Protocol = "SteakhouseUsdt"
-	ProtocolGauntletUsdcPrimeBase Protocol = "GauntletUsdcPrimeBase"
-	ProtocolSteakhouseUsdcBase Protocol = "SteakhouseUsdcBase"
-	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
-)
-
-// Provider represents the provider type.
-type Provider string
-
-const (
-	ProviderUniswapX Provider = "UniswapX"
-	ProviderUniswapClassic Provider = "UniswapClassic"
-	ProviderCircleCctp Provider = "CircleCctp"
 )
 
 // Kind represents the kind type.
@@ -370,7 +432,6 @@ const (
 type HsmGenesisFirmwareVersion string
 
 const (
-	HsmGenesisFirmwareVersionN22 HsmGenesisFirmwareVersion = "2.2"
 	HsmGenesisFirmwareVersionN24 HsmGenesisFirmwareVersion = "2.4"
 )
 
@@ -379,6 +440,26 @@ type Version int64
 
 const (
 	VersionN1 Version = 1
+)
+
+// Level represents the level type.
+type Level string
+
+const (
+	LevelLow Level = "Low"
+	LevelMedium Level = "Medium"
+	LevelHigh Level = "High"
+	LevelSevere Level = "Severe"
+)
+
+// MaxAlertLevel represents the maxalertlevel type.
+type MaxAlertLevel string
+
+const (
+	MaxAlertLevelLow MaxAlertLevel = "Low"
+	MaxAlertLevelMedium MaxAlertLevel = "Medium"
+	MaxAlertLevelHigh MaxAlertLevel = "High"
+	MaxAlertLevelSevere MaxAlertLevel = "Severe"
 )
 
 // RequestMethod represents the requestmethod type.
@@ -468,6 +549,22 @@ type TransactionRequest struct {
 type Requester struct {
 	UserID string `json:"userId"`
 	TokenID *string `json:"tokenId,omitempty"`
+}
+
+// Request to release quarantined funds into the available balance. Executed immediately unless a policy requires approval, in which case it stays Pending until the approval resolves.
+type VaultReleaseQuarantineRequest struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	QuarantineID string `json:"quarantineId"`
+	Network string `json:"network"`
+	TransactionHash string `json:"transactionHash"`
+	KytResult *map[string]interface{} `json:"kytResult,omitempty"`
+	Requester map[string]interface{} `json:"requester"`
+	Reason *string `json:"reason,omitempty"`
+	RejectionReason *string `json:"rejectionReason,omitempty"`
+	Status string `json:"status"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	DateCreated string `json:"dateCreated"`
 }
 
 // Vault balance entry object.
@@ -815,7 +912,7 @@ type Allocation struct {
 type AddressWatchBlockchainEvent struct {
 	ID string `json:"id"`
 	AddressWatchID string `json:"addressWatchId"`
-	Network Network `json:"network"`
+	Network AddressWatchNetwork `json:"network"`
 	Name string `json:"name"`
 	BlockNumber float64 `json:"blockNumber"`
 	TxHash string `json:"txHash"`
@@ -828,7 +925,7 @@ type AddressWatchBlockchainEvent struct {
 // AddressWatch represents the AddressWatch type.
 type AddressWatch struct {
 	ID string `json:"id"`
-	Network Network `json:"network"`
+	Network AddressWatchNetwork `json:"network"`
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`

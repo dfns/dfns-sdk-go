@@ -44,6 +44,8 @@ func (c *AllocationsClient) ListAllocations(ctx context.Context, query *ListAllo
 }
 
 // Create a new allocation.
+// 
+// An allocation deposits assets from one of your wallets into a rewards-earning protocol. Two providers are available:
 func (c *AllocationsClient) CreateAllocation(ctx context.Context, body CreateAllocationRequest) (*CreateAllocationResponse, error) {
 	path := "/allocations"
 	var result CreateAllocationResponse

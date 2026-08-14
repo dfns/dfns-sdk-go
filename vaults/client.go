@@ -54,7 +54,7 @@ func (c *VaultsClient) CreateVault(ctx context.Context, body CreateVaultRequest)
 	return &result, nil
 }
 
-// Creates a vault address (managed wallet) on an EVM or Bitcoin network.
+// Creates a vault address (managed wallet) on a network that supports vaults.
 func (c *VaultsClient) CreateVaultAddress(ctx context.Context, vaultID string, body CreateVaultAddressRequest) (*CreateVaultAddressResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/addresses"
 	var result CreateVaultAddressResponse

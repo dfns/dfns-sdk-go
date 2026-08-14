@@ -167,20 +167,24 @@ func main() {
 
 The client provides access to the following API domains:
 
-- `client.Auth` - Authentication and user management (53 endpoints)
+- `client.AddressWatches` - address watches operations (6 endpoints)
+- `client.Agreements` - Agreement management (2 endpoints)
+- `client.Allocations` - Allocation management (6 endpoints)
+- `client.Auth` - Authentication and user management (58 endpoints)
 - `client.Exchanges` - Exchange integrations (9 endpoints)
 - `client.FeeSponsors` - Fee sponsor management (7 endpoints)
 - `client.Keys` - Key management (12 endpoints)
 - `client.Networks` - Network information (7 endpoints)
+- `client.Payins` - payins operations (6 endpoints)
+- `client.Payouts` - payouts operations (5 endpoints)
 - `client.Permissions` - Permission management (8 endpoints)
 - `client.Policies` - Policy management (8 endpoints)
-- `client.Signers` - Signer management (2 endpoints)
+- `client.Signers` - Signer management (17 endpoints)
 - `client.Staking` - Staking operations (6 endpoints)
-- `client.Wallets` - Wallet operations (31 endpoints)
-- `client.Webhooks` - Webhook subscriptions (8 endpoints)
 - `client.Swaps` - Token swap operations (5 endpoints)
-- `client.Agreements` - Agreement management (2 endpoints)
-- `client.Allocations` - Allocation management (5 endpoints)
+- `client.Vaults` - vaults operations (15 endpoints)
+- `client.Wallets` - Wallet operations (29 endpoints)
+- `client.Webhooks` - Webhook subscriptions (8 endpoints)
 
 Each domain provides typed methods for all available API endpoints.
 
