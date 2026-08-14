@@ -24,7 +24,7 @@ type AbortTransactionResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Abort Transfer
@@ -47,7 +47,7 @@ type AbortTransferResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // ActivateWalletRequest represents the request body for the activateWallet operation.
@@ -71,7 +71,7 @@ type ActivateWalletResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // List Transactions
@@ -108,7 +108,7 @@ type SignAndBroadcastTransactionResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Cancel Transaction
@@ -129,7 +129,7 @@ type CancelTransactionResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Cancel Transfer
@@ -150,7 +150,7 @@ type CancelTransferResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Proxy a request to the Canton Ledger API
@@ -178,7 +178,7 @@ type SpeedUpTransactionResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Speed Up Transfer
@@ -199,7 +199,7 @@ type SpeedUpTransferResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // List Wallets
@@ -262,7 +262,7 @@ type GetTransactionResponse struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Get Transfer
@@ -285,7 +285,7 @@ type GetTransferResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Get Wallet
@@ -426,7 +426,7 @@ type TransferAssetResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Tag Wallet

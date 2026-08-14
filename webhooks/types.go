@@ -84,7 +84,7 @@ type GetWebhookEventResponse struct {
 	ID string `json:"id"`
 	Date string `json:"date"`
 	Kind string `json:"kind"`
-	Data map[string]map[string]interface{} `json:"data"`
+	Data map[string]interface{} `json:"data"`
 	Status string `json:"status"`
 	ErrorType *string `json:"error,omitempty"`
 	TimestampSent int64 `json:"timestampSent"`

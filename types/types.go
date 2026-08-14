@@ -475,7 +475,7 @@ type WebhookEvent struct {
 	ID string `json:"id"`
 	Date string `json:"date"`
 	Kind string `json:"kind"`
-	Data map[string]map[string]interface{} `json:"data"`
+	Data map[string]interface{} `json:"data"`
 	Status string `json:"status"`
 	ErrorType *string `json:"error,omitempty"`
 	TimestampSent int64 `json:"timestampSent"`
@@ -542,7 +542,7 @@ type TransactionRequest struct {
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // The user who initiated the request.
@@ -621,7 +621,7 @@ type TransferRequest struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Vault lock object: funds manually locked for off-chain settlement or escrow.
@@ -771,7 +771,7 @@ type SignatureRequest struct {
 	DateSigned *string `json:"dateSigned,omitempty"`
 	DateConfirmed *string `json:"dateConfirmed,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Key represents the Key type.
@@ -919,7 +919,7 @@ type AddressWatchBlockchainEvent struct {
 	Index string `json:"index"`
 	Timestamp string `json:"timestamp"`
 	Status string `json:"status"`
-	Data map[string]map[string]interface{} `json:"data"`
+	Data map[string]interface{} `json:"data"`
 }
 
 // AddressWatch represents the AddressWatch type.

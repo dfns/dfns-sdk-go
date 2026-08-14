@@ -58,7 +58,7 @@ type CreateGenesisInputRequest struct {
 	HsmGenesisSerial string `json:"hsmGenesisSerial"`
 	MacGenesisSerial *string `json:"macGenesisSerial,omitempty"`
 	HsmGenesisFirmwareVersion *string `json:"hsmGenesisFirmwareVersion,omitempty"`
-	DebugOptions map[string]map[string]interface{} `json:"debugOptions,omitempty"`
+	DebugOptions map[string]interface{} `json:"debugOptions,omitempty"`
 }
 
 // Create Key Harvest Input
