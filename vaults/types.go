@@ -115,7 +115,7 @@ type CreateVaultTransferResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
-	Details map[string]map[string]interface{} `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Get Vault Lock
