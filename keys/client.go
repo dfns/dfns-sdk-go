@@ -118,7 +118,7 @@ func (c *KeysClient) DeriveKey(ctx context.Context, keyID string, body DeriveKey
 
 // Dfns secures private keys by generating them as MPC key shares in our decentralized key management network.  Our goal is to eliminate all single points of failure (SPOFs) associated with blockchain private keys.
 // 
-// In certain circumstances, however, customers require Dfns to export a private key. In this case, Dfns exposes the following endpoint which can be used in conjunction with our [export SDK](https://github.com/dfns/dfns-sdk-ts/tree/m/examples/sdk/export-wallet).
+// In certain circumstances, however, customers require Dfns to export a private key. In this case, Dfns exposes the following endpoint which can be used in conjunction with our [export SDK](https://github.com/dfns/dfns-sdk-ts/tree/m/examples/sdk/export-wallet). Each signer returns its key share encrypted to an encryption key you provide; the full private key is reconstituted client-side and is never assembled on Dfns servers.
 func (c *KeysClient) ExportKey(ctx context.Context, keyID string, body ExportKeyRequest) (*ExportKeyResponse, error) {
 	path := "/keys/" + url.PathEscape(keyID) + "/export"
 	var result ExportKeyResponse

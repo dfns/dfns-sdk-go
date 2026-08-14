@@ -20,7 +20,7 @@ type ListAddressWatchesQuery struct {
 
 // Create Address Watch
 type CreateAddressWatchRequest struct {
-	Network types.Network `json:"network"`
+	Network types.AddressWatchNetwork `json:"network"`
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
@@ -30,7 +30,7 @@ type CreateAddressWatchRequest struct {
 // Create Address Watch
 type CreateAddressWatchResponse struct {
 	ID string `json:"id"`
-	Network types.Network `json:"network"`
+	Network types.AddressWatchNetwork `json:"network"`
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
@@ -43,7 +43,7 @@ type CreateAddressWatchResponse struct {
 // Get Address Watch
 type GetAddressWatchResponse struct {
 	ID string `json:"id"`
-	Network types.Network `json:"network"`
+	Network types.AddressWatchNetwork `json:"network"`
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
@@ -56,7 +56,7 @@ type GetAddressWatchResponse struct {
 // Get Address Watch Assets
 type GetAddressWatchAssetsResponse struct {
 	AddressWatchID string `json:"addressWatchId"`
-	Network types.Network `json:"network"`
+	Network types.AddressWatchNetwork `json:"network"`
 	Assets []map[string]interface{} `json:"assets"`
 	NetWorth *map[string]interface{} `json:"netWorth,omitempty"`
 }
@@ -71,7 +71,7 @@ type GetAddressWatchBlockchainEventsResponse struct {
 	Items []types.AddressWatchBlockchainEvent `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 	AddressWatchID string `json:"addressWatchId"`
-	Network types.Network `json:"network"`
+	Network types.AddressWatchNetwork `json:"network"`
 }
 
 // GetAddressWatchBlockchainEventsQuery represents query parameters.
@@ -88,7 +88,7 @@ type GetAddressWatchHistoryResponse struct {
 	Items []interface{} `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 	AddressWatchID string `json:"addressWatchId"`
-	Network types.Network `json:"network"`
+	Network types.AddressWatchNetwork `json:"network"`
 }
 
 // GetAddressWatchHistoryQuery represents query parameters.

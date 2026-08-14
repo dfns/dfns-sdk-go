@@ -52,6 +52,7 @@ type CreateCloneInputRequest struct {
 type CreateGenesisInputRequest struct {
 	Kind string `json:"kind"`
 	NumProvisioners int64 `json:"numProvisioners"`
+	NumOperational int64 `json:"numOperational"`
 	NumSecp256k1 int64 `json:"numSecp256k1"`
 	NumEd25519 int64 `json:"numEd25519"`
 	HsmGenesisSerial string `json:"hsmGenesisSerial"`

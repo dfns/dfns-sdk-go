@@ -39,7 +39,7 @@ type CreateVaultResponse struct {
 
 // Create Vault Address
 type CreateVaultAddressRequest struct {
-	Network interface{} `json:"network"`
+	Network string `json:"network"`
 }
 
 // Create Vault Address
@@ -88,7 +88,7 @@ type CreateVaultLockResponse struct {
 
 // Create Vault Transfer
 type CreateVaultTransferRequest struct {
-	Network interface{} `json:"network"`
+	Network string `json:"network"`
 	Tid string `json:"tid"`
 	To string `json:"to"`
 	Amount string `json:"amount"`
@@ -210,7 +210,18 @@ type ReleaseQuarantineRequest struct {
 
 // Release Quarantine
 type ReleaseQuarantineResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	QuarantineID string `json:"quarantineId"`
+	Network string `json:"network"`
+	TransactionHash string `json:"transactionHash"`
+	KytResult *map[string]interface{} `json:"kytResult,omitempty"`
+	Requester map[string]interface{} `json:"requester"`
+	Reason *string `json:"reason,omitempty"`
+	RejectionReason *string `json:"rejectionReason,omitempty"`
 	Status string `json:"status"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	DateCreated string `json:"dateCreated"`
 }
 
 // Tag Vault
