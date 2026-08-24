@@ -67,6 +67,17 @@ func (c *AddressWatchesClient) GetAddressWatch(ctx context.Context, addressWatch
 	return &result, nil
 }
 
+// Deletes an address watch. Once deleted, the address is not watched anymore, no webhook is sent for it, and it won't count in your overall organisation wallet count. Watching the same address again on the same network re-activates this watch, with the same ID and the same history.
+func (c *AddressWatchesClient) DeleteAddressWatch(ctx context.Context, addressWatchID string) (*DeleteAddressWatchResponse, error) {
+	path := "/address-watches/" + url.PathEscape(addressWatchID)
+	var result DeleteAddressWatchResponse
+	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Retrieves the list of assets held by the address watch, as tracked by the indexer. Balances are tracked from the moment the watch is created.
 func (c *AddressWatchesClient) GetAddressWatchAssets(ctx context.Context, addressWatchID string, query *GetAddressWatchAssetsQuery) (*GetAddressWatchAssetsResponse, error) {
 	path := "/address-watches/" + url.PathEscape(addressWatchID) + "/assets"

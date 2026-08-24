@@ -82,6 +82,30 @@ func (c *DelegatedAddressWatchesClient) GetAddressWatch(ctx context.Context, add
 	return &result, nil
 }
 
+// DeleteAddressWatchInit starts delegated user action signing for the deleteAddressWatch operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to DeleteAddressWatchComplete
+// along with the same arguments given here.
+func (c *DelegatedAddressWatchesClient) DeleteAddressWatchInit(ctx context.Context, addressWatchID string) (*signer.UserActionChallenge, error) {
+	path := "/address-watches/" + url.PathEscape(addressWatchID)
+	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, nil)
+}
+
+// DeleteAddressWatchComplete finishes delegated signing for the deleteAddressWatch operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the DeleteAddressWatchInit challenge.
+func (c *DelegatedAddressWatchesClient) DeleteAddressWatchComplete(ctx context.Context, addressWatchID string, challengeID string, assertion *signer.CredentialAssertion) (*DeleteAddressWatchResponse, error) {
+	path := "/address-watches/" + url.PathEscape(addressWatchID)
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result DeleteAddressWatchResponse
+	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Retrieves the list of assets held by the address watch, as tracked by the indexer. Balances are tracked from the moment the watch is created.
 func (c *DelegatedAddressWatchesClient) GetAddressWatchAssets(ctx context.Context, addressWatchID string, query *GetAddressWatchAssetsQuery) (*GetAddressWatchAssetsResponse, error) {
 	path := "/address-watches/" + url.PathEscape(addressWatchID) + "/assets"

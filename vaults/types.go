@@ -79,11 +79,14 @@ type CreateVaultLockResponse struct {
 	Network string `json:"network"`
 	Tid string `json:"tid"`
 	Amount string `json:"amount"`
-	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Requester map[string]interface{} `json:"requester"`
+	RejectionReason *string `json:"rejectionReason,omitempty"`
+	Status string `json:"status"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	LockID *string `json:"lockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
-	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
 // Create Vault Transfer
