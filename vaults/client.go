@@ -94,7 +94,7 @@ func (c *VaultsClient) ListVaultLocks(ctx context.Context, vaultID string, query
 	return &result, nil
 }
 
-// Locks funds from the vault's available balance for off-chain settlement or escrow.
+// Requests locking funds from the vault's available balance for off-chain settlement or escrow. Executed immediately unless a policy requires approval.
 func (c *VaultsClient) CreateVaultLock(ctx context.Context, vaultID string, body CreateVaultLockRequest) (*CreateVaultLockResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/locks"
 	var result CreateVaultLockResponse

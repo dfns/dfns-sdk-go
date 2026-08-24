@@ -167,7 +167,7 @@ func main() {
 
 The client provides access to the following API domains:
 
-- `client.AddressWatches` - address watches operations (6 endpoints)
+- `client.AddressWatches` - address watches operations (7 endpoints)
 - `client.Agreements` - Agreement management (2 endpoints)
 - `client.Allocations` - Allocation management (6 endpoints)
 - `client.Auth` - Authentication and user management (58 endpoints)

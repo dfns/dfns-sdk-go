@@ -242,6 +242,7 @@ type CreateWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	VaultID *string `json:"vaultId,omitempty"`
 }
 
 // Get Transaction
@@ -302,6 +303,7 @@ type GetWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	VaultID *string `json:"vaultId,omitempty"`
 }
 
 // Update Wallet
@@ -324,6 +326,7 @@ type UpdateWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	VaultID *string `json:"vaultId,omitempty"`
 }
 
 // Get Wallet Assets
@@ -388,6 +391,7 @@ type ImportWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	VaultID *string `json:"vaultId,omitempty"`
 }
 
 // List Transfers

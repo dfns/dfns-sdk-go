@@ -24,7 +24,6 @@ type CreateAddressWatchRequest struct {
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
-	Tags []string `json:"tags,omitempty"`
 }
 
 // Create Address Watch
@@ -34,7 +33,6 @@ type CreateAddressWatchResponse struct {
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
-	Tags []string `json:"tags"`
 	Status string `json:"status"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`
@@ -47,7 +45,18 @@ type GetAddressWatchResponse struct {
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
-	Tags []string `json:"tags"`
+	Status string `json:"status"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
+}
+
+// Delete Address Watch
+type DeleteAddressWatchResponse struct {
+	ID string `json:"id"`
+	Network types.AddressWatchNetwork `json:"network"`
+	Address string `json:"address"`
+	Name *string `json:"name,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
 	Status string `json:"status"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`

@@ -624,6 +624,23 @@ type TransferRequest struct {
 	Details map[string]interface{} `json:"details,omitempty"`
 }
 
+// Request to lock vault funds. Executed immediately unless a policy requires approval, in which case it stays Pending until the approval resolves.
+type VaultLockRequest struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	Requester map[string]interface{} `json:"requester"`
+	RejectionReason *string `json:"rejectionReason,omitempty"`
+	Status string `json:"status"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	LockID *string `json:"lockId,omitempty"`
+	DateCreated string `json:"dateCreated"`
+}
+
 // Vault lock object: funds manually locked for off-chain settlement or escrow.
 type VaultLock struct {
 	ID string `json:"id"`
@@ -834,6 +851,7 @@ type Wallet struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	VaultID *string `json:"vaultId,omitempty"`
 }
 
 // Register a recovery key. See [Account Recovery](https://docs.dfns.co/api-reference/auth/account-recovery) for more details.
@@ -929,7 +947,6 @@ type AddressWatch struct {
 	Address string `json:"address"`
 	Name *string `json:"name,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
-	Tags []string `json:"tags"`
 	Status string `json:"status"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`
