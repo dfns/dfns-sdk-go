@@ -442,26 +442,6 @@ const (
 	VersionN1 Version = 1
 )
 
-// Level represents the level type.
-type Level string
-
-const (
-	LevelLow Level = "Low"
-	LevelMedium Level = "Medium"
-	LevelHigh Level = "High"
-	LevelSevere Level = "Severe"
-)
-
-// MaxAlertLevel represents the maxalertlevel type.
-type MaxAlertLevel string
-
-const (
-	MaxAlertLevelLow MaxAlertLevel = "Low"
-	MaxAlertLevelMedium MaxAlertLevel = "Medium"
-	MaxAlertLevelHigh MaxAlertLevel = "High"
-	MaxAlertLevelSevere MaxAlertLevel = "Severe"
-)
-
 // RequestMethod represents the requestmethod type.
 type RequestMethod string
 
@@ -558,7 +538,7 @@ type VaultReleaseQuarantineRequest struct {
 	QuarantineID string `json:"quarantineId"`
 	Network string `json:"network"`
 	TransactionHash string `json:"transactionHash"`
-	KytResult *map[string]interface{} `json:"kytResult,omitempty"`
+	KytResult interface{} `json:"kytResult,omitempty"`
 	Requester map[string]interface{} `json:"requester"`
 	Reason *string `json:"reason,omitempty"`
 	RejectionReason *string `json:"rejectionReason,omitempty"`
@@ -622,23 +602,6 @@ type TransferRequest struct {
 	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	ReplacementID *string `json:"replacementId,omitempty"`
 	Details map[string]interface{} `json:"details,omitempty"`
-}
-
-// Request to lock vault funds. Executed immediately unless a policy requires approval, in which case it stays Pending until the approval resolves.
-type VaultLockRequest struct {
-	ID string `json:"id"`
-	VaultID string `json:"vaultId"`
-	Network string `json:"network"`
-	Tid string `json:"tid"`
-	Amount string `json:"amount"`
-	ExternalID *string `json:"externalId,omitempty"`
-	Reason *string `json:"reason,omitempty"`
-	Requester map[string]interface{} `json:"requester"`
-	RejectionReason *string `json:"rejectionReason,omitempty"`
-	Status string `json:"status"`
-	ApprovalID *string `json:"approvalId,omitempty"`
-	LockID *string `json:"lockId,omitempty"`
-	DateCreated string `json:"dateCreated"`
 }
 
 // Vault lock object: funds manually locked for off-chain settlement or escrow.

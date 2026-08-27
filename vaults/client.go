@@ -94,7 +94,7 @@ func (c *VaultsClient) ListVaultLocks(ctx context.Context, vaultID string, query
 	return &result, nil
 }
 
-// Requests locking funds from the vault's available balance for off-chain settlement or escrow. Executed immediately unless a policy requires approval.
+// Requests locking funds from the vault's available balance for off-chain settlement or escrow. Returns the created lock (200), or the pending lock request (202) when a policy requires approval.
 func (c *VaultsClient) CreateVaultLock(ctx context.Context, vaultID string, body CreateVaultLockRequest) (*CreateVaultLockResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/locks"
 	var result CreateVaultLockResponse
@@ -110,28 +110,6 @@ func (c *VaultsClient) CreateVaultTransfer(ctx context.Context, vaultID string, 
 	path := "/vaults/" + url.PathEscape(vaultID) + "/transfers"
 	var result CreateVaultTransferResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// Retrieves a vault lock by its ID.
-func (c *VaultsClient) GetVaultLock(ctx context.Context, vaultID string, lockID string) (*GetVaultLockResponse, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
-	var result GetVaultLockResponse
-	err := c.client.Do(ctx, "GET", path, nil, &result, false)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// Releases a lock, returning the locked funds to the vault's available balance. Owner only.
-func (c *VaultsClient) DeleteVaultLock(ctx context.Context, vaultID string, lockID string) (*DeleteVaultLockResponse, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
-	var result DeleteVaultLockResponse
-	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
 	if err != nil {
 		return nil, err
 	}
@@ -154,6 +132,17 @@ func (c *VaultsClient) UpdateVault(ctx context.Context, vaultID string, body Upd
 	path := "/vaults/" + url.PathEscape(vaultID)
 	var result UpdateVaultResponse
 	err := c.client.Do(ctx, "PUT", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Retrieves a vault lock by its ID.
+func (c *VaultsClient) GetVaultLock(ctx context.Context, vaultID string, lockID string) (*GetVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
+	var result GetVaultLockResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
 		return nil, err
 	}
@@ -220,6 +209,17 @@ func (c *VaultsClient) ReleaseQuarantine(ctx context.Context, vaultID string, qu
 	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID) + "/release"
 	var result ReleaseQuarantineResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Releases a lock, returning the locked funds to the vault's available balance. Owner only.
+func (c *VaultsClient) ReleaseVaultLock(ctx context.Context, vaultID string, lockID string) (*ReleaseVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/release"
+	var result ReleaseVaultLockResponse
+	err := c.client.Do(ctx, "POST", path, nil, &result, true)
 	if err != nil {
 		return nil, err
 	}
