@@ -79,14 +79,11 @@ type CreateVaultLockResponse struct {
 	Network string `json:"network"`
 	Tid string `json:"tid"`
 	Amount string `json:"amount"`
+	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
-	Requester map[string]interface{} `json:"requester"`
-	RejectionReason *string `json:"rejectionReason,omitempty"`
-	Status string `json:"status"`
-	ApprovalID *string `json:"approvalId,omitempty"`
-	LockID *string `json:"lockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
 // Create Vault Transfer
@@ -121,34 +118,6 @@ type CreateVaultTransferResponse struct {
 	Details map[string]interface{} `json:"details,omitempty"`
 }
 
-// Get Vault Lock
-type GetVaultLockResponse struct {
-	ID string `json:"id"`
-	VaultID string `json:"vaultId"`
-	Network string `json:"network"`
-	Tid string `json:"tid"`
-	Amount string `json:"amount"`
-	Owner string `json:"owner"`
-	ExternalID *string `json:"externalId,omitempty"`
-	Reason *string `json:"reason,omitempty"`
-	DateCreated string `json:"dateCreated"`
-	DateDeleted *string `json:"dateDeleted,omitempty"`
-}
-
-// Delete Vault Lock
-type DeleteVaultLockResponse struct {
-	ID string `json:"id"`
-	VaultID string `json:"vaultId"`
-	Network string `json:"network"`
-	Tid string `json:"tid"`
-	Amount string `json:"amount"`
-	Owner string `json:"owner"`
-	ExternalID *string `json:"externalId,omitempty"`
-	Reason *string `json:"reason,omitempty"`
-	DateCreated string `json:"dateCreated"`
-	DateDeleted *string `json:"dateDeleted,omitempty"`
-}
-
 // Get Vault
 type GetVaultResponse struct {
 	ID string `json:"id"`
@@ -177,6 +146,20 @@ type UpdateVaultResponse struct {
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
 	Addresses []types.VaultAddress `json:"addresses,omitempty"`
+}
+
+// Get Vault Lock
+type GetVaultLockResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
 // List Vault Assets
@@ -218,13 +201,27 @@ type ReleaseQuarantineResponse struct {
 	QuarantineID string `json:"quarantineId"`
 	Network string `json:"network"`
 	TransactionHash string `json:"transactionHash"`
-	KytResult *map[string]interface{} `json:"kytResult,omitempty"`
+	KytResult interface{} `json:"kytResult,omitempty"`
 	Requester map[string]interface{} `json:"requester"`
 	Reason *string `json:"reason,omitempty"`
 	RejectionReason *string `json:"rejectionReason,omitempty"`
 	Status string `json:"status"`
 	ApprovalID *string `json:"approvalId,omitempty"`
 	DateCreated string `json:"dateCreated"`
+}
+
+// Release Vault Lock
+type ReleaseVaultLockResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
 // Tag Vault

@@ -172,41 +172,6 @@ func (c *DelegatedVaultsClient) CreateVaultTransferComplete(ctx context.Context,
 	return &result, nil
 }
 
-// Retrieves a vault lock by its ID.
-func (c *DelegatedVaultsClient) GetVaultLock(ctx context.Context, vaultID string, lockID string) (*GetVaultLockResponse, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
-	var result GetVaultLockResponse
-	err := c.client.Do(ctx, "GET", path, nil, &result, false)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// DeleteVaultLockInit starts delegated user action signing for the deleteVaultLock operation.
-// It returns the challenge to sign out-of-band; pass the signed assertion to DeleteVaultLockComplete
-// along with the same arguments given here.
-func (c *DelegatedVaultsClient) DeleteVaultLockInit(ctx context.Context, vaultID string, lockID string) (*signer.UserActionChallenge, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
-	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, nil)
-}
-
-// DeleteVaultLockComplete finishes delegated signing for the deleteVaultLock operation:
-// it submits the externally-signed challenge and issues the request. challengeID is the
-// ChallengeIdentifier from the DeleteVaultLockInit challenge.
-func (c *DelegatedVaultsClient) DeleteVaultLockComplete(ctx context.Context, vaultID string, lockID string, challengeID string, assertion *signer.CredentialAssertion) (*DeleteVaultLockResponse, error) {
-	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
-	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
-	if err != nil {
-		return nil, err
-	}
-	var result DeleteVaultLockResponse
-	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, &result, userAction); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
 // Retrieves a Vault by its ID.
 func (c *DelegatedVaultsClient) GetVault(ctx context.Context, vaultID string) (*GetVaultResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID)
@@ -237,6 +202,17 @@ func (c *DelegatedVaultsClient) UpdateVaultComplete(ctx context.Context, vaultID
 	}
 	var result UpdateVaultResponse
 	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Retrieves a vault lock by its ID.
+func (c *DelegatedVaultsClient) GetVaultLock(ctx context.Context, vaultID string, lockID string) (*GetVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID)
+	var result GetVaultLockResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
 		return nil, err
 	}
 	return &result, nil
@@ -316,6 +292,30 @@ func (c *DelegatedVaultsClient) ReleaseQuarantineComplete(ctx context.Context, v
 	}
 	var result ReleaseQuarantineResponse
 	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// ReleaseVaultLockInit starts delegated user action signing for the releaseVaultLock operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to ReleaseVaultLockComplete
+// along with the same arguments given here.
+func (c *DelegatedVaultsClient) ReleaseVaultLockInit(ctx context.Context, vaultID string, lockID string) (*signer.UserActionChallenge, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/release"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, nil)
+}
+
+// ReleaseVaultLockComplete finishes delegated signing for the releaseVaultLock operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the ReleaseVaultLockInit challenge.
+func (c *DelegatedVaultsClient) ReleaseVaultLockComplete(ctx context.Context, vaultID string, lockID string, challengeID string, assertion *signer.CredentialAssertion) (*ReleaseVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/release"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result ReleaseVaultLockResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, nil, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil
