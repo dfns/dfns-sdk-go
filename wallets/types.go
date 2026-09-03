@@ -74,6 +74,66 @@ type ActivateWalletResponse struct {
 	Details map[string]interface{} `json:"details,omitempty"`
 }
 
+// List Bulk Wallet Jobs
+type ListBulkWalletJobsResponse struct {
+	Items []types.BulkWalletCreationJob `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListBulkWalletJobsQuery represents query parameters.
+type ListBulkWalletJobsQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+	Status *string `json:"status,omitempty"`
+}
+
+// Bulk Create Wallets
+type BulkCreateWalletsRequest struct {
+	Network types.BulkWalletNetwork `json:"network"`
+	Count int64 `json:"count"`
+	Name string `json:"name"`
+	Tags []string `json:"tags,omitempty"`
+	KeystoreID *string `json:"keystoreId,omitempty"`
+}
+
+// Bulk Create Wallets
+type BulkCreateWalletsResponse struct {
+	ID string `json:"id"`
+	Status string `json:"status"`
+}
+
+// Get Bulk Wallet Job
+type GetBulkWalletJobResponse struct {
+	ID string `json:"id"`
+	OrgID string `json:"orgId"`
+	Status string `json:"status"`
+	Network types.Network `json:"network"`
+	NamePrefix string `json:"namePrefix"`
+	Tags []string `json:"tags"`
+	TotalCount int64 `json:"totalCount"`
+	CompletedCount int64 `json:"completedCount"`
+	KeystoreID string `json:"keystoreId"`
+	MasterKeyID *string `json:"masterKeyId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	NextRetryDate *string `json:"nextRetryDate,omitempty"`
+	NextRetryAttempt *int64 `json:"nextRetryAttempt,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+	DateCompleted *string `json:"dateCompleted,omitempty"`
+}
+
+// List Bulk Wallet Job Wallets
+type ListBulkWalletJobWalletsResponse struct {
+	Items []types.Wallet `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListBulkWalletJobWalletsQuery represents query parameters.
+type ListBulkWalletJobWalletsQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+}
+
 // List Transactions
 type ListTransactionsResponse struct {
 	Items []types.TransactionRequest `json:"items"`

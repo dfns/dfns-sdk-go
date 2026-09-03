@@ -53,6 +53,10 @@ type GetAuditLogResponse struct {
 	UserID interface{} `json:"userId"`
 	Username interface{} `json:"username"`
 	DatePerformed string `json:"datePerformed"`
+	DateSigned string `json:"dateSigned"`
+	DateResolved string `json:"dateResolved"`
+	ResponseStatus interface{} `json:"responseStatus"`
+	ResponseError interface{} `json:"responseError"`
 	FirstFactorCredential map[string]interface{} `json:"firstFactorCredential"`
 }
 

@@ -80,6 +80,17 @@ func (c *DelegatedPayinsClient) CreatePayinComplete(ctx context.Context, body Cr
 	return result, nil
 }
 
+// Request a quote from a given provider for a payin. Returns the stablecoin amount to be delivered and the fees.
+func (c *DelegatedPayinsClient) RequestPayinQuote(ctx context.Context, body RequestPayinQuoteRequest) (*RequestPayinQuoteResponse, error) {
+	path := "/payins/quote"
+	var result RequestPayinQuoteResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Check whether a wallet's address is registered (and approved) as an payin recipient with the provider.
 func (c *DelegatedPayinsClient) GetPayinRecipient(ctx context.Context, query *GetPayinRecipientQuery) (*GetPayinRecipientResponse, error) {
 	path := "/payins/recipients"
@@ -135,6 +146,24 @@ func (c *DelegatedPayinsClient) GetPayinStatus(ctx context.Context, payinID stri
 	return result, nil
 }
 
+// List the provider accounts, with their registered wallet addresses per asset. An account is created on the provider platform (e.g. the Borderless dashboard) and its registered addresses serve both directions: a payin delivers to — and a payout is funded from — a wallet whose address is registered on the account.
+func (c *DelegatedPayinsClient) ListPayinAccounts(ctx context.Context, query *ListPayinAccountsQuery) (*ListPayinAccountsResponse, error) {
+	path := "/payins/accounts"
+	if query != nil {
+		q := url.Values{}
+		q.Set("provider", fmt.Sprintf("%v", query.Provider))
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListPayinAccountsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // The organisation's available balance at the payin provider, one entry per currency —
 //     the funds payins can deliver on-chain.
 func (c *DelegatedPayinsClient) ListPayinBalances(ctx context.Context, query *ListPayinBalancesQuery) (*ListPayinBalancesResponse, error) {
@@ -149,6 +178,48 @@ func (c *DelegatedPayinsClient) ListPayinBalances(ctx context.Context, query *Li
 	var result ListPayinBalancesResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List the currently available payin options — deliverable assets and fiat currency/payment-method/country combinations — as covered by the active provider institutions.
+func (c *DelegatedPayinsClient) ListPayinOptions(ctx context.Context, query *ListPayinOptionsQuery) (*ListPayinOptionsResponse, error) {
+	path := "/payins/options"
+	if query != nil {
+		q := url.Values{}
+		q.Set("provider", fmt.Sprintf("%v", query.Provider))
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListPayinOptionsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// RegisterPayinAccountAssetInit starts delegated user action signing for the registerPayinAccountAsset operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to RegisterPayinAccountAssetComplete
+// along with the same arguments given here.
+func (c *DelegatedPayinsClient) RegisterPayinAccountAssetInit(ctx context.Context, body RegisterPayinAccountAssetRequest) (*signer.UserActionChallenge, error) {
+	path := "/payins/accounts/assets"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// RegisterPayinAccountAssetComplete finishes delegated signing for the registerPayinAccountAsset operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the RegisterPayinAccountAssetInit challenge.
+func (c *DelegatedPayinsClient) RegisterPayinAccountAssetComplete(ctx context.Context, body RegisterPayinAccountAssetRequest, challengeID string, assertion *signer.CredentialAssertion) (*RegisterPayinAccountAssetResponse, error) {
+	path := "/payins/accounts/assets"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result RegisterPayinAccountAssetResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil

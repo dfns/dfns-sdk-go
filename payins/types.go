@@ -2,6 +2,10 @@
 
 package payins
 
+import (
+	"github.com/dfns/dfns-sdk-go/v2/types"
+)
+
 // List Payins
 type ListPayinsResponse struct {
 	Items []interface{} `json:"items"`
@@ -19,6 +23,19 @@ type ListPayinsQuery struct {
 
 // CreatePayinRequest represents the request body for the createPayin operation.
 type CreatePayinRequest = any
+
+// RequestPayinQuoteRequest represents the request body for the requestPayinQuote operation.
+type RequestPayinQuoteRequest = any
+
+// Request Payin Quote
+type RequestPayinQuoteResponse struct {
+	Provider string `json:"provider"`
+	Currency string `json:"currency"`
+	Network types.Network `json:"network"`
+	Tid string `json:"tid"`
+	Timestamp string `json:"timestamp"`
+	Quotes []map[string]interface{} `json:"quotes"`
+}
 
 // Get Payin Recipient
 type GetPayinRecipientResponse struct {
@@ -48,6 +65,16 @@ type RegisterPayinRecipientResponse struct {
 	RecipientAddressID *string `json:"recipientAddressId,omitempty"`
 }
 
+// List Payin Accounts
+type ListPayinAccountsResponse struct {
+	Items []map[string]interface{} `json:"items"`
+}
+
+// ListPayinAccountsQuery represents query parameters.
+type ListPayinAccountsQuery struct {
+	Provider string `json:"provider"`
+}
+
 // List Payin Balances
 type ListPayinBalancesResponse struct {
 	Items []map[string]interface{} `json:"items"`
@@ -56,4 +83,25 @@ type ListPayinBalancesResponse struct {
 // ListPayinBalancesQuery represents query parameters.
 type ListPayinBalancesQuery struct {
 	Provider string `json:"provider"`
+}
+
+// List Payin Options
+type ListPayinOptionsResponse struct {
+	Assets []string `json:"assets"`
+	Currencies []map[string]interface{} `json:"currencies"`
+}
+
+// ListPayinOptionsQuery represents query parameters.
+type ListPayinOptionsQuery struct {
+	Provider string `json:"provider"`
+}
+
+// RegisterPayinAccountAssetRequest represents the request body for the registerPayinAccountAsset operation.
+type RegisterPayinAccountAssetRequest = any
+
+// Register Payin Account Asset
+type RegisterPayinAccountAssetResponse struct {
+	AccountID string `json:"accountId"`
+	Name *string `json:"name,omitempty"`
+	Assets []map[string]interface{} `json:"assets"`
 }
