@@ -63,6 +63,17 @@ func (c *PayinsClient) CreatePayin(ctx context.Context, body CreatePayinRequest)
 	return result, nil
 }
 
+// Request a quote from a given provider for a payin. Returns the stablecoin amount to be delivered and the fees.
+func (c *PayinsClient) RequestPayinQuote(ctx context.Context, body RequestPayinQuoteRequest) (*RequestPayinQuoteResponse, error) {
+	path := "/payins/quote"
+	var result RequestPayinQuoteResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Check whether a wallet's address is registered (and approved) as an payin recipient with the provider.
 func (c *PayinsClient) GetPayinRecipient(ctx context.Context, query *GetPayinRecipientQuery) (*GetPayinRecipientResponse, error) {
 	path := "/payins/recipients"
@@ -107,6 +118,24 @@ func (c *PayinsClient) GetPayinStatus(ctx context.Context, payinID string) (inte
 	return result, nil
 }
 
+// List the provider accounts, with their registered wallet addresses per asset. An account is created on the provider platform (e.g. the Borderless dashboard) and its registered addresses serve both directions: a payin delivers to — and a payout is funded from — a wallet whose address is registered on the account.
+func (c *PayinsClient) ListPayinAccounts(ctx context.Context, query *ListPayinAccountsQuery) (*ListPayinAccountsResponse, error) {
+	path := "/payins/accounts"
+	if query != nil {
+		q := url.Values{}
+		q.Set("provider", fmt.Sprintf("%v", query.Provider))
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListPayinAccountsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // The organisation's available balance at the payin provider, one entry per currency —
 //     the funds payins can deliver on-chain.
 func (c *PayinsClient) ListPayinBalances(ctx context.Context, query *ListPayinBalancesQuery) (*ListPayinBalancesResponse, error) {
@@ -120,6 +149,35 @@ func (c *PayinsClient) ListPayinBalances(ctx context.Context, query *ListPayinBa
 	}
 	var result ListPayinBalancesResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List the currently available payin options — deliverable assets and fiat currency/payment-method/country combinations — as covered by the active provider institutions.
+func (c *PayinsClient) ListPayinOptions(ctx context.Context, query *ListPayinOptionsQuery) (*ListPayinOptionsResponse, error) {
+	path := "/payins/options"
+	if query != nil {
+		q := url.Values{}
+		q.Set("provider", fmt.Sprintf("%v", query.Provider))
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListPayinOptionsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Register a wallet's address for an asset on a provider account, a prerequisite for both payins (the wallet receives the delivered asset) and payouts (the wallet funds the withdrawal). Returns the updated account.
+func (c *PayinsClient) RegisterPayinAccountAsset(ctx context.Context, body RegisterPayinAccountAssetRequest) (*RegisterPayinAccountAssetResponse, error) {
+	path := "/payins/accounts/assets"
+	var result RegisterPayinAccountAssetResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}

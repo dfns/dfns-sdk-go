@@ -59,6 +59,77 @@ func (c *WalletsClient) ActivateWallet(ctx context.Context, walletID string, bod
 	return &result, nil
 }
 
+// List the org bulk wallet creation jobs, most recent first, with progress and status.
+func (c *WalletsClient) ListBulkWalletJobs(ctx context.Context, query *ListBulkWalletJobsQuery) (*ListBulkWalletJobsResponse, error) {
+	path := "/wallets/bulk-create"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if query.Status != nil {
+			q.Set("status", fmt.Sprintf("%v", *query.Status))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListBulkWalletJobsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Creates a batch of custodial wallets asynchronously via HD key derivation. Returns a job handle immediately; poll the bulk-create job endpoints for progress.
+func (c *WalletsClient) BulkCreateWallets(ctx context.Context, body BulkCreateWalletsRequest) (*BulkCreateWalletsResponse, error) {
+	path := "/wallets/bulk-create"
+	var result BulkCreateWalletsResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Retrieve a single bulk wallet creation job by its ID, with progress and status.
+func (c *WalletsClient) GetBulkWalletJob(ctx context.Context, jobID string) (*GetBulkWalletJobResponse, error) {
+	path := "/wallets/bulk-create/" + url.PathEscape(jobID)
+	var result GetBulkWalletJobResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List every wallet created by a bulk wallet creation job, ordered by wallet ID and paginated. Only available once the job has completed.
+func (c *WalletsClient) ListBulkWalletJobWallets(ctx context.Context, jobID string, query *ListBulkWalletJobWalletsQuery) (*ListBulkWalletJobWalletsResponse, error) {
+	path := "/wallets/bulk-create/" + url.PathEscape(jobID) + "/wallets"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListBulkWalletJobWalletsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Retrieves a list of transactions requests for the specified wallet.
 func (c *WalletsClient) ListTransactions(ctx context.Context, walletID string, query *ListTransactionsQuery) (*ListTransactionsResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/transactions"

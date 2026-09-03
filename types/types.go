@@ -412,6 +412,15 @@ const (
 	CurrencyEUR Currency = "EUR"
 )
 
+// PaymentMethod represents the paymentmethod type.
+type PaymentMethod string
+
+const (
+	PaymentMethodWire PaymentMethod = "Wire"
+	PaymentMethodACH PaymentMethod = "ACH"
+	PaymentMethodSepa PaymentMethod = "Sepa"
+)
+
 // OperationKind represents the operationkind type.
 type OperationKind string
 
@@ -440,6 +449,28 @@ type Version int64
 
 const (
 	VersionN1 Version = 1
+)
+
+// BulkWalletNetwork represents the bulkwalletnetwork type.
+type BulkWalletNetwork string
+
+const (
+	BulkWalletNetworkEthereum BulkWalletNetwork = "Ethereum"
+	BulkWalletNetworkEthereumSepolia BulkWalletNetwork = "EthereumSepolia"
+	BulkWalletNetworkEthereumHolesky BulkWalletNetwork = "EthereumHolesky"
+	BulkWalletNetworkEthereumHoodi BulkWalletNetwork = "EthereumHoodi"
+	BulkWalletNetworkBsc BulkWalletNetwork = "Bsc"
+	BulkWalletNetworkBscTestnet BulkWalletNetwork = "BscTestnet"
+	BulkWalletNetworkBase BulkWalletNetwork = "Base"
+	BulkWalletNetworkBaseSepolia BulkWalletNetwork = "BaseSepolia"
+	BulkWalletNetworkArbitrumOne BulkWalletNetwork = "ArbitrumOne"
+	BulkWalletNetworkArbitrumSepolia BulkWalletNetwork = "ArbitrumSepolia"
+	BulkWalletNetworkOptimism BulkWalletNetwork = "Optimism"
+	BulkWalletNetworkOptimismSepolia BulkWalletNetwork = "OptimismSepolia"
+	BulkWalletNetworkTron BulkWalletNetwork = "Tron"
+	BulkWalletNetworkTronNile BulkWalletNetwork = "TronNile"
+	BulkWalletNetworkSolana BulkWalletNetwork = "Solana"
+	BulkWalletNetworkSolanaDevnet BulkWalletNetwork = "SolanaDevnet"
 )
 
 // RequestMethod represents the requestmethod type.
@@ -502,6 +533,32 @@ type Offer struct {
 	Memo *string `json:"memo,omitempty"`
 	SettlementTransactionID *string `json:"settlementTransactionId,omitempty"`
 	DateSettled *string `json:"dateSettled,omitempty"`
+}
+
+// BulkWalletCreationJobHandle represents the BulkWalletCreationJobHandle type.
+type BulkWalletCreationJobHandle struct {
+	ID string `json:"id"`
+	Status string `json:"status"`
+}
+
+// BulkWalletCreationJob represents the BulkWalletCreationJob type.
+type BulkWalletCreationJob struct {
+	ID string `json:"id"`
+	OrgID string `json:"orgId"`
+	Status string `json:"status"`
+	Network Network `json:"network"`
+	NamePrefix string `json:"namePrefix"`
+	Tags []string `json:"tags"`
+	TotalCount int64 `json:"totalCount"`
+	CompletedCount int64 `json:"completedCount"`
+	KeystoreID string `json:"keystoreId"`
+	MasterKeyID *string `json:"masterKeyId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	NextRetryDate *string `json:"nextRetryDate,omitempty"`
+	NextRetryAttempt *int64 `json:"nextRetryAttempt,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+	DateCompleted *string `json:"dateCompleted,omitempty"`
 }
 
 // TransactionRequest represents the TransactionRequest type.
@@ -862,6 +919,10 @@ type AuditLog struct {
 	UserID interface{} `json:"userId"`
 	Username interface{} `json:"username"`
 	DatePerformed string `json:"datePerformed"`
+	DateSigned string `json:"dateSigned"`
+	DateResolved string `json:"dateResolved"`
+	ResponseStatus interface{} `json:"responseStatus"`
+	ResponseError interface{} `json:"responseError"`
 	FirstFactorCredential map[string]interface{} `json:"firstFactorCredential"`
 }
 
