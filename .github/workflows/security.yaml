@@ -30,7 +30,7 @@ jobs:
 
       - name: Install trivy
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/.local/bin ${{ env.TRIVY_VERSION }}
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "$HOME/.local/bin" "$TRIVY_VERSION"
       - name: Run security scan with aquasecurity trivy
         run: trivy fs --exit-code 1 --no-progress --severity CRITICAL ./
 
