@@ -9,6 +9,7 @@ const (
 	AddressWatchNetworkArbitrumOne AddressWatchNetwork = "ArbitrumOne"
 	AddressWatchNetworkArbitrumSepolia AddressWatchNetwork = "ArbitrumSepolia"
 	AddressWatchNetworkArcTestnet AddressWatchNetwork = "ArcTestnet"
+	AddressWatchNetworkAreum AddressWatchNetwork = "Areum"
 	AddressWatchNetworkAvalancheC AddressWatchNetwork = "AvalancheC"
 	AddressWatchNetworkAvalancheCFuji AddressWatchNetwork = "AvalancheCFuji"
 	AddressWatchNetworkBase AddressWatchNetwork = "Base"
@@ -42,8 +43,6 @@ const (
 	AddressWatchNetworkPlumeSepolia AddressWatchNetwork = "PlumeSepolia"
 	AddressWatchNetworkPolygon AddressWatchNetwork = "Polygon"
 	AddressWatchNetworkPolygonAmoy AddressWatchNetwork = "PolygonAmoy"
-	AddressWatchNetworkRace AddressWatchNetwork = "Race"
-	AddressWatchNetworkRaceSepolia AddressWatchNetwork = "RaceSepolia"
 	AddressWatchNetworkRayls AddressWatchNetwork = "Rayls"
 	AddressWatchNetworkRaylsTestnet AddressWatchNetwork = "RaylsTestnet"
 	AddressWatchNetworkRobinhood AddressWatchNetwork = "Robinhood"
@@ -109,10 +108,9 @@ const (
 	NetworkArbitrumOne Network = "ArbitrumOne"
 	NetworkArbitrumSepolia Network = "ArbitrumSepolia"
 	NetworkArcTestnet Network = "ArcTestnet"
+	NetworkAreum Network = "Areum"
 	NetworkAvalancheC Network = "AvalancheC"
 	NetworkAvalancheCFuji Network = "AvalancheCFuji"
-	NetworkBabylonGenesis Network = "BabylonGenesis"
-	NetworkBabylonTestnet5 Network = "BabylonTestnet5"
 	NetworkBase Network = "Base"
 	NetworkBaseSepolia Network = "BaseSepolia"
 	NetworkBerachain Network = "Berachain"
@@ -180,8 +178,6 @@ const (
 	NetworkPolygonAmoy Network = "PolygonAmoy"
 	NetworkPolymesh Network = "Polymesh"
 	NetworkPolymeshTestnet Network = "PolymeshTestnet"
-	NetworkRace Network = "Race"
-	NetworkRaceSepolia Network = "RaceSepolia"
 	NetworkRayls Network = "Rayls"
 	NetworkRaylsTestnet Network = "RaylsTestnet"
 	NetworkRobinhood Network = "Robinhood"
@@ -199,7 +195,6 @@ const (
 	NetworkSui Network = "Sui"
 	NetworkSuiTestnet Network = "SuiTestnet"
 	NetworkTezos Network = "Tezos"
-	NetworkTezosGhostnet Network = "TezosGhostnet"
 	NetworkTezosShadownet Network = "TezosShadownet"
 	NetworkTempo Network = "Tempo"
 	NetworkTempoModerato Network = "TempoModerato"
@@ -671,6 +666,8 @@ type VaultLock struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	ReplacesLockID *string `json:"replacesLockId,omitempty"`
+	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`
 }

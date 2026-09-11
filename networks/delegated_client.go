@@ -25,6 +25,8 @@ func NewDelegatedNetworksClient(c *client.Client) *DelegatedNetworksClient {
 }
 
 // Gets real-time fee details for a given network, allowing users to make decisions based on their preferences for transaction speed/priority. Three levels of priority will be displayed: `slow`, `standard`, `fast`.
+// 
+// Legacy (pre-London) EVM networks such as Ethereum Classic do not support EIP-1559 fee estimation and are not listed here. When broadcasting on those networks, omit `priority` and a legacy `gasPrice` is filled automatically.
 func (c *DelegatedNetworksClient) EstimateFees(ctx context.Context, query *EstimateFeesQuery) (interface{}, error) {
 	path := "/networks/fees"
 	if query != nil {

@@ -182,7 +182,7 @@ The client provides access to the following API domains:
 - `client.Signers` - Signer management (17 endpoints)
 - `client.Staking` - Staking operations (6 endpoints)
 - `client.Swaps` - Token swap operations (5 endpoints)
-- `client.Vaults` - vaults operations (15 endpoints)
+- `client.Vaults` - vaults operations (16 endpoints)
 - `client.Wallets` - Wallet operations (33 endpoints)
 - `client.Webhooks` - Webhook subscriptions (8 endpoints)
 

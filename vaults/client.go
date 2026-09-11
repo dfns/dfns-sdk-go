@@ -54,7 +54,7 @@ func (c *VaultsClient) CreateVault(ctx context.Context, body CreateVaultRequest)
 	return &result, nil
 }
 
-// Creates a vault address (managed wallet) on a network that supports vaults.
+// Creates a vault address (managed wallet) on a network that supports vaults — EVM networks, Bitcoin, and Solana (native SOL and SPL/Token-2022 tokens). Add one network per call.
 func (c *VaultsClient) CreateVaultAddress(ctx context.Context, vaultID string, body CreateVaultAddressRequest) (*CreateVaultAddressResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/addresses"
 	var result CreateVaultAddressResponse
@@ -242,6 +242,17 @@ func (c *VaultsClient) UntagVault(ctx context.Context, vaultID string, body Unta
 	path := "/vaults/" + url.PathEscape(vaultID) + "/tags"
 	var result UntagVaultResponse
 	err := c.client.Do(ctx, "DELETE", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Requests replacing a lock with a new lock at a new total amount. Owner only. Executed immediately unless a policy requires approval. On execution the lock is released, a new lock is created at the new amount (carrying over the owner, externalId and reason), and the new lock is returned. If a policy requires approval, responds 202 with the pending replace request instead.
+func (c *VaultsClient) ReplaceVaultLock(ctx context.Context, vaultID string, lockID string, body ReplaceVaultLockRequest) (*ReplaceVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/replace"
+	var result ReplaceVaultLockResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}
