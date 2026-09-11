@@ -71,7 +71,7 @@ func (c *DelegatedAuthClient) ListAuditLogs(ctx context.Context, query *ListAudi
 
 // Gets detailed information for a particular audit log. Specifically, the API returns the action performed, as well as the `firstFactorCredential` in which you will find the signature information required to validate it. 
 // 
-// Dfns maintains a script which can be used for audit log signature validation: [WebAuthn Signature Verifier](https://github.com/dfns/example-scripts/tree/m/python/utils)
+// Dfns maintains a script which can be used for audit log signature validation: [WebAuthn Signature Verifier](https://github.com/dfns/dfns-sdk-python/tree/main/examples/verify-webauthn-signature)
 func (c *DelegatedAuthClient) GetAuditLog(ctx context.Context, id string) (*GetAuditLogResponse, error) {
 	path := "/auth/action/logs/" + url.PathEscape(id)
 	var result GetAuditLogResponse

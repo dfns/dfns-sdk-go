@@ -82,6 +82,8 @@ type CreateVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	ReplacesLockID *string `json:"replacesLockId,omitempty"`
+	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
@@ -158,6 +160,8 @@ type GetVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	ReplacesLockID *string `json:"replacesLockId,omitempty"`
+	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
@@ -220,6 +224,8 @@ type ReleaseVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	ReplacesLockID *string `json:"replacesLockId,omitempty"`
+	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
 	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
@@ -240,4 +246,26 @@ type UntagVaultRequest struct {
 
 // Untag Vault
 type UntagVaultResponse struct {
+}
+
+// Replace Vault Lock
+type ReplaceVaultLockRequest struct {
+	Amount string `json:"amount"`
+	Reason *string `json:"reason,omitempty"`
+}
+
+// Replace Vault Lock
+type ReplaceVaultLockResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	Tid string `json:"tid"`
+	Amount string `json:"amount"`
+	Owner string `json:"owner"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Reason *string `json:"reason,omitempty"`
+	ReplacesLockID *string `json:"replacesLockId,omitempty"`
+	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
+	DateCreated string `json:"dateCreated"`
+	DateDeleted *string `json:"dateDeleted,omitempty"`
 }

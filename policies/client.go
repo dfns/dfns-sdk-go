@@ -31,7 +31,7 @@ func (c *PoliciesClient) GetPolicy(ctx context.Context, policyID string) (*GetPo
 	return &result, nil
 }
 
-// Update an existing policy.
+// Update an existing policy. The policy status is not editable through this endpoint — the update body has no `status` field. To deactivate a policy, use the Archive Policy endpoint instead.
 func (c *PoliciesClient) UpdatePolicy(ctx context.Context, policyID string, body UpdatePolicyRequest) (interface{}, error) {
 	path := "/v2/policies/" + url.PathEscape(policyID)
 	var result interface{}

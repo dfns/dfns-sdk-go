@@ -229,7 +229,7 @@ func (c *WalletsClient) SpeedUpTransfer(ctx context.Context, walletID string, tr
 	return &result, nil
 }
 
-// Retrieves the list of Wallets in your organization. You can filter the results by owner (either by owner id or owner username). Pagination is supported via limit and paginationToken parameters.
+// Retrieves the list of Wallets in your organization. You can filter the results by owner (either by owner id or owner username). The list cannot be filtered by tags or externalId — those are set at wallet creation only; to segment wallets by tag or externalId, list them and filter client-side, or maintain the mapping in your own system. Pagination is supported via limit and paginationToken parameters.
 func (c *WalletsClient) ListWallets(ctx context.Context, query *ListWalletsQuery) (*ListWalletsResponse, error) {
 	path := "/wallets"
 	if query != nil {
@@ -316,7 +316,7 @@ func (c *WalletsClient) UpdateWallet(ctx context.Context, walletID string, body 
 	return &result, nil
 }
 
-// Retrieves a list of assets owned by the specified wallet.  Return values vary by chain as shown below.
+// Retrieves a list of assets owned by the specified wallet.  Return values vary by chain as shown below. Each asset includes its current USD market price (`quotes`); pass `netWorth=true` to also return the wallet's total USD value (net worth).
 func (c *WalletsClient) GetWalletAssets(ctx context.Context, walletID string, query *GetWalletAssetsQuery) (*GetWalletAssetsResponse, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/assets"
 	if query != nil {
