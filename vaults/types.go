@@ -70,6 +70,7 @@ type CreateVaultLockRequest struct {
 	Amount string `json:"amount"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Beneficiary *string `json:"beneficiary,omitempty"`
 }
 
 // Create Vault Lock
@@ -82,6 +83,9 @@ type CreateVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Beneficiary *string `json:"beneficiary,omitempty"`
+	TransferID *string `json:"transferId,omitempty"`
+	TransferAmount *string `json:"transferAmount,omitempty"`
 	ReplacesLockID *string `json:"replacesLockId,omitempty"`
 	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
@@ -160,6 +164,9 @@ type GetVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Beneficiary *string `json:"beneficiary,omitempty"`
+	TransferID *string `json:"transferId,omitempty"`
+	TransferAmount *string `json:"transferAmount,omitempty"`
 	ReplacesLockID *string `json:"replacesLockId,omitempty"`
 	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
@@ -224,6 +231,9 @@ type ReleaseVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Beneficiary *string `json:"beneficiary,omitempty"`
+	TransferID *string `json:"transferId,omitempty"`
+	TransferAmount *string `json:"transferAmount,omitempty"`
 	ReplacesLockID *string `json:"replacesLockId,omitempty"`
 	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`
@@ -248,6 +258,34 @@ type UntagVaultRequest struct {
 type UntagVaultResponse struct {
 }
 
+// Transfer Vault Lock
+type TransferVaultLockRequest struct {
+	Amount string `json:"amount"`
+}
+
+// Transfer Vault Lock
+type TransferVaultLockResponse struct {
+	ID string `json:"id"`
+	WalletID string `json:"walletId"`
+	Network types.Network `json:"network"`
+	Requester types.Requester `json:"requester"`
+	RequestBody interface{} `json:"requestBody"`
+	Metadata map[string]interface{} `json:"metadata"`
+	Status string `json:"status"`
+	Reason *string `json:"reason,omitempty"`
+	TxHash *string `json:"txHash,omitempty"`
+	Fee *string `json:"fee,omitempty"`
+	DateRequested string `json:"dateRequested"`
+	DatePolicyResolved *string `json:"datePolicyResolved,omitempty"`
+	DateBroadcasted *string `json:"dateBroadcasted,omitempty"`
+	DateConfirmed *string `json:"dateConfirmed,omitempty"`
+	ApprovalID *string `json:"approvalId,omitempty"`
+	ExternalID *string `json:"externalId,omitempty"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+	ReplacementID *string `json:"replacementId,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
+}
+
 // Replace Vault Lock
 type ReplaceVaultLockRequest struct {
 	Amount string `json:"amount"`
@@ -264,6 +302,9 @@ type ReplaceVaultLockResponse struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Beneficiary *string `json:"beneficiary,omitempty"`
+	TransferID *string `json:"transferId,omitempty"`
+	TransferAmount *string `json:"transferAmount,omitempty"`
 	ReplacesLockID *string `json:"replacesLockId,omitempty"`
 	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`

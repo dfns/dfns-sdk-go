@@ -8,6 +8,7 @@ type AddressWatchNetwork string
 const (
 	AddressWatchNetworkArbitrumOne AddressWatchNetwork = "ArbitrumOne"
 	AddressWatchNetworkArbitrumSepolia AddressWatchNetwork = "ArbitrumSepolia"
+	AddressWatchNetworkArc AddressWatchNetwork = "Arc"
 	AddressWatchNetworkArcTestnet AddressWatchNetwork = "ArcTestnet"
 	AddressWatchNetworkAreum AddressWatchNetwork = "Areum"
 	AddressWatchNetworkAvalancheC AddressWatchNetwork = "AvalancheC"
@@ -107,6 +108,7 @@ const (
 	NetworkAptosTestnet Network = "AptosTestnet"
 	NetworkArbitrumOne Network = "ArbitrumOne"
 	NetworkArbitrumSepolia Network = "ArbitrumSepolia"
+	NetworkArc Network = "Arc"
 	NetworkArcTestnet Network = "ArcTestnet"
 	NetworkAreum Network = "Areum"
 	NetworkAvalancheC Network = "AvalancheC"
@@ -656,7 +658,7 @@ type TransferRequest struct {
 	Details map[string]interface{} `json:"details,omitempty"`
 }
 
-// Vault lock object: funds manually locked for off-chain settlement or escrow.
+// Vault lock object: funds manually locked for off-chain settlement or escrow. The owner can release them back to the vault or transfer them to the beneficiary.
 type VaultLock struct {
 	ID string `json:"id"`
 	VaultID string `json:"vaultId"`
@@ -666,6 +668,9 @@ type VaultLock struct {
 	Owner string `json:"owner"`
 	ExternalID *string `json:"externalId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	Beneficiary *string `json:"beneficiary,omitempty"`
+	TransferID *string `json:"transferId,omitempty"`
+	TransferAmount *string `json:"transferAmount,omitempty"`
 	ReplacesLockID *string `json:"replacesLockId,omitempty"`
 	ReplacedByLockID *string `json:"replacedByLockId,omitempty"`
 	DateCreated string `json:"dateCreated"`

@@ -741,7 +741,7 @@ type ListUsersResponse struct {
 type ListUsersQuery struct {
 	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
-	Kind *string `json:"kind,omitempty"`
+	Kind *interface{} `json:"kind,omitempty"`
 }
 
 // Create User

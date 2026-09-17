@@ -248,6 +248,17 @@ func (c *VaultsClient) UntagVault(ctx context.Context, vaultID string, body Unta
 	return &result, nil
 }
 
+// Sends part or all of the locked amount to the lock's beneficiary, paying the network fee from the vault's available balance. Owner only, not subject to policies. Returns the outgoing transfer. The funds stay locked while it is in flight; once confirmed the lock is deleted and any unsent remainder returns to the available balance. If the transfer fails the lock stays in place and can be transferred again.
+func (c *VaultsClient) TransferVaultLock(ctx context.Context, vaultID string, lockID string, body TransferVaultLockRequest) (*TransferVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/transfer"
+	var result TransferVaultLockResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Requests replacing a lock with a new lock at a new total amount. Owner only. Executed immediately unless a policy requires approval. On execution the lock is released, a new lock is created at the new amount (carrying over the owner, externalId and reason), and the new lock is returned. If a policy requires approval, responds 202 with the pending replace request instead.
 func (c *VaultsClient) ReplaceVaultLock(ctx context.Context, vaultID string, lockID string, body ReplaceVaultLockRequest) (*ReplaceVaultLockResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/replace"
