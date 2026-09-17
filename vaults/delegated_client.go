@@ -369,6 +369,30 @@ func (c *DelegatedVaultsClient) UntagVaultComplete(ctx context.Context, vaultID 
 	return &result, nil
 }
 
+// TransferVaultLockInit starts delegated user action signing for the transferVaultLock operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to TransferVaultLockComplete
+// along with the same arguments given here.
+func (c *DelegatedVaultsClient) TransferVaultLockInit(ctx context.Context, vaultID string, lockID string, body TransferVaultLockRequest) (*signer.UserActionChallenge, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/transfer"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// TransferVaultLockComplete finishes delegated signing for the transferVaultLock operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the TransferVaultLockInit challenge.
+func (c *DelegatedVaultsClient) TransferVaultLockComplete(ctx context.Context, vaultID string, lockID string, body TransferVaultLockRequest, challengeID string, assertion *signer.CredentialAssertion) (*TransferVaultLockResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/locks/" + url.PathEscape(lockID) + "/transfer"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result TransferVaultLockResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // ReplaceVaultLockInit starts delegated user action signing for the replaceVaultLock operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to ReplaceVaultLockComplete
 // along with the same arguments given here.
