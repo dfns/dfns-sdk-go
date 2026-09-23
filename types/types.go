@@ -22,7 +22,7 @@ const (
 	AddressWatchNetworkBsc AddressWatchNetwork = "Bsc"
 	AddressWatchNetworkBscTestnet AddressWatchNetwork = "BscTestnet"
 	AddressWatchNetworkCelo AddressWatchNetwork = "Celo"
-	AddressWatchNetworkCeloAlfajores AddressWatchNetwork = "CeloAlfajores"
+	AddressWatchNetworkCeloSepolia AddressWatchNetwork = "CeloSepolia"
 	AddressWatchNetworkCodex AddressWatchNetwork = "Codex"
 	AddressWatchNetworkCodexSepolia AddressWatchNetwork = "CodexSepolia"
 	AddressWatchNetworkEthereum AddressWatchNetwork = "Ethereum"
@@ -132,7 +132,7 @@ const (
 	NetworkConcordium Network = "Concordium"
 	NetworkConcordiumTestnet Network = "ConcordiumTestnet"
 	NetworkCelo Network = "Celo"
-	NetworkCeloAlfajores Network = "CeloAlfajores"
+	NetworkCeloSepolia Network = "CeloSepolia"
 	NetworkCodex Network = "Codex"
 	NetworkCodexSepolia Network = "CodexSepolia"
 	NetworkCosmosHub4 Network = "CosmosHub4"
@@ -633,6 +633,17 @@ type VaultAsset struct {
 	QuarantinedBalance string `json:"quarantinedBalance"`
 	LockedBalance string `json:"lockedBalance"`
 	Quotes *map[string]interface{} `json:"quotes,omitempty"`
+}
+
+// Vault quarantine object: an incoming deposit held out of the available balance until released.
+type VaultQuarantine struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	TransactionHash string `json:"transactionHash"`
+	KytResult interface{} `json:"kytResult,omitempty"`
+	DateReleased *string `json:"dateReleased,omitempty"`
+	DateCreated string `json:"dateCreated"`
 }
 
 // TransferRequest represents the TransferRequest type.
