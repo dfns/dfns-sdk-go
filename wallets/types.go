@@ -214,11 +214,14 @@ type CancelTransferResponse struct {
 }
 
 // Proxy a request to the Canton Ledger API
-type ProxyARequestToTheCantonLedgerAPIRequest struct {
+type CantonLedgerAPIProxyRequest struct {
 	RequestMethod string `json:"requestMethod"`
 	Resource string `json:"resource"`
 	Body map[string]interface{} `json:"body,omitempty"`
 }
+
+// Deprecated: use CantonLedgerAPIProxyRequest instead.
+type ProxyARequestToTheCantonLedgerAPIRequest = CantonLedgerAPIProxyRequest
 
 // Speed Up Transaction
 type SpeedUpTransactionResponse struct {

@@ -92,7 +92,7 @@ func (c *DelegatedPayoutsClient) RequestPayoutQuote(ctx context.Context, body Re
 }
 
 // Retrieve the current status of a payout by its ID.
-func (c *DelegatedPayoutsClient) GetPayoutStatus(ctx context.Context, payoutID string) (interface{}, error) {
+func (c *DelegatedPayoutsClient) GetPayout(ctx context.Context, payoutID string) (interface{}, error) {
 	path := "/payouts/" + url.PathEscape(payoutID)
 	var result interface{}
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
@@ -100,6 +100,11 @@ func (c *DelegatedPayoutsClient) GetPayoutStatus(ctx context.Context, payoutID s
 		return nil, err
 	}
 	return result, nil
+}
+
+// Deprecated: use GetPayout instead.
+func (c *DelegatedPayoutsClient) GetPayoutStatus(ctx context.Context, payoutID string) (interface{}, error) {
+	return c.GetPayout(ctx, payoutID)
 }
 
 // CreatePayoutActionInit starts delegated user action signing for the createPayoutAction operation.

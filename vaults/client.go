@@ -149,6 +149,17 @@ func (c *VaultsClient) GetVaultLock(ctx context.Context, vaultID string, lockID 
 	return &result, nil
 }
 
+// Retrieves a vault quarantine by its ID.
+func (c *VaultsClient) GetVaultQuarantine(ctx context.Context, vaultID string, quarantineID string) (*GetVaultQuarantineResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines/" + url.PathEscape(quarantineID)
+	var result GetVaultQuarantineResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Lists a vault's assets with balances (available/quarantined/locked) and USD valuation.
 func (c *VaultsClient) ListVaultAssets(ctx context.Context, vaultID string, query *ListVaultAssetsQuery) (*ListVaultAssetsResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/assets"
@@ -197,6 +208,32 @@ func (c *VaultsClient) ListVaultBalances(ctx context.Context, vaultID string, qu
 		}
 	}
 	var result ListVaultBalancesResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Lists a vault's quarantines, active and released.
+func (c *VaultsClient) ListVaultQuarantines(ctx context.Context, vaultID string, query *ListVaultQuarantinesQuery) (*ListVaultQuarantinesResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if query.Network != nil {
+			q.Set("network", fmt.Sprintf("%v", *query.Network))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListVaultQuarantinesResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
 		return nil, err
