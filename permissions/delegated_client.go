@@ -49,7 +49,7 @@ func (c *DelegatedPermissionsClient) ArchivePermissionComplete(ctx context.Conte
 }
 
 // Lists all permission (role) assignments for a given permission.
-func (c *DelegatedPermissionsClient) ListPermissionAssignments(ctx context.Context, permissionID string, query *ListPermissionAssignmentsQuery) (*ListPermissionAssignmentsResponse, error) {
+func (c *DelegatedPermissionsClient) ListAssignments(ctx context.Context, permissionID string, query *ListAssignmentsQuery) (*ListAssignmentsResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments"
 	if query != nil {
 		q := url.Values{}
@@ -63,12 +63,17 @@ func (c *DelegatedPermissionsClient) ListPermissionAssignments(ctx context.Conte
 			path += "?" + q.Encode()
 		}
 	}
-	var result ListPermissionAssignmentsResponse
+	var result ListAssignmentsResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use ListAssignments instead.
+func (c *DelegatedPermissionsClient) ListPermissionAssignments(ctx context.Context, permissionID string, query *ListAssignmentsQuery) (*ListAssignmentsResponse, error) {
+	return c.ListAssignments(ctx, permissionID, query)
 }
 
 // AssignPermissionInit starts delegated user action signing for the assignPermission operation.

@@ -71,11 +71,11 @@ type ListAccountAssetsQuery struct {
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
 
-// CreateExchangeDepositRequest represents the request body for the createExchangeDeposit operation.
-type CreateExchangeDepositRequest = any
+// CreateDepositRequest represents the request body for the createDeposit operation.
+type CreateDepositRequest = any
 
 // Create Exchange Deposit
-type CreateExchangeDepositResponse struct {
+type CreateDepositResponse struct {
 	ID string `json:"id"`
 	ExchangeID string `json:"exchangeId"`
 	AccountID string `json:"accountId"`
@@ -88,11 +88,17 @@ type CreateExchangeDepositResponse struct {
 	DateCreated string `json:"dateCreated"`
 }
 
-// CreateExchangeWithdrawalRequest represents the request body for the createExchangeWithdrawal operation.
-type CreateExchangeWithdrawalRequest = any
+// Deprecated: use CreateDepositRequest instead.
+type CreateExchangeDepositRequest = CreateDepositRequest
+
+// Deprecated: use CreateDepositResponse instead.
+type CreateExchangeDepositResponse = CreateDepositResponse
+
+// CreateWithdrawalRequest represents the request body for the createWithdrawal operation.
+type CreateWithdrawalRequest = any
 
 // Create Exchange Withdrawal
-type CreateExchangeWithdrawalResponse struct {
+type CreateWithdrawalResponse struct {
 	ID string `json:"id"`
 	ExchangeID string `json:"exchangeId"`
 	AccountID string `json:"accountId"`
@@ -104,3 +110,9 @@ type CreateExchangeWithdrawalResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	DateCreated string `json:"dateCreated"`
 }
+
+// Deprecated: use CreateWithdrawalRequest instead.
+type CreateExchangeWithdrawalRequest = CreateWithdrawalRequest
+
+// Deprecated: use CreateWithdrawalResponse instead.
+type CreateExchangeWithdrawalResponse = CreateWithdrawalResponse

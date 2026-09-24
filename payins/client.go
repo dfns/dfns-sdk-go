@@ -64,14 +64,19 @@ func (c *PayinsClient) CreatePayin(ctx context.Context, body CreatePayinRequest)
 }
 
 // Request a quote from a given provider for a payin. Returns the stablecoin amount to be delivered and the fees.
-func (c *PayinsClient) RequestPayinQuote(ctx context.Context, body RequestPayinQuoteRequest) (*RequestPayinQuoteResponse, error) {
+func (c *PayinsClient) CreatePayinQuote(ctx context.Context, body CreatePayinQuoteRequest) (*CreatePayinQuoteResponse, error) {
 	path := "/payins/quote"
-	var result RequestPayinQuoteResponse
+	var result CreatePayinQuoteResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use CreatePayinQuote instead.
+func (c *PayinsClient) RequestPayinQuote(ctx context.Context, body CreatePayinQuoteRequest) (*CreatePayinQuoteResponse, error) {
+	return c.CreatePayinQuote(ctx, body)
 }
 
 // Check whether a wallet's address is registered (and approved) as an payin recipient with the provider.
@@ -97,9 +102,9 @@ func (c *PayinsClient) GetPayinRecipient(ctx context.Context, query *GetPayinRec
 // Register a wallet's address as an payin recipient with the provider. The registration then needs
 //     to be approved on the provider's side (for Circle Mint: by an administrator in the Mint Console)
 //     before payins to that wallet can be created.
-func (c *PayinsClient) RegisterPayinRecipient(ctx context.Context, body RegisterPayinRecipientRequest) (*RegisterPayinRecipientResponse, error) {
+func (c *PayinsClient) CreatePayinRecipient(ctx context.Context, body CreatePayinRecipientRequest) (*CreatePayinRecipientResponse, error) {
 	path := "/payins/recipients"
-	var result RegisterPayinRecipientResponse
+	var result CreatePayinRecipientResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
@@ -107,8 +112,13 @@ func (c *PayinsClient) RegisterPayinRecipient(ctx context.Context, body Register
 	return &result, nil
 }
 
+// Deprecated: use CreatePayinRecipient instead.
+func (c *PayinsClient) RegisterPayinRecipient(ctx context.Context, body CreatePayinRecipientRequest) (*CreatePayinRecipientResponse, error) {
+	return c.CreatePayinRecipient(ctx, body)
+}
+
 // Retrieve the current status of an payin by its ID.
-func (c *PayinsClient) GetPayinStatus(ctx context.Context, payinID string) (interface{}, error) {
+func (c *PayinsClient) GetPayin(ctx context.Context, payinID string) (interface{}, error) {
 	path := "/payins/" + url.PathEscape(payinID)
 	var result interface{}
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
@@ -116,6 +126,11 @@ func (c *PayinsClient) GetPayinStatus(ctx context.Context, payinID string) (inte
 		return nil, err
 	}
 	return result, nil
+}
+
+// Deprecated: use GetPayin instead.
+func (c *PayinsClient) GetPayinStatus(ctx context.Context, payinID string) (interface{}, error) {
+	return c.GetPayin(ctx, payinID)
 }
 
 // List the provider accounts, with their registered wallet addresses per asset. An account is created on the provider platform (e.g. the Borderless dashboard) and its registered addresses serve both directions: a payin delivers to — and a payout is funded from — a wallet whose address is registered on the account.
