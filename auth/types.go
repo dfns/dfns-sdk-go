@@ -192,11 +192,14 @@ type DelegatedLoginResponse struct {
 }
 
 // Complete User Login
-type CompleteUserLoginRequest struct {
+type LoginRequest struct {
 	ChallengeIdentifier string `json:"challengeIdentifier"`
 	FirstFactor interface{} `json:"firstFactor"`
 	SecondFactor interface{} `json:"secondFactor,omitempty"`
 }
+
+// Deprecated: use LoginRequest instead.
+type CompleteUserLoginRequest = LoginRequest
 
 // Logout
 type LogoutRequest struct {
@@ -209,22 +212,31 @@ type LogoutResponse struct {
 }
 
 // Complete OIDC Login
-type CompleteOidcLoginRequest struct {
+type OidcLoginRequest struct {
 	Code string `json:"code"`
 	State string `json:"state"`
 }
 
+// Deprecated: use OidcLoginRequest instead.
+type CompleteOidcLoginRequest = OidcLoginRequest
+
 // Initiate OIDC Login
-type InitiateOidcLoginRequest struct {
+type OidcLoginInitRequest struct {
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	RedirectURI string `json:"redirectUri"`
 }
 
 // Initiate OIDC Login
-type InitiateOidcLoginResponse struct {
+type OidcLoginInitResponse struct {
 	RedirectURL string `json:"redirectUrl"`
 }
+
+// Deprecated: use OidcLoginInitRequest instead.
+type InitiateOidcLoginRequest = OidcLoginInitRequest
+
+// Deprecated: use OidcLoginInitResponse instead.
+type InitiateOidcLoginResponse = OidcLoginInitResponse
 
 // Send Login Code
 type SendLoginCodeRequest struct {
@@ -251,18 +263,24 @@ type SocialLoginResponse struct {
 }
 
 // Complete SSO Login
-type CompleteSsoLoginRequest struct {
+type SsoLoginRequest struct {
 	Code string `json:"code"`
 	State string `json:"state"`
 }
 
 // Complete SSO Login
-type CompleteSsoLoginResponse struct {
+type SsoLoginResponse struct {
 	Token string `json:"token"`
 }
 
+// Deprecated: use SsoLoginRequest instead.
+type CompleteSsoLoginRequest = SsoLoginRequest
+
+// Deprecated: use SsoLoginResponse instead.
+type CompleteSsoLoginResponse = SsoLoginResponse
+
 // Initiate SSO Login
-type InitiateSsoLoginRequest struct {
+type SsoLoginInitRequest struct {
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	ClientID string `json:"clientId"`
@@ -270,9 +288,15 @@ type InitiateSsoLoginRequest struct {
 }
 
 // Initiate SSO Login
-type InitiateSsoLoginResponse struct {
+type SsoLoginInitResponse struct {
 	SsoRedirectURL string `json:"ssoRedirectUrl"`
 }
+
+// Deprecated: use SsoLoginInitRequest instead.
+type InitiateSsoLoginRequest = SsoLoginInitRequest
+
+// Deprecated: use SsoLoginInitResponse instead.
+type InitiateSsoLoginResponse = SsoLoginInitResponse
 
 // Exchange Access Token
 type ExchangeAccessTokenRequest struct {
@@ -423,16 +447,22 @@ type CreateDelegatedRecoveryChallengeResponse struct {
 }
 
 // Recover User
-type RecoverUserRequest struct {
+type RecoverRequest struct {
 	Recovery map[string]interface{} `json:"recovery"`
 	NewCredentials map[string]interface{} `json:"newCredentials"`
 }
 
 // Recover User
-type RecoverUserResponse struct {
+type RecoverResponse struct {
 	Credential map[string]interface{} `json:"credential"`
 	User map[string]interface{} `json:"user"`
 }
+
+// Deprecated: use RecoverRequest instead.
+type RecoverUserRequest = RecoverRequest
+
+// Deprecated: use RecoverResponse instead.
+type RecoverUserResponse = RecoverResponse
 
 // Create Recovery Challenge
 type CreateRecoveryChallengeRequest struct {
@@ -459,16 +489,22 @@ type CreateRecoveryChallengeResponse struct {
 }
 
 // Send Recovery Code Email
-type SendRecoveryCodeEmailRequest struct {
+type SendRecoveryCodeRequest struct {
 	Username string `json:"username"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 }
 
 // Send Recovery Code Email
-type SendRecoveryCodeEmailResponse struct {
+type SendRecoveryCodeResponse struct {
 	Message string `json:"message"`
 }
+
+// Deprecated: use SendRecoveryCodeRequest instead.
+type SendRecoveryCodeEmailRequest = SendRecoveryCodeRequest
+
+// Deprecated: use SendRecoveryCodeResponse instead.
+type SendRecoveryCodeEmailResponse = SendRecoveryCodeResponse
 
 // Create Delegated Registration Challenge
 type CreateDelegatedRegistrationChallengeRequest struct {
@@ -535,20 +571,26 @@ type CreateSocialRegistrationChallengeResponse struct {
 }
 
 // Complete User Registration
-type CompleteUserRegistrationRequest struct {
+type RegisterRequest struct {
 	FirstFactorCredential interface{} `json:"firstFactorCredential"`
 	SecondFactorCredential interface{} `json:"secondFactorCredential,omitempty"`
 	RecoveryCredential *types.RecoveryKeyAttestation `json:"recoveryCredential,omitempty"`
 }
 
 // Complete User Registration
-type CompleteUserRegistrationResponse struct {
+type RegisterResponse struct {
 	Credential map[string]interface{} `json:"credential"`
 	User map[string]interface{} `json:"user"`
 }
 
+// Deprecated: use RegisterRequest instead.
+type CompleteUserRegistrationRequest = RegisterRequest
+
+// Deprecated: use RegisterResponse instead.
+type CompleteUserRegistrationResponse = RegisterResponse
+
 // Complete End User Registration with Wallets
-type CompleteEndUserRegistrationWithWalletsRequest struct {
+type RegisterEndUserRequest struct {
 	FirstFactorCredential interface{} `json:"firstFactorCredential"`
 	SecondFactorCredential interface{} `json:"secondFactorCredential,omitempty"`
 	RecoveryCredential *types.RecoveryKeyAttestation `json:"recoveryCredential,omitempty"`
@@ -556,12 +598,18 @@ type CompleteEndUserRegistrationWithWalletsRequest struct {
 }
 
 // Complete End User Registration with Wallets
-type CompleteEndUserRegistrationWithWalletsResponse struct {
+type RegisterEndUserResponse struct {
 	Credential map[string]interface{} `json:"credential"`
 	User map[string]interface{} `json:"user"`
 	Authentication map[string]interface{} `json:"authentication"`
 	Wallets []types.Wallet `json:"wallets"`
 }
+
+// Deprecated: use RegisterEndUserRequest instead.
+type CompleteEndUserRegistrationWithWalletsRequest = RegisterEndUserRequest
+
+// Deprecated: use RegisterEndUserResponse instead.
+type CompleteEndUserRegistrationWithWalletsResponse = RegisterEndUserResponse
 
 // Resend Registration Code
 type ResendRegistrationCodeRequest struct {

@@ -134,9 +134,9 @@ func (c *ExchangesClient) ListAssetWithdrawalNetworks(ctx context.Context, excha
 }
 
 // Creates a new exchange deposit transaction.
-func (c *ExchangesClient) CreateExchangeDeposit(ctx context.Context, exchangeID string, accountID string, body CreateExchangeDepositRequest) (*CreateExchangeDepositResponse, error) {
+func (c *ExchangesClient) CreateDeposit(ctx context.Context, exchangeID string, accountID string, body CreateDepositRequest) (*CreateDepositResponse, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/deposits"
-	var result CreateExchangeDepositResponse
+	var result CreateDepositResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
@@ -144,13 +144,23 @@ func (c *ExchangesClient) CreateExchangeDeposit(ctx context.Context, exchangeID 
 	return &result, nil
 }
 
+// Deprecated: use CreateDeposit instead.
+func (c *ExchangesClient) CreateExchangeDeposit(ctx context.Context, exchangeID string, accountID string, body CreateDepositRequest) (*CreateDepositResponse, error) {
+	return c.CreateDeposit(ctx, exchangeID, accountID, body)
+}
+
 // Creates a new exchange withdrawal transaction.
-func (c *ExchangesClient) CreateExchangeWithdrawal(ctx context.Context, exchangeID string, accountID string, body CreateExchangeWithdrawalRequest) (*CreateExchangeWithdrawalResponse, error) {
+func (c *ExchangesClient) CreateWithdrawal(ctx context.Context, exchangeID string, accountID string, body CreateWithdrawalRequest) (*CreateWithdrawalResponse, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/withdrawals"
-	var result CreateExchangeWithdrawalResponse
+	var result CreateWithdrawalResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use CreateWithdrawal instead.
+func (c *ExchangesClient) CreateExchangeWithdrawal(ctx context.Context, exchangeID string, accountID string, body CreateWithdrawalRequest) (*CreateWithdrawalResponse, error) {
+	return c.CreateWithdrawal(ctx, exchangeID, accountID, body)
 }

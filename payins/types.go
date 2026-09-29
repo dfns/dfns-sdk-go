@@ -24,11 +24,11 @@ type ListPayinsQuery struct {
 // CreatePayinRequest represents the request body for the createPayin operation.
 type CreatePayinRequest = any
 
-// RequestPayinQuoteRequest represents the request body for the requestPayinQuote operation.
-type RequestPayinQuoteRequest = any
+// CreatePayinQuoteRequest represents the request body for the createPayinQuote operation.
+type CreatePayinQuoteRequest = any
 
 // Request Payin Quote
-type RequestPayinQuoteResponse struct {
+type CreatePayinQuoteResponse struct {
 	Provider string `json:"provider"`
 	Currency string `json:"currency"`
 	Network types.Network `json:"network"`
@@ -36,6 +36,12 @@ type RequestPayinQuoteResponse struct {
 	Timestamp string `json:"timestamp"`
 	Quotes []map[string]interface{} `json:"quotes"`
 }
+
+// Deprecated: use CreatePayinQuoteRequest instead.
+type RequestPayinQuoteRequest = CreatePayinQuoteRequest
+
+// Deprecated: use CreatePayinQuoteResponse instead.
+type RequestPayinQuoteResponse = CreatePayinQuoteResponse
 
 // Get Payin Recipient
 type GetPayinRecipientResponse struct {
@@ -53,17 +59,23 @@ type GetPayinRecipientQuery struct {
 	Currency string `json:"currency"`
 }
 
-// RegisterPayinRecipientRequest represents the request body for the registerPayinRecipient operation.
-type RegisterPayinRecipientRequest = any
+// CreatePayinRecipientRequest represents the request body for the createPayinRecipient operation.
+type CreatePayinRecipientRequest = any
 
 // Register Payin Recipient
-type RegisterPayinRecipientResponse struct {
+type CreatePayinRecipientResponse struct {
 	Provider string `json:"provider"`
 	WalletID string `json:"walletId"`
 	Currency string `json:"currency"`
 	Status string `json:"status"`
 	RecipientAddressID *string `json:"recipientAddressId,omitempty"`
 }
+
+// Deprecated: use CreatePayinRecipientRequest instead.
+type RegisterPayinRecipientRequest = CreatePayinRecipientRequest
+
+// Deprecated: use CreatePayinRecipientResponse instead.
+type RegisterPayinRecipientResponse = CreatePayinRecipientResponse
 
 // List Payin Accounts
 type ListPayinAccountsResponse struct {

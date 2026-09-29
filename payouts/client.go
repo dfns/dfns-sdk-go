@@ -75,7 +75,7 @@ func (c *PayoutsClient) RequestPayoutQuote(ctx context.Context, body RequestPayo
 }
 
 // Retrieve the current status of a payout by its ID.
-func (c *PayoutsClient) GetPayoutStatus(ctx context.Context, payoutID string) (interface{}, error) {
+func (c *PayoutsClient) GetPayout(ctx context.Context, payoutID string) (interface{}, error) {
 	path := "/payouts/" + url.PathEscape(payoutID)
 	var result interface{}
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
@@ -83,6 +83,11 @@ func (c *PayoutsClient) GetPayoutStatus(ctx context.Context, payoutID string) (i
 		return nil, err
 	}
 	return result, nil
+}
+
+// Deprecated: use GetPayout instead.
+func (c *PayoutsClient) GetPayoutStatus(ctx context.Context, payoutID string) (interface{}, error) {
+	return c.GetPayout(ctx, payoutID)
 }
 
 // Perform an action on a payout, such as confirming or canceling.

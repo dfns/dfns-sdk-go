@@ -173,6 +173,17 @@ type GetVaultLockResponse struct {
 	DateDeleted *string `json:"dateDeleted,omitempty"`
 }
 
+// Get Vault Quarantine
+type GetVaultQuarantineResponse struct {
+	ID string `json:"id"`
+	VaultID string `json:"vaultId"`
+	Network string `json:"network"`
+	TransactionHash string `json:"transactionHash"`
+	KytResult interface{} `json:"kytResult,omitempty"`
+	DateReleased *string `json:"dateReleased,omitempty"`
+	DateCreated string `json:"dateCreated"`
+}
+
 // List Vault Assets
 type ListVaultAssetsResponse struct {
 	Items []types.VaultAsset `json:"items"`
@@ -198,6 +209,19 @@ type ListVaultBalancesQuery struct {
 	Kind *string `json:"kind,omitempty"`
 	Network *string `json:"network,omitempty"`
 	Tid *string `json:"tid,omitempty"`
+}
+
+// List Vault Quarantines
+type ListVaultQuarantinesResponse struct {
+	Items []types.VaultQuarantine `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListVaultQuarantinesQuery represents query parameters.
+type ListVaultQuarantinesQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+	Network *string `json:"network,omitempty"`
 }
 
 // Release Quarantine

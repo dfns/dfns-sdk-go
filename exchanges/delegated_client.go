@@ -163,48 +163,48 @@ func (c *DelegatedExchangesClient) ListAssetWithdrawalNetworks(ctx context.Conte
 	return result, nil
 }
 
-// CreateExchangeDepositInit starts delegated user action signing for the createExchangeDeposit operation.
-// It returns the challenge to sign out-of-band; pass the signed assertion to CreateExchangeDepositComplete
+// CreateDepositInit starts delegated user action signing for the createDeposit operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreateDepositComplete
 // along with the same arguments given here.
-func (c *DelegatedExchangesClient) CreateExchangeDepositInit(ctx context.Context, exchangeID string, accountID string, body CreateExchangeDepositRequest) (*signer.UserActionChallenge, error) {
+func (c *DelegatedExchangesClient) CreateDepositInit(ctx context.Context, exchangeID string, accountID string, body CreateDepositRequest) (*signer.UserActionChallenge, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/deposits"
 	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
 }
 
-// CreateExchangeDepositComplete finishes delegated signing for the createExchangeDeposit operation:
+// CreateDepositComplete finishes delegated signing for the createDeposit operation:
 // it submits the externally-signed challenge and issues the request. challengeID is the
-// ChallengeIdentifier from the CreateExchangeDepositInit challenge.
-func (c *DelegatedExchangesClient) CreateExchangeDepositComplete(ctx context.Context, exchangeID string, accountID string, body CreateExchangeDepositRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreateExchangeDepositResponse, error) {
+// ChallengeIdentifier from the CreateDepositInit challenge.
+func (c *DelegatedExchangesClient) CreateDepositComplete(ctx context.Context, exchangeID string, accountID string, body CreateDepositRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreateDepositResponse, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/deposits"
 	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
 	if err != nil {
 		return nil, err
 	}
-	var result CreateExchangeDepositResponse
+	var result CreateDepositResponse
 	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil
 }
 
-// CreateExchangeWithdrawalInit starts delegated user action signing for the createExchangeWithdrawal operation.
-// It returns the challenge to sign out-of-band; pass the signed assertion to CreateExchangeWithdrawalComplete
+// CreateWithdrawalInit starts delegated user action signing for the createWithdrawal operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreateWithdrawalComplete
 // along with the same arguments given here.
-func (c *DelegatedExchangesClient) CreateExchangeWithdrawalInit(ctx context.Context, exchangeID string, accountID string, body CreateExchangeWithdrawalRequest) (*signer.UserActionChallenge, error) {
+func (c *DelegatedExchangesClient) CreateWithdrawalInit(ctx context.Context, exchangeID string, accountID string, body CreateWithdrawalRequest) (*signer.UserActionChallenge, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/withdrawals"
 	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
 }
 
-// CreateExchangeWithdrawalComplete finishes delegated signing for the createExchangeWithdrawal operation:
+// CreateWithdrawalComplete finishes delegated signing for the createWithdrawal operation:
 // it submits the externally-signed challenge and issues the request. challengeID is the
-// ChallengeIdentifier from the CreateExchangeWithdrawalInit challenge.
-func (c *DelegatedExchangesClient) CreateExchangeWithdrawalComplete(ctx context.Context, exchangeID string, accountID string, body CreateExchangeWithdrawalRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreateExchangeWithdrawalResponse, error) {
+// ChallengeIdentifier from the CreateWithdrawalInit challenge.
+func (c *DelegatedExchangesClient) CreateWithdrawalComplete(ctx context.Context, exchangeID string, accountID string, body CreateWithdrawalRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreateWithdrawalResponse, error) {
 	path := "/exchanges/" + url.PathEscape(exchangeID) + "/accounts/" + url.PathEscape(accountID) + "/withdrawals"
 	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
 	if err != nil {
 		return nil, err
 	}
-	var result CreateExchangeWithdrawalResponse
+	var result CreateWithdrawalResponse
 	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
 		return nil, err
 	}

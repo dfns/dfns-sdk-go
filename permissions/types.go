@@ -20,16 +20,22 @@ type ArchivePermissionResponse struct {
 }
 
 // List Permission Assignments
-type ListPermissionAssignmentsResponse struct {
+type ListAssignmentsResponse struct {
 	Items []map[string]interface{} `json:"items"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
-// ListPermissionAssignmentsQuery represents query parameters.
-type ListPermissionAssignmentsQuery struct {
+// ListAssignmentsQuery represents query parameters.
+type ListAssignmentsQuery struct {
 	Limit *int64 `json:"limit,omitempty"`
 	PaginationToken *string `json:"paginationToken,omitempty"`
 }
+
+// Deprecated: use ListAssignmentsResponse instead.
+type ListPermissionAssignmentsResponse = ListAssignmentsResponse
+
+// Deprecated: use ListAssignmentsQuery instead.
+type ListPermissionAssignmentsQuery = ListAssignmentsQuery
 
 // Assign Permission
 type AssignPermissionRequest struct {

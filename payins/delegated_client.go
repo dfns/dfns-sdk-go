@@ -81,14 +81,19 @@ func (c *DelegatedPayinsClient) CreatePayinComplete(ctx context.Context, body Cr
 }
 
 // Request a quote from a given provider for a payin. Returns the stablecoin amount to be delivered and the fees.
-func (c *DelegatedPayinsClient) RequestPayinQuote(ctx context.Context, body RequestPayinQuoteRequest) (*RequestPayinQuoteResponse, error) {
+func (c *DelegatedPayinsClient) CreatePayinQuote(ctx context.Context, body CreatePayinQuoteRequest) (*CreatePayinQuoteResponse, error) {
 	path := "/payins/quote"
-	var result RequestPayinQuoteResponse
+	var result CreatePayinQuoteResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use CreatePayinQuote instead.
+func (c *DelegatedPayinsClient) RequestPayinQuote(ctx context.Context, body CreatePayinQuoteRequest) (*CreatePayinQuoteResponse, error) {
+	return c.CreatePayinQuote(ctx, body)
 }
 
 // Check whether a wallet's address is registered (and approved) as an payin recipient with the provider.
@@ -111,24 +116,24 @@ func (c *DelegatedPayinsClient) GetPayinRecipient(ctx context.Context, query *Ge
 	return &result, nil
 }
 
-// RegisterPayinRecipientInit starts delegated user action signing for the registerPayinRecipient operation.
-// It returns the challenge to sign out-of-band; pass the signed assertion to RegisterPayinRecipientComplete
+// CreatePayinRecipientInit starts delegated user action signing for the createPayinRecipient operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreatePayinRecipientComplete
 // along with the same arguments given here.
-func (c *DelegatedPayinsClient) RegisterPayinRecipientInit(ctx context.Context, body RegisterPayinRecipientRequest) (*signer.UserActionChallenge, error) {
+func (c *DelegatedPayinsClient) CreatePayinRecipientInit(ctx context.Context, body CreatePayinRecipientRequest) (*signer.UserActionChallenge, error) {
 	path := "/payins/recipients"
 	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
 }
 
-// RegisterPayinRecipientComplete finishes delegated signing for the registerPayinRecipient operation:
+// CreatePayinRecipientComplete finishes delegated signing for the createPayinRecipient operation:
 // it submits the externally-signed challenge and issues the request. challengeID is the
-// ChallengeIdentifier from the RegisterPayinRecipientInit challenge.
-func (c *DelegatedPayinsClient) RegisterPayinRecipientComplete(ctx context.Context, body RegisterPayinRecipientRequest, challengeID string, assertion *signer.CredentialAssertion) (*RegisterPayinRecipientResponse, error) {
+// ChallengeIdentifier from the CreatePayinRecipientInit challenge.
+func (c *DelegatedPayinsClient) CreatePayinRecipientComplete(ctx context.Context, body CreatePayinRecipientRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreatePayinRecipientResponse, error) {
 	path := "/payins/recipients"
 	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
 	if err != nil {
 		return nil, err
 	}
-	var result RegisterPayinRecipientResponse
+	var result CreatePayinRecipientResponse
 	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
@@ -136,7 +141,7 @@ func (c *DelegatedPayinsClient) RegisterPayinRecipientComplete(ctx context.Conte
 }
 
 // Retrieve the current status of an payin by its ID.
-func (c *DelegatedPayinsClient) GetPayinStatus(ctx context.Context, payinID string) (interface{}, error) {
+func (c *DelegatedPayinsClient) GetPayin(ctx context.Context, payinID string) (interface{}, error) {
 	path := "/payins/" + url.PathEscape(payinID)
 	var result interface{}
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
@@ -144,6 +149,11 @@ func (c *DelegatedPayinsClient) GetPayinStatus(ctx context.Context, payinID stri
 		return nil, err
 	}
 	return result, nil
+}
+
+// Deprecated: use GetPayin instead.
+func (c *DelegatedPayinsClient) GetPayinStatus(ctx context.Context, payinID string) (interface{}, error) {
+	return c.GetPayin(ctx, payinID)
 }
 
 // List the provider accounts, with their registered wallet addresses per asset. An account is created on the provider platform (e.g. the Borderless dashboard) and its registered addresses serve both directions: a payin delivers to — and a payout is funded from — a wallet whose address is registered on the account.

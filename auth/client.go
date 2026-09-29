@@ -244,7 +244,7 @@ func (c *AuthClient) DelegatedLogin(ctx context.Context, body DelegatedLoginRequ
 // Completes the login process and provides the authenticated user with their authentication token.
 // 
 // The type of credentials used to login is determined by the `kind` field in the nested objects (`firstFactor` and `secondFactor`). Supported credential kinds are:
-func (c *AuthClient) CompleteUserLogin(ctx context.Context, body CompleteUserLoginRequest) (interface{}, error) {
+func (c *AuthClient) Login(ctx context.Context, body LoginRequest) (interface{}, error) {
 	path := "/auth/login"
 	var result interface{}
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
@@ -252,6 +252,11 @@ func (c *AuthClient) CompleteUserLogin(ctx context.Context, body CompleteUserLog
 		return nil, err
 	}
 	return result, nil
+}
+
+// Deprecated: use Login instead.
+func (c *AuthClient) CompleteUserLogin(ctx context.Context, body LoginRequest) (interface{}, error) {
+	return c.Login(ctx, body)
 }
 
 // Completes the user logout process.
@@ -266,7 +271,7 @@ func (c *AuthClient) Logout(ctx context.Context, body LogoutRequest) (*LogoutRes
 }
 
 // Completes the OIDC login process by exchanging the authorization code obtained from the identity provider. If the verified user has no active first-factor credential yet, it returns a registration challenge to complete via [Complete User Registration](/api-reference/auth/complete-user-registration); otherwise it returns the user's authentication token.
-func (c *AuthClient) CompleteOidcLogin(ctx context.Context, body CompleteOidcLoginRequest) (interface{}, error) {
+func (c *AuthClient) OidcLogin(ctx context.Context, body OidcLoginRequest) (interface{}, error) {
 	path := "/auth/login/oidc"
 	var result interface{}
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
@@ -276,15 +281,25 @@ func (c *AuthClient) CompleteOidcLogin(ctx context.Context, body CompleteOidcLog
 	return result, nil
 }
 
+// Deprecated: use OidcLogin instead.
+func (c *AuthClient) CompleteOidcLogin(ctx context.Context, body OidcLoginRequest) (interface{}, error) {
+	return c.OidcLogin(ctx, body)
+}
+
 // Initialize the OIDC login process by returning the identity provider authorization URL to redirect the user to.
-func (c *AuthClient) InitiateOidcLogin(ctx context.Context, body InitiateOidcLoginRequest) (*InitiateOidcLoginResponse, error) {
+func (c *AuthClient) OidcLoginInit(ctx context.Context, body OidcLoginInitRequest) (*OidcLoginInitResponse, error) {
 	path := "/auth/login/oidc/init"
-	var result InitiateOidcLoginResponse
+	var result OidcLoginInitResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use OidcLoginInit instead.
+func (c *AuthClient) InitiateOidcLogin(ctx context.Context, body OidcLoginInitRequest) (*OidcLoginInitResponse, error) {
+	return c.OidcLoginInit(ctx, body)
 }
 
 // Sends a temporary one time code to the user that can be used during login flow.
@@ -312,9 +327,9 @@ func (c *AuthClient) SocialLogin(ctx context.Context, body SocialLoginRequest) (
 }
 
 // Completes the SSO login process by exchanging the authorization code obtained from the identity provider for the user's authentication token.
-func (c *AuthClient) CompleteSsoLogin(ctx context.Context, body CompleteSsoLoginRequest) (*CompleteSsoLoginResponse, error) {
+func (c *AuthClient) SsoLogin(ctx context.Context, body SsoLoginRequest) (*SsoLoginResponse, error) {
 	path := "/auth/login/sso"
-	var result CompleteSsoLoginResponse
+	var result SsoLoginResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
@@ -322,15 +337,25 @@ func (c *AuthClient) CompleteSsoLogin(ctx context.Context, body CompleteSsoLogin
 	return &result, nil
 }
 
+// Deprecated: use SsoLogin instead.
+func (c *AuthClient) CompleteSsoLogin(ctx context.Context, body SsoLoginRequest) (*SsoLoginResponse, error) {
+	return c.SsoLogin(ctx, body)
+}
+
 // Initialize the login process with SSO by returning the IdP URL to call.
-func (c *AuthClient) InitiateSsoLogin(ctx context.Context, body InitiateSsoLoginRequest) (*InitiateSsoLoginResponse, error) {
+func (c *AuthClient) SsoLoginInit(ctx context.Context, body SsoLoginInitRequest) (*SsoLoginInitResponse, error) {
 	path := "/auth/login/sso/init"
-	var result InitiateSsoLoginResponse
+	var result SsoLoginInitResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use SsoLoginInit instead.
+func (c *AuthClient) InitiateSsoLogin(ctx context.Context, body SsoLoginInitRequest) (*SsoLoginInitResponse, error) {
+	return c.SsoLoginInit(ctx, body)
 }
 
 // Only for TenantUsers - Exchanges the current user access token, for an org-bound or tenant-bound token. The user must have access to the target org / tenant. The new access token expiration won't exceed the current token's one.
@@ -437,14 +462,19 @@ func (c *AuthClient) CreateDelegatedRecoveryChallenge(ctx context.Context, body 
 // Recovers a user, using a recovery credential. After successfully recovering the user, all of the user's previous credentials and personal access tokens will be invalidated.
 // 
 // This flow requires cryptographic validation of newly created credential(s) using a recovery credential. The `recovery.credentialAssertion.clientData` field's challenge must be the _base64url-encoded_ representation of the `newCredential` object.
-func (c *AuthClient) RecoverUser(ctx context.Context, body RecoverUserRequest) (*RecoverUserResponse, error) {
+func (c *AuthClient) Recover(ctx context.Context, body RecoverRequest) (*RecoverResponse, error) {
 	path := "/auth/recover/user"
-	var result RecoverUserResponse
+	var result RecoverResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use Recover instead.
+func (c *AuthClient) RecoverUser(ctx context.Context, body RecoverRequest) (*RecoverResponse, error) {
+	return c.Recover(ctx, body)
 }
 
 // Starts a user recovery session, returning a challenge that will be used to verify the user's identity.
@@ -459,14 +489,19 @@ func (c *AuthClient) CreateRecoveryChallenge(ctx context.Context, body CreateRec
 }
 
 // Send the user a recovery verification code. This code is used as a second factor to verify the user initiated the recovery request.
-func (c *AuthClient) SendRecoveryCodeEmail(ctx context.Context, body SendRecoveryCodeEmailRequest) (*SendRecoveryCodeEmailResponse, error) {
+func (c *AuthClient) SendRecoveryCode(ctx context.Context, body SendRecoveryCodeRequest) (*SendRecoveryCodeResponse, error) {
 	path := "/auth/recover/user/code"
-	var result SendRecoveryCodeEmailResponse
+	var result SendRecoveryCodeResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use SendRecoveryCode instead.
+func (c *AuthClient) SendRecoveryCodeEmail(ctx context.Context, body SendRecoveryCodeRequest) (*SendRecoveryCodeResponse, error) {
+	return c.SendRecoveryCode(ctx, body)
 }
 
 // <Warning>
@@ -507,9 +542,9 @@ func (c *AuthClient) CreateSocialRegistrationChallenge(ctx context.Context, body
 // Completes the user registration process and creates the user's initial credentials.
 // 
 // All credentials submitted in this call (`firstFactorCredential`, `secondFactorCredential`, `recoveryCredential`) sign the same challenge returned by the registration init endpoint ([Create Registration Challenge](https://docs.dfns.co/api-reference/auth/create-registration-challenge), [Create Delegated Registration Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-registration-challenge), or [Create Social Registration Challenge](https://docs.dfns.co/api-reference/auth/create-social-registration-challenge)).
-func (c *AuthClient) CompleteUserRegistration(ctx context.Context, body CompleteUserRegistrationRequest) (*CompleteUserRegistrationResponse, error) {
+func (c *AuthClient) Register(ctx context.Context, body RegisterRequest) (*RegisterResponse, error) {
 	path := "/auth/registration"
-	var result CompleteUserRegistrationResponse
+	var result RegisterResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
@@ -517,17 +552,27 @@ func (c *AuthClient) CompleteUserRegistration(ctx context.Context, body Complete
 	return &result, nil
 }
 
+// Deprecated: use Register instead.
+func (c *AuthClient) CompleteUserRegistration(ctx context.Context, body RegisterRequest) (*RegisterResponse, error) {
+	return c.Register(ctx, body)
+}
+
 // Completes the end user registration process and creates the user's initial credentials along with delegated wallets for the new end user.
 // 
 // All credentials submitted in this call (`firstFactorCredential`, `secondFactorCredential`, `recoveryCredential`) sign the same challenge returned by the registration init endpoint ([Create Delegated Registration Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-registration-challenge) or [Create Social Registration Challenge](https://docs.dfns.co/api-reference/auth/create-social-registration-challenge)).
-func (c *AuthClient) CompleteEndUserRegistrationWithWallets(ctx context.Context, body CompleteEndUserRegistrationWithWalletsRequest) (*CompleteEndUserRegistrationWithWalletsResponse, error) {
+func (c *AuthClient) RegisterEndUser(ctx context.Context, body RegisterEndUserRequest) (*RegisterEndUserResponse, error) {
 	path := "/auth/registration/enduser"
-	var result CompleteEndUserRegistrationWithWalletsResponse
+	var result RegisterEndUserResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use RegisterEndUser instead.
+func (c *AuthClient) CompleteEndUserRegistrationWithWallets(ctx context.Context, body RegisterEndUserRequest) (*RegisterEndUserResponse, error) {
+	return c.RegisterEndUser(ctx, body)
 }
 
 // Sends the user a new registration code. The previous registration code will be marked invalid. If the user has already completed their registration no action will be taken.

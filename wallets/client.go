@@ -193,7 +193,7 @@ func (c *WalletsClient) CancelTransfer(ctx context.Context, walletID string, tra
 }
 
 // Proxies a request to the Canton Ledger API associated with this wallet, using the validator's OAuth2 credentials. Restricted to a curated allow-list of read-style resources. Used to satisfy the Canton WalletConnect `canton_ledgerApi` method.
-func (c *WalletsClient) ProxyARequestToTheCantonLedgerAPI(ctx context.Context, walletID string, body ProxyARequestToTheCantonLedgerAPIRequest) (interface{}, error) {
+func (c *WalletsClient) CantonLedgerAPIProxy(ctx context.Context, walletID string, body CantonLedgerAPIProxyRequest) (interface{}, error) {
 	path := "/wallets/" + url.PathEscape(walletID) + "/canton/ledger-api"
 	var result interface{}
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
@@ -201,6 +201,11 @@ func (c *WalletsClient) ProxyARequestToTheCantonLedgerAPI(ctx context.Context, w
 		return nil, err
 	}
 	return result, nil
+}
+
+// Deprecated: use CantonLedgerAPIProxy instead.
+func (c *WalletsClient) ProxyARequestToTheCantonLedgerAPI(ctx context.Context, walletID string, body CantonLedgerAPIProxyRequest) (interface{}, error) {
+	return c.CantonLedgerAPIProxy(ctx, walletID, body)
 }
 
 // Speeds up a transaction by creating a replacement transaction with the same parameters but higher gas fees.

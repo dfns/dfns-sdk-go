@@ -32,7 +32,7 @@ func (c *PermissionsClient) ArchivePermission(ctx context.Context, permissionID 
 }
 
 // Lists all permission (role) assignments for a given permission.
-func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permissionID string, query *ListPermissionAssignmentsQuery) (*ListPermissionAssignmentsResponse, error) {
+func (c *PermissionsClient) ListAssignments(ctx context.Context, permissionID string, query *ListAssignmentsQuery) (*ListAssignmentsResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments"
 	if query != nil {
 		q := url.Values{}
@@ -46,12 +46,17 @@ func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permi
 			path += "?" + q.Encode()
 		}
 	}
-	var result ListPermissionAssignmentsResponse
+	var result ListAssignmentsResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Deprecated: use ListAssignments instead.
+func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permissionID string, query *ListAssignmentsQuery) (*ListAssignmentsResponse, error) {
+	return c.ListAssignments(ctx, permissionID, query)
 }
 
 // Assigns a permission (role) to an identity (user, PAT or service account), granting it access to the operations defined in the permission. Returns the assignment on success (200), or a pending change request if approval is required (202).
