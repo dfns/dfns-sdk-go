@@ -89,13 +89,50 @@ const (
 	ProtocolSentoraPyusdMain Protocol = "SentoraPyusdMain"
 )
 
-// Provider represents the provider type.
-type Provider string
+// Kind represents the kind type.
+type Kind string
 
 const (
-	ProviderUniswapX Provider = "UniswapX"
-	ProviderUniswapClassic Provider = "UniswapClassic"
-	ProviderCircleCctp Provider = "CircleCctp"
+	KindPolicyTriggered Kind = "policy.triggered"
+	KindPolicyApprovalPending Kind = "policy.approval.pending"
+	KindPolicyApprovalResolved Kind = "policy.approval.resolved"
+	KindKeyCreated Kind = "key.created"
+	KindKeyDeleted Kind = "key.deleted"
+	KindKeyDelegated Kind = "key.delegated"
+	KindKeyExported Kind = "key.exported"
+	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
+	KindWalletBlockchainEventTransferIncluded Kind = "wallet.blockchain_event.transfer.included"
+	KindWalletBlockchainEventMiscConfirmed Kind = "wallet.blockchain_event.misc.confirmed"
+	KindWalletCreated Kind = "wallet.created"
+	KindWalletActivated Kind = "wallet.activated"
+	KindWalletDelegated Kind = "wallet.delegated"
+	KindWalletExported Kind = "wallet.exported"
+	KindWalletSignatureFailed Kind = "wallet.signature.failed"
+	KindWalletSignatureRejected Kind = "wallet.signature.rejected"
+	KindWalletSignatureRequested Kind = "wallet.signature.requested"
+	KindWalletSignatureSigned Kind = "wallet.signature.signed"
+	KindWalletTransactionBroadcasted Kind = "wallet.transaction.broadcasted"
+	KindWalletTransactionConfirmed Kind = "wallet.transaction.confirmed"
+	KindWalletTransactionFailed Kind = "wallet.transaction.failed"
+	KindWalletTransactionRejected Kind = "wallet.transaction.rejected"
+	KindWalletTransactionRequested Kind = "wallet.transaction.requested"
+	KindWalletTransferBroadcasted Kind = "wallet.transfer.broadcasted"
+	KindWalletTransferConfirmed Kind = "wallet.transfer.confirmed"
+	KindWalletTransferFailed Kind = "wallet.transfer.failed"
+	KindWalletTransferRejected Kind = "wallet.transfer.rejected"
+	KindWalletTransferRequested Kind = "wallet.transfer.requested"
+	KindWalletOfferReceived Kind = "wallet.offer.received"
+	KindWalletOfferAccepted Kind = "wallet.offer.accepted"
+	KindWalletOfferRejected Kind = "wallet.offer.rejected"
+	KindWalletOfferWithdrawn Kind = "wallet.offer.withdrawn"
+	KindWalletTagsModified Kind = "wallet.tags.modified"
+	KindVaultCreated Kind = "vault.created"
+	KindVaultUpdated Kind = "vault.updated"
+	KindVaultTagsModified Kind = "vault.tags.modified"
+	KindVaultEventCreated Kind = "vault.event.created"
+	KindAddressWatchBlockchainEventTransferConfirmed Kind = "address_watch.blockchain_event.transfer.confirmed"
+	KindAddressWatchBlockchainEventMiscConfirmed Kind = "address_watch.blockchain_event.misc.confirmed"
+	KindPayoutActionRequired Kind = "payout.action.required"
 )
 
 // Network represents the network type.
@@ -216,50 +253,13 @@ const (
 	NetworkXrpLedgerTestnet Network = "XrpLedgerTestnet"
 )
 
-// Kind represents the kind type.
-type Kind string
+// Provider represents the provider type.
+type Provider string
 
 const (
-	KindPolicyTriggered Kind = "policy.triggered"
-	KindPolicyApprovalPending Kind = "policy.approval.pending"
-	KindPolicyApprovalResolved Kind = "policy.approval.resolved"
-	KindKeyCreated Kind = "key.created"
-	KindKeyDeleted Kind = "key.deleted"
-	KindKeyDelegated Kind = "key.delegated"
-	KindKeyExported Kind = "key.exported"
-	KindWalletBlockchaineventDetected Kind = "wallet.blockchainevent.detected"
-	KindWalletBlockchainEventTransferIncluded Kind = "wallet.blockchain_event.transfer.included"
-	KindWalletBlockchainEventMiscConfirmed Kind = "wallet.blockchain_event.misc.confirmed"
-	KindWalletCreated Kind = "wallet.created"
-	KindWalletActivated Kind = "wallet.activated"
-	KindWalletDelegated Kind = "wallet.delegated"
-	KindWalletExported Kind = "wallet.exported"
-	KindWalletSignatureFailed Kind = "wallet.signature.failed"
-	KindWalletSignatureRejected Kind = "wallet.signature.rejected"
-	KindWalletSignatureRequested Kind = "wallet.signature.requested"
-	KindWalletSignatureSigned Kind = "wallet.signature.signed"
-	KindWalletTransactionBroadcasted Kind = "wallet.transaction.broadcasted"
-	KindWalletTransactionConfirmed Kind = "wallet.transaction.confirmed"
-	KindWalletTransactionFailed Kind = "wallet.transaction.failed"
-	KindWalletTransactionRejected Kind = "wallet.transaction.rejected"
-	KindWalletTransactionRequested Kind = "wallet.transaction.requested"
-	KindWalletTransferBroadcasted Kind = "wallet.transfer.broadcasted"
-	KindWalletTransferConfirmed Kind = "wallet.transfer.confirmed"
-	KindWalletTransferFailed Kind = "wallet.transfer.failed"
-	KindWalletTransferRejected Kind = "wallet.transfer.rejected"
-	KindWalletTransferRequested Kind = "wallet.transfer.requested"
-	KindWalletOfferReceived Kind = "wallet.offer.received"
-	KindWalletOfferAccepted Kind = "wallet.offer.accepted"
-	KindWalletOfferRejected Kind = "wallet.offer.rejected"
-	KindWalletOfferWithdrawn Kind = "wallet.offer.withdrawn"
-	KindWalletTagsModified Kind = "wallet.tags.modified"
-	KindVaultCreated Kind = "vault.created"
-	KindVaultUpdated Kind = "vault.updated"
-	KindVaultTagsModified Kind = "vault.tags.modified"
-	KindVaultEventCreated Kind = "vault.event.created"
-	KindAddressWatchBlockchainEventTransferConfirmed Kind = "address_watch.blockchain_event.transfer.confirmed"
-	KindAddressWatchBlockchainEventMiscConfirmed Kind = "address_watch.blockchain_event.misc.confirmed"
-	KindPayoutActionRequired Kind = "payout.action.required"
+	ProviderUniswapX Provider = "UniswapX"
+	ProviderUniswapClassic Provider = "UniswapClassic"
+	ProviderCircleCctp Provider = "CircleCctp"
 )
 
 // UserActionServerKind represents the useractionserverkind type.
@@ -884,6 +884,7 @@ type Wallet struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	NetworkInfo *map[string]interface{} `json:"networkInfo,omitempty"`
 	VaultID *string `json:"vaultId,omitempty"`
 }
 

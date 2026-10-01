@@ -6,6 +6,26 @@ import (
 	"github.com/dfns/dfns-sdk-go/v2/types"
 )
 
+// Request 0fns Allocation Quote
+type CreateAllocationQuoteRequest struct {
+	WalletID string `json:"walletId"`
+	Protocol string `json:"protocol"`
+	Kind string `json:"kind"`
+	SourceAsset map[string]interface{} `json:"sourceAsset"`
+	TargetAsset map[string]interface{} `json:"targetAsset"`
+}
+
+// Request 0fns Allocation Quote
+type CreateAllocationQuoteResponse struct {
+	WalletID string `json:"walletId"`
+	Protocol string `json:"protocol"`
+	Kind string `json:"kind"`
+	SourceAsset map[string]interface{} `json:"sourceAsset"`
+	TargetAsset map[string]interface{} `json:"targetAsset"`
+	EstFillTime int64 `json:"estFillTime"`
+	DateCreated string `json:"dateCreated"`
+}
+
 // List Allocations
 type ListAllocationsResponse struct {
 	Items []types.Allocation `json:"items"`
@@ -81,4 +101,16 @@ type GetAllocationsInfoResponse struct {
 	GauntletUsdcPrimeBase *map[string]interface{} `json:"GauntletUsdcPrimeBase,omitempty"`
 	SteakhouseUsdcBase *map[string]interface{} `json:"SteakhouseUsdcBase,omitempty"`
 	SentoraPyusdMain *map[string]interface{} `json:"SentoraPyusdMain,omitempty"`
+}
+
+// Cancel an unfilled 0fns order placement
+type Cancel0fnsOrderPlacementRequest struct {
+	AllocationActionID string `json:"allocationActionId"`
+	ExternalID *string `json:"externalId,omitempty"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
+}
+
+// Cancel an unfilled 0fns order placement
+type Cancel0fnsOrderPlacementResponse struct {
+	TransactionID string `json:"transactionId"`
 }

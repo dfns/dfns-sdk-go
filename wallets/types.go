@@ -305,6 +305,7 @@ type CreateWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	NetworkInfo *map[string]interface{} `json:"networkInfo,omitempty"`
 	VaultID *string `json:"vaultId,omitempty"`
 }
 
@@ -366,6 +367,7 @@ type GetWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	NetworkInfo *map[string]interface{} `json:"networkInfo,omitempty"`
 	VaultID *string `json:"vaultId,omitempty"`
 }
 
@@ -389,6 +391,7 @@ type UpdateWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	NetworkInfo *map[string]interface{} `json:"networkInfo,omitempty"`
 	VaultID *string `json:"vaultId,omitempty"`
 }
 
@@ -454,6 +457,7 @@ type ImportWalletResponse struct {
 	ExternalID *string `json:"externalId,omitempty"`
 	Tags []string `json:"tags"`
 	ValidatorID *string `json:"validatorId,omitempty"`
+	NetworkInfo *map[string]interface{} `json:"networkInfo,omitempty"`
 	VaultID *string `json:"vaultId,omitempty"`
 }
 
