@@ -20,6 +20,17 @@ func NewAllocationsClient(c *client.Client) *AllocationsClient {
 	return &AllocationsClient{client: c}
 }
 
+// Get a price quote for a 0fns deposit or withdrawal at the current market rate.
+func (c *AllocationsClient) CreateAllocationQuote(ctx context.Context, body CreateAllocationQuoteRequest) (*CreateAllocationQuoteResponse, error) {
+	path := "/allocations/get-0fns-quote"
+	var result CreateAllocationQuoteResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Lists the allocations of your organization.
 func (c *AllocationsClient) ListAllocations(ctx context.Context, query *ListAllocationsQuery) (*ListAllocationsResponse, error) {
 	path := "/allocations"
@@ -106,6 +117,17 @@ func (c *AllocationsClient) GetAllocationsInfo(ctx context.Context) (*GetAllocat
 	path := "/allocations/info"
 	var result GetAllocationsInfoResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Craft and broadcast an on-chain cancelOrder to cancel a 0fns OrderBook order placement that was not filled, reclaiming its escrow. The escrowed input token is returned to the wallet that funded the order.
+func (c *AllocationsClient) Cancel0fnsOrderPlacement(ctx context.Context, body Cancel0fnsOrderPlacementRequest) (*Cancel0fnsOrderPlacementResponse, error) {
+	path := "/allocations/cancel-0fns-order-placement"
+	var result Cancel0fnsOrderPlacementResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}

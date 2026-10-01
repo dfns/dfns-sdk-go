@@ -24,6 +24,17 @@ func NewDelegatedAllocationsClient(c *client.Client) *DelegatedAllocationsClient
 	return &DelegatedAllocationsClient{client: c}
 }
 
+// Get a price quote for a 0fns deposit or withdrawal at the current market rate.
+func (c *DelegatedAllocationsClient) CreateAllocationQuote(ctx context.Context, body CreateAllocationQuoteRequest) (*CreateAllocationQuoteResponse, error) {
+	path := "/allocations/get-0fns-quote"
+	var result CreateAllocationQuoteResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Lists the allocations of your organization.
 func (c *DelegatedAllocationsClient) ListAllocations(ctx context.Context, query *ListAllocationsQuery) (*ListAllocationsResponse, error) {
 	path := "/allocations"
@@ -135,6 +146,30 @@ func (c *DelegatedAllocationsClient) GetAllocationsInfo(ctx context.Context) (*G
 	var result GetAllocationsInfoResponse
 	err := c.client.Do(ctx, "GET", path, nil, &result, false)
 	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Cancel0fnsOrderPlacementInit starts delegated user action signing for the cancel0fnsOrderPlacement operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to Cancel0fnsOrderPlacementComplete
+// along with the same arguments given here.
+func (c *DelegatedAllocationsClient) Cancel0fnsOrderPlacementInit(ctx context.Context, body Cancel0fnsOrderPlacementRequest) (*signer.UserActionChallenge, error) {
+	path := "/allocations/cancel-0fns-order-placement"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// Cancel0fnsOrderPlacementComplete finishes delegated signing for the cancel0fnsOrderPlacement operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the Cancel0fnsOrderPlacementInit challenge.
+func (c *DelegatedAllocationsClient) Cancel0fnsOrderPlacementComplete(ctx context.Context, body Cancel0fnsOrderPlacementRequest, challengeID string, assertion *signer.CredentialAssertion) (*Cancel0fnsOrderPlacementResponse, error) {
+	path := "/allocations/cancel-0fns-order-placement"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result Cancel0fnsOrderPlacementResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil
