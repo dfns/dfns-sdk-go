@@ -123,3 +123,16 @@ func (c *NetworksClient) CreateCantonValidator(ctx context.Context, network stri
 	}
 	return &result, nil
 }
+
+// Re-index a finalized transaction that is missing from your wallets' history. A transaction that is already indexed is not processed again.
+// 
+//   <Note>
+func (c *NetworksClient) ReindexTransaction(ctx context.Context, network string, body ReindexTransactionRequest) (*ReindexTransactionResponse, error) {
+	path := "/networks/" + url.PathEscape(network) + "/transactions/reindex"
+	var result ReindexTransactionResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}

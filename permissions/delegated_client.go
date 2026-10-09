@@ -48,6 +48,65 @@ func (c *DelegatedPermissionsClient) ArchivePermissionComplete(ctx context.Conte
 	return &result, nil
 }
 
+// Retrieves a permission (role) by ID, including any pending change request.
+func (c *DelegatedPermissionsClient) GetPermission(ctx context.Context, permissionID string) (*GetPermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	var result GetPermissionResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// UpdatePermissionInit starts delegated user action signing for the updatePermission operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to UpdatePermissionComplete
+// along with the same arguments given here.
+func (c *DelegatedPermissionsClient) UpdatePermissionInit(ctx context.Context, permissionID string, body UpdatePermissionRequest) (*signer.UserActionChallenge, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	return c.client.CreateUserActionChallenge(ctx, "PUT", path, body)
+}
+
+// UpdatePermissionComplete finishes delegated signing for the updatePermission operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the UpdatePermissionInit challenge.
+func (c *DelegatedPermissionsClient) UpdatePermissionComplete(ctx context.Context, permissionID string, body UpdatePermissionRequest, challengeID string, assertion *signer.CredentialAssertion) (*UpdatePermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result UpdatePermissionResponse
+	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// DeletePermissionInit starts delegated user action signing for the deletePermission operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to DeletePermissionComplete
+// along with the same arguments given here.
+func (c *DelegatedPermissionsClient) DeletePermissionInit(ctx context.Context, permissionID string) (*signer.UserActionChallenge, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, nil)
+}
+
+// DeletePermissionComplete finishes delegated signing for the deletePermission operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the DeletePermissionInit challenge.
+func (c *DelegatedPermissionsClient) DeletePermissionComplete(ctx context.Context, permissionID string, challengeID string, assertion *signer.CredentialAssertion) (*DeletePermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result DeletePermissionResponse
+	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Lists all permission (role) assignments for a given permission.
 func (c *DelegatedPermissionsClient) ListAssignments(ctx context.Context, permissionID string, query *ListAssignmentsQuery) (*ListAssignmentsResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments"
@@ -183,39 +242,4 @@ func (c *DelegatedPermissionsClient) RevokePermissionComplete(ctx context.Contex
 		return err
 	}
 	return c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, nil, userAction)
-}
-
-// Retrieves a permission (role) by ID, including any pending change request.
-func (c *DelegatedPermissionsClient) GetPermission(ctx context.Context, permissionID string) (*GetPermissionResponse, error) {
-	path := "/permissions/" + url.PathEscape(permissionID)
-	var result GetPermissionResponse
-	err := c.client.Do(ctx, "GET", path, nil, &result, false)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// UpdatePermissionInit starts delegated user action signing for the updatePermission operation.
-// It returns the challenge to sign out-of-band; pass the signed assertion to UpdatePermissionComplete
-// along with the same arguments given here.
-func (c *DelegatedPermissionsClient) UpdatePermissionInit(ctx context.Context, permissionID string, body UpdatePermissionRequest) (*signer.UserActionChallenge, error) {
-	path := "/permissions/" + url.PathEscape(permissionID)
-	return c.client.CreateUserActionChallenge(ctx, "PUT", path, body)
-}
-
-// UpdatePermissionComplete finishes delegated signing for the updatePermission operation:
-// it submits the externally-signed challenge and issues the request. challengeID is the
-// ChallengeIdentifier from the UpdatePermissionInit challenge.
-func (c *DelegatedPermissionsClient) UpdatePermissionComplete(ctx context.Context, permissionID string, body UpdatePermissionRequest, challengeID string, assertion *signer.CredentialAssertion) (*UpdatePermissionResponse, error) {
-	path := "/permissions/" + url.PathEscape(permissionID)
-	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
-	if err != nil {
-		return nil, err
-	}
-	var result UpdatePermissionResponse
-	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, body, &result, userAction); err != nil {
-		return nil, err
-	}
-	return &result, nil
 }

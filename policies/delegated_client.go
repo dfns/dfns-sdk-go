@@ -157,6 +157,17 @@ func (c *DelegatedPoliciesClient) CreatePolicyComplete(ctx context.Context, body
 	return result, nil
 }
 
+// Retrieve the RSA public key (JWK, RFC 7517) of the org's Sumsub Travel Rule integration. Use it to JWE-encrypt (RSA-OAEP-256 / A256GCM) the IVMS101 payload client-side before submitting a transfer screened by a Sumsub Travel Rule policy. Requires Travel Rule to be enabled for the tenant and an activated Sumsub integration on the org.
+func (c *DelegatedPoliciesClient) GetSumsubTravelRulePublicKey(ctx context.Context) (*GetSumsubTravelRulePublicKeyResponse, error) {
+	path := "/v2/policies/travel-rule/sumsub/public-key"
+	var result GetSumsubTravelRulePublicKeyResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Retrieve information about a specific approval request.
 func (c *DelegatedPoliciesClient) GetApproval(ctx context.Context, approvalID string) (*GetApprovalResponse, error) {
 	path := "/v2/policy-approvals/" + url.PathEscape(approvalID)

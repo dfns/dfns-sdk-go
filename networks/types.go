@@ -83,3 +83,13 @@ type CreateCantonValidatorResponse struct {
 	DateCreated string `json:"dateCreated"`
 	PartyHint string `json:"partyHint"`
 }
+
+// Reindex Transaction
+type ReindexTransactionRequest struct {
+	TxHash string `json:"txHash"`
+}
+
+// Reindex Transaction
+type ReindexTransactionResponse struct {
+	Success string `json:"success"`
+}

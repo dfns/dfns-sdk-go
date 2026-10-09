@@ -20,11 +20,45 @@ func NewPermissionsClient(c *client.Client) *PermissionsClient {
 	return &PermissionsClient{client: c}
 }
 
-// Archives or unarchives a permission (role). Archived permissions are effectively soft-deleted.
+// @deprecated in favor of "deletePermission".
+// Deletes a permission (aka "Role").
 func (c *PermissionsClient) ArchivePermission(ctx context.Context, permissionID string, body ArchivePermissionRequest) (*ArchivePermissionResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/archive"
 	var result ArchivePermissionResponse
 	err := c.client.Do(ctx, "PUT", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Retrieves a permission (role) by ID, including any pending change request.
+func (c *PermissionsClient) GetPermission(ctx context.Context, permissionID string) (*GetPermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	var result GetPermissionResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Updates the name or operations of an existing permission (role).
+func (c *PermissionsClient) UpdatePermission(ctx context.Context, permissionID string, body UpdatePermissionRequest) (*UpdatePermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	var result UpdatePermissionResponse
+	err := c.client.Do(ctx, "PUT", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Deletes a permission (aka "Role").
+func (c *PermissionsClient) DeletePermission(ctx context.Context, permissionID string) (*DeletePermissionResponse, error) {
+	path := "/permissions/" + url.PathEscape(permissionID)
+	var result DeletePermissionResponse
+	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
 	if err != nil {
 		return nil, err
 	}
@@ -117,26 +151,4 @@ func (c *PermissionsClient) RevokePermission(ctx context.Context, permissionID s
 		}
 	}
 	return c.client.Do(ctx, "DELETE", path, nil, nil, true)
-}
-
-// Retrieves a permission (role) by ID, including any pending change request.
-func (c *PermissionsClient) GetPermission(ctx context.Context, permissionID string) (*GetPermissionResponse, error) {
-	path := "/permissions/" + url.PathEscape(permissionID)
-	var result GetPermissionResponse
-	err := c.client.Do(ctx, "GET", path, nil, &result, false)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// Updates the name or operations of an existing permission (role).
-func (c *PermissionsClient) UpdatePermission(ctx context.Context, permissionID string, body UpdatePermissionRequest) (*UpdatePermissionResponse, error) {
-	path := "/permissions/" + url.PathEscape(permissionID)
-	var result UpdatePermissionResponse
-	err := c.client.Do(ctx, "PUT", path, body, &result, true)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
 }

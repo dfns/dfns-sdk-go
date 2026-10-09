@@ -50,6 +50,15 @@ type ListPoliciesQuery struct {
 // CreatePolicyRequest represents the request body for the createPolicy operation.
 type CreatePolicyRequest = any
 
+// Get Sumsub Travel Rule public key
+type GetSumsubTravelRulePublicKeyResponse struct {
+	Kty string `json:"kty"`
+	Kid string `json:"kid"`
+	N string `json:"n"`
+	E string `json:"e"`
+	Use *string `json:"use,omitempty"`
+}
+
 // Get Approval
 type GetApprovalResponse struct {
 	ID string `json:"id"`
