@@ -211,6 +211,21 @@ type ListVaultBalancesQuery struct {
 	Tid *string `json:"tid,omitempty"`
 }
 
+// List Vault History
+type ListVaultHistoryResponse struct {
+	Items []interface{} `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListVaultHistoryQuery represents query parameters.
+type ListVaultHistoryQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+	Network *interface{} `json:"network,omitempty"`
+	Tid *interface{} `json:"tid,omitempty"`
+	Kind *interface{} `json:"kind,omitempty"`
+}
+
 // List Vault Quarantines
 type ListVaultQuarantinesResponse struct {
 	Items []types.VaultQuarantine `json:"items"`

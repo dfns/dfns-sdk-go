@@ -36,6 +36,8 @@ const (
 	AddressWatchNetworkFlowEvmTestnet AddressWatchNetwork = "FlowEvmTestnet"
 	AddressWatchNetworkInk AddressWatchNetwork = "Ink"
 	AddressWatchNetworkInkSepolia AddressWatchNetwork = "InkSepolia"
+	AddressWatchNetworkMonad AddressWatchNetwork = "Monad"
+	AddressWatchNetworkMonadTestnet AddressWatchNetwork = "MonadTestnet"
 	AddressWatchNetworkOptimism AddressWatchNetwork = "Optimism"
 	AddressWatchNetworkOptimismSepolia AddressWatchNetwork = "OptimismSepolia"
 	AddressWatchNetworkPlasma AddressWatchNetwork = "Plasma"
@@ -198,6 +200,8 @@ const (
 	NetworkKusamaAssetHub Network = "KusamaAssetHub"
 	NetworkLitecoin Network = "Litecoin"
 	NetworkLitecoinTestnet Network = "LitecoinTestnet"
+	NetworkMonad Network = "Monad"
+	NetworkMonadTestnet Network = "MonadTestnet"
 	NetworkMovement Network = "Movement"
 	NetworkMovementTestnet Network = "MovementTestnet"
 	NetworkNear Network = "Near"
@@ -432,6 +436,13 @@ type Value string
 const (
 	ValueApproved Value = "Approved"
 	ValueDenied Value = "Denied"
+)
+
+// Kty represents the kty type.
+type Kty string
+
+const (
+	KtyRSA Kty = "RSA"
 )
 
 // HsmGenesisFirmwareVersion represents the hsmgenesisfirmwareversion type.

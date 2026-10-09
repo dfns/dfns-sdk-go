@@ -189,6 +189,8 @@ type DelegatedLoginRequest struct {
 // Delegated Login
 type DelegatedLoginResponse struct {
 	Token string `json:"token"`
+	Expiry *float64 `json:"expiry,omitempty"`
+	Identity *map[string]interface{} `json:"identity,omitempty"`
 }
 
 // Complete User Login
@@ -260,6 +262,8 @@ type SocialLoginRequest struct {
 // Social Login
 type SocialLoginResponse struct {
 	Token string `json:"token"`
+	Expiry *float64 `json:"expiry,omitempty"`
+	Identity *map[string]interface{} `json:"identity,omitempty"`
 }
 
 // Complete SSO Login
@@ -271,6 +275,8 @@ type SsoLoginRequest struct {
 // Complete SSO Login
 type SsoLoginResponse struct {
 	Token string `json:"token"`
+	Expiry *float64 `json:"expiry,omitempty"`
+	Identity *map[string]interface{} `json:"identity,omitempty"`
 }
 
 // Deprecated: use SsoLoginRequest instead.

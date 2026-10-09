@@ -284,6 +284,38 @@ func (c *DelegatedVaultsClient) ListVaultBalances(ctx context.Context, vaultID s
 	return &result, nil
 }
 
+// Lists a vault's history, most recent first: one item per incoming or outgoing transfer, carrying its current status, and one per lock creation or deletion.
+func (c *DelegatedVaultsClient) ListVaultHistory(ctx context.Context, vaultID string, query *ListVaultHistoryQuery) (*ListVaultHistoryResponse, error) {
+	path := "/vaults/" + url.PathEscape(vaultID) + "/history"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if query.Network != nil {
+			q.Set("network", fmt.Sprintf("%v", *query.Network))
+		}
+		if query.Tid != nil {
+			q.Set("tid", fmt.Sprintf("%v", *query.Tid))
+		}
+		if query.Kind != nil {
+			q.Set("kind", fmt.Sprintf("%v", *query.Kind))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListVaultHistoryResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Lists a vault's quarantines, active and released.
 func (c *DelegatedVaultsClient) ListVaultQuarantines(ctx context.Context, vaultID string, query *ListVaultQuarantinesQuery) (*ListVaultQuarantinesResponse, error) {
 	path := "/vaults/" + url.PathEscape(vaultID) + "/quarantines"

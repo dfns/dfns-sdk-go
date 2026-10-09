@@ -19,6 +19,41 @@ type ArchivePermissionResponse struct {
 	DateUpdated string `json:"dateUpdated"`
 }
 
+// Get Permission
+type GetPermissionResponse struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
+	Operations []string `json:"operations"`
+	Status string `json:"status"`
+	IsImmutable bool `json:"isImmutable"`
+	IsArchived bool `json:"isArchived"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+	PendingChangeRequest *map[string]interface{} `json:"pendingChangeRequest,omitempty"`
+}
+
+// Update Permission
+type UpdatePermissionRequest struct {
+	Name *string `json:"name,omitempty"`
+	Operations []interface{} `json:"operations,omitempty"`
+}
+
+// Update Permission
+type UpdatePermissionResponse struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
+	Operations []string `json:"operations"`
+	Status string `json:"status"`
+	IsImmutable bool `json:"isImmutable"`
+	IsArchived bool `json:"isArchived"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
+// Delete Permission
+type DeletePermissionResponse struct {
+}
+
 // List Permission Assignments
 type ListAssignmentsResponse struct {
 	Items []map[string]interface{} `json:"items"`
@@ -85,35 +120,4 @@ type CreatePermissionResponse struct {
 // RevokePermissionQuery represents query parameters.
 type RevokePermissionQuery struct {
 	Force *bool `json:"force,omitempty"`
-}
-
-// Get Permission
-type GetPermissionResponse struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
-	Operations []string `json:"operations"`
-	Status string `json:"status"`
-	IsImmutable bool `json:"isImmutable"`
-	IsArchived bool `json:"isArchived"`
-	DateCreated string `json:"dateCreated"`
-	DateUpdated string `json:"dateUpdated"`
-	PendingChangeRequest *map[string]interface{} `json:"pendingChangeRequest,omitempty"`
-}
-
-// Update Permission
-type UpdatePermissionRequest struct {
-	Name *string `json:"name,omitempty"`
-	Operations []interface{} `json:"operations,omitempty"`
-}
-
-// Update Permission
-type UpdatePermissionResponse struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
-	Operations []string `json:"operations"`
-	Status string `json:"status"`
-	IsImmutable bool `json:"isImmutable"`
-	IsArchived bool `json:"isArchived"`
-	DateCreated string `json:"dateCreated"`
-	DateUpdated string `json:"dateUpdated"`
 }

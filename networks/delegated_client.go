@@ -162,3 +162,27 @@ func (c *DelegatedNetworksClient) CreateCantonValidatorComplete(ctx context.Cont
 	}
 	return &result, nil
 }
+
+// ReindexTransactionInit starts delegated user action signing for the reindexTransaction operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to ReindexTransactionComplete
+// along with the same arguments given here.
+func (c *DelegatedNetworksClient) ReindexTransactionInit(ctx context.Context, network string, body ReindexTransactionRequest) (*signer.UserActionChallenge, error) {
+	path := "/networks/" + url.PathEscape(network) + "/transactions/reindex"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// ReindexTransactionComplete finishes delegated signing for the reindexTransaction operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the ReindexTransactionInit challenge.
+func (c *DelegatedNetworksClient) ReindexTransactionComplete(ctx context.Context, network string, body ReindexTransactionRequest, challengeID string, assertion *signer.CredentialAssertion) (*ReindexTransactionResponse, error) {
+	path := "/networks/" + url.PathEscape(network) + "/transactions/reindex"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result ReindexTransactionResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
