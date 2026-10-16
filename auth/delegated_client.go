@@ -346,19 +346,30 @@ func (c *DelegatedAuthClient) Logout(ctx context.Context, body LogoutRequest) (*
 	return &result, nil
 }
 
-// Completes the OIDC login process by exchanging the authorization code obtained from the identity provider. If the verified user has no active first-factor credential yet, it returns a registration challenge to complete via [Complete User Registration](/api-reference/auth/complete-user-registration); otherwise it returns the user's authentication token.
-func (c *DelegatedAuthClient) OidcLogin(ctx context.Context, body OidcLoginRequest) (interface{}, error) {
-	path := "/auth/login/oidc"
-	var result interface{}
+// Registers the first credential for an OIDC-authenticated user, bootstrapping from the credential challenge issued by [OIDC Login](/api-reference/auth/oidc-login). Rejected if the user already has an active first-factor credential; use [Create Credential](/api-reference/auth/create-credential) in that case.
+func (c *DelegatedAuthClient) OidcLoginCredentials(ctx context.Context, body OidcLoginCredentialsRequest) (*OidcLoginCredentialsResponse, error) {
+	path := "/auth/login/oidc/credentials"
+	var result OidcLoginCredentialsResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return &result, nil
+}
+
+// Completes the OIDC login process by exchanging the authorization code obtained from the identity provider. Returns the user's authentication token; when the verified user has no active first-factor credential yet, the response also includes a credential challenge so the client can register one before performing any user-action-signed operation.
+func (c *DelegatedAuthClient) OidcLogin(ctx context.Context, body OidcLoginRequest) (*OidcLoginResponse, error) {
+	path := "/auth/login/oidc"
+	var result OidcLoginResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 // Deprecated: use OidcLogin instead.
-func (c *DelegatedAuthClient) CompleteOidcLogin(ctx context.Context, body OidcLoginRequest) (interface{}, error) {
+func (c *DelegatedAuthClient) CompleteOidcLogin(ctx context.Context, body OidcLoginRequest) (*OidcLoginResponse, error) {
 	return c.OidcLogin(ctx, body)
 }
 
@@ -904,6 +915,54 @@ func (c *DelegatedAuthClient) DeactivateServiceAccountComplete(ctx context.Conte
 	}
 	var result DeactivateServiceAccountResponse
 	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// CreateServiceAccountCredentialInit starts delegated user action signing for the createServiceAccountCredential operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreateServiceAccountCredentialComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) CreateServiceAccountCredentialInit(ctx context.Context, body CreateServiceAccountCredentialRequest) (*signer.UserActionChallenge, error) {
+	path := "/auth/service-accounts/credentials"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// CreateServiceAccountCredentialComplete finishes delegated signing for the createServiceAccountCredential operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the CreateServiceAccountCredentialInit challenge.
+func (c *DelegatedAuthClient) CreateServiceAccountCredentialComplete(ctx context.Context, body CreateServiceAccountCredentialRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreateServiceAccountCredentialResponse, error) {
+	path := "/auth/service-accounts/credentials"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result CreateServiceAccountCredentialResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// DeleteServiceAccountCredentialInit starts delegated user action signing for the deleteServiceAccountCredential operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to DeleteServiceAccountCredentialComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) DeleteServiceAccountCredentialInit(ctx context.Context, credentialUUID string) (*signer.UserActionChallenge, error) {
+	path := "/auth/service-accounts/credentials/" + url.PathEscape(credentialUUID)
+	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, nil)
+}
+
+// DeleteServiceAccountCredentialComplete finishes delegated signing for the deleteServiceAccountCredential operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the DeleteServiceAccountCredentialInit challenge.
+func (c *DelegatedAuthClient) DeleteServiceAccountCredentialComplete(ctx context.Context, credentialUUID string, challengeID string, assertion *signer.CredentialAssertion) (*DeleteServiceAccountCredentialResponse, error) {
+	path := "/auth/service-accounts/credentials/" + url.PathEscape(credentialUUID)
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result DeleteServiceAccountCredentialResponse
+	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil

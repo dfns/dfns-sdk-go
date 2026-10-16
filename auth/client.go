@@ -270,19 +270,30 @@ func (c *AuthClient) Logout(ctx context.Context, body LogoutRequest) (*LogoutRes
 	return &result, nil
 }
 
-// Completes the OIDC login process by exchanging the authorization code obtained from the identity provider. If the verified user has no active first-factor credential yet, it returns a registration challenge to complete via [Complete User Registration](/api-reference/auth/complete-user-registration); otherwise it returns the user's authentication token.
-func (c *AuthClient) OidcLogin(ctx context.Context, body OidcLoginRequest) (interface{}, error) {
-	path := "/auth/login/oidc"
-	var result interface{}
+// Registers the first credential for an OIDC-authenticated user, bootstrapping from the credential challenge issued by [OIDC Login](/api-reference/auth/oidc-login). Rejected if the user already has an active first-factor credential; use [Create Credential](/api-reference/auth/create-credential) in that case.
+func (c *AuthClient) OidcLoginCredentials(ctx context.Context, body OidcLoginCredentialsRequest) (*OidcLoginCredentialsResponse, error) {
+	path := "/auth/login/oidc/credentials"
+	var result OidcLoginCredentialsResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, false)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return &result, nil
+}
+
+// Completes the OIDC login process by exchanging the authorization code obtained from the identity provider. Returns the user's authentication token; when the verified user has no active first-factor credential yet, the response also includes a credential challenge so the client can register one before performing any user-action-signed operation.
+func (c *AuthClient) OidcLogin(ctx context.Context, body OidcLoginRequest) (*OidcLoginResponse, error) {
+	path := "/auth/login/oidc"
+	var result OidcLoginResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 // Deprecated: use OidcLogin instead.
-func (c *AuthClient) CompleteOidcLogin(ctx context.Context, body OidcLoginRequest) (interface{}, error) {
+func (c *AuthClient) CompleteOidcLogin(ctx context.Context, body OidcLoginRequest) (*OidcLoginResponse, error) {
 	return c.OidcLogin(ctx, body)
 }
 
@@ -666,6 +677,28 @@ func (c *AuthClient) DeactivateServiceAccount(ctx context.Context, serviceAccoun
 	path := "/auth/service-accounts/" + url.PathEscape(serviceAccountID) + "/deactivate"
 	var result DeactivateServiceAccountResponse
 	err := c.client.Do(ctx, "PUT", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Add a new Key credential to the OIDC service account authenticated by this request. The caller must be an OIDC service account — the IdP access token identifies the SA; the user-action is signed with an existing active credential to prove rotation authority.
+func (c *AuthClient) CreateServiceAccountCredential(ctx context.Context, body CreateServiceAccountCredentialRequest) (*CreateServiceAccountCredentialResponse, error) {
+	path := "/auth/service-accounts/credentials"
+	var result CreateServiceAccountCredentialResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Delete a credential of the OIDC service account authenticated by this request. The caller must be an OIDC service account. At least one active credential must remain after the delete.
+func (c *AuthClient) DeleteServiceAccountCredential(ctx context.Context, credentialUUID string) (*DeleteServiceAccountCredentialResponse, error) {
+	path := "/auth/service-accounts/credentials/" + url.PathEscape(credentialUUID)
+	var result DeleteServiceAccountCredentialResponse
+	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
 	if err != nil {
 		return nil, err
 	}

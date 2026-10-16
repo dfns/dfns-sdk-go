@@ -119,5 +119,5 @@ type CreatePermissionResponse struct {
 
 // RevokePermissionQuery represents query parameters.
 type RevokePermissionQuery struct {
-	Force *bool `json:"force,omitempty"`
+	Force *interface{} `json:"force,omitempty"`
 }
