@@ -101,7 +101,7 @@ type CreateCredentialResponse struct {
 
 // Create Credential Challenge
 type CreateCredentialChallengeRequest struct {
-	Kind types.CredentialKind `json:"kind"`
+	Kind string `json:"kind"`
 }
 
 // Activate Credential
@@ -213,20 +213,48 @@ type LogoutResponse struct {
 	Message string `json:"message"`
 }
 
+// OidcLoginCredentialsRequest represents the request body for the oidcLoginCredentials operation.
+type OidcLoginCredentialsRequest = any
+
+// Oidc Login Credentials
+type OidcLoginCredentialsResponse struct {
+	Kind string `json:"kind"`
+	CredentialID string `json:"credentialId"`
+	CredentialUUID string `json:"credentialUuid"`
+	DateCreated string `json:"dateCreated"`
+	IsActive bool `json:"isActive"`
+	Name string `json:"name"`
+	PublicKey string `json:"publicKey"`
+	RelyingPartyID string `json:"relyingPartyId"`
+	Origin string `json:"origin"`
+}
+
 // Complete OIDC Login
 type OidcLoginRequest struct {
 	Code string `json:"code"`
 	State string `json:"state"`
 }
 
+// Complete OIDC Login
+type OidcLoginResponse struct {
+	Token string `json:"token"`
+	Expiry *float64 `json:"expiry,omitempty"`
+	Identity *map[string]interface{} `json:"identity,omitempty"`
+	CredentialChallenge *map[string]interface{} `json:"credentialChallenge,omitempty"`
+}
+
 // Deprecated: use OidcLoginRequest instead.
 type CompleteOidcLoginRequest = OidcLoginRequest
+
+// Deprecated: use OidcLoginResponse instead.
+type CompleteOidcLoginResponse = OidcLoginResponse
 
 // Initiate OIDC Login
 type OidcLoginInitRequest struct {
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	RedirectURI string `json:"redirectUri"`
+	Nonce *string `json:"nonce,omitempty"`
 }
 
 // Initiate OIDC Login
@@ -641,6 +669,7 @@ type CreateServiceAccountRequest struct {
 	PermissionID *string `json:"permissionId,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	DaysValid *int64 `json:"daysValid,omitempty"`
+	FederatedIdentity *map[string]interface{} `json:"federatedIdentity,omitempty"`
 }
 
 // Create Service Account
@@ -695,6 +724,29 @@ type DeactivateServiceAccountResponse struct {
 	AccessTokens []types.PersonalAccessToken `json:"accessTokens"`
 }
 
+// Create Service Account Credential
+type CreateServiceAccountCredentialRequest struct {
+	PublicKey string `json:"publicKey"`
+	Name *string `json:"name,omitempty"`
+}
+
+// Create Service Account Credential
+type CreateServiceAccountCredentialResponse struct {
+	Kind string `json:"kind"`
+	CredentialID string `json:"credentialId"`
+	CredentialUUID string `json:"credentialUuid"`
+	DateCreated string `json:"dateCreated"`
+	IsActive bool `json:"isActive"`
+	Name string `json:"name"`
+	PublicKey string `json:"publicKey"`
+	RelyingPartyID string `json:"relyingPartyId"`
+	Origin string `json:"origin"`
+}
+
+// Delete Service Account Credential
+type DeleteServiceAccountCredentialResponse struct {
+}
+
 // Activate User
 type ActivateUserResponse struct {
 	Username string `json:"username"`
@@ -702,6 +754,7 @@ type ActivateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
@@ -719,6 +772,7 @@ type DeactivateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
@@ -736,6 +790,7 @@ type GetUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
@@ -758,6 +813,7 @@ type UpdateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
@@ -775,6 +831,7 @@ type DeleteUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
@@ -814,6 +871,7 @@ type CreateUserResponse struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`

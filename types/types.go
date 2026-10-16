@@ -290,9 +290,9 @@ const (
 	CredentialKindFido2 CredentialKind = "Fido2"
 	CredentialKindKey CredentialKind = "Key"
 	CredentialKindPassword CredentialKind = "Password"
-	CredentialKindTotp CredentialKind = "Totp"
-	CredentialKindRecoveryKey CredentialKind = "RecoveryKey"
 	CredentialKindPasswordProtectedKey CredentialKind = "PasswordProtectedKey"
+	CredentialKindRecoveryKey CredentialKind = "RecoveryKey"
+	CredentialKindTotp CredentialKind = "Totp"
 )
 
 // Factor represents the factor type.
@@ -330,13 +330,6 @@ const (
 	TypeValuePublicKey TypeValue = "public-key"
 )
 
-// SocialLoginProviderKind represents the socialloginproviderkind type.
-type SocialLoginProviderKind string
-
-const (
-	SocialLoginProviderKindOidc SocialLoginProviderKind = "Oidc"
-)
-
 // FirstFactorItem represents the firstfactoritem type.
 type FirstFactorItem string
 
@@ -344,9 +337,10 @@ const (
 	FirstFactorItemFido2 FirstFactorItem = "Fido2"
 	FirstFactorItemKey FirstFactorItem = "Key"
 	FirstFactorItemPassword FirstFactorItem = "Password"
-	FirstFactorItemTotp FirstFactorItem = "Totp"
-	FirstFactorItemRecoveryKey FirstFactorItem = "RecoveryKey"
 	FirstFactorItemPasswordProtectedKey FirstFactorItem = "PasswordProtectedKey"
+	FirstFactorItemRecoveryKey FirstFactorItem = "RecoveryKey"
+	FirstFactorItemSessionKey FirstFactorItem = "SessionKey"
+	FirstFactorItemTotp FirstFactorItem = "Totp"
 )
 
 // SecondFactorItem represents the secondfactoritem type.
@@ -356,9 +350,10 @@ const (
 	SecondFactorItemFido2 SecondFactorItem = "Fido2"
 	SecondFactorItemKey SecondFactorItem = "Key"
 	SecondFactorItemPassword SecondFactorItem = "Password"
-	SecondFactorItemTotp SecondFactorItem = "Totp"
-	SecondFactorItemRecoveryKey SecondFactorItem = "RecoveryKey"
 	SecondFactorItemPasswordProtectedKey SecondFactorItem = "PasswordProtectedKey"
+	SecondFactorItemRecoveryKey SecondFactorItem = "RecoveryKey"
+	SecondFactorItemSessionKey SecondFactorItem = "SessionKey"
+	SecondFactorItemTotp SecondFactorItem = "Totp"
 )
 
 // AuthenticatorAttachment represents the authenticatorattachment type.
@@ -376,6 +371,13 @@ const (
 	ResidentKeyRequired ResidentKey = "required"
 	ResidentKeyPreferred ResidentKey = "preferred"
 	ResidentKeyDiscouraged ResidentKey = "discouraged"
+)
+
+// SocialLoginProviderKind represents the socialloginproviderkind type.
+type SocialLoginProviderKind string
+
+const (
+	SocialLoginProviderKindOidc SocialLoginProviderKind = "Oidc"
 )
 
 // KeyScheme represents the keyscheme type.
@@ -871,6 +873,7 @@ type User struct {
 	UserID string `json:"userId"`
 	Kind string `json:"kind"`
 	CredentialUUID string `json:"credentialUuid"`
+	CredentialID *string `json:"credentialId,omitempty"`
 	OrgID *string `json:"orgId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	Permissions []string `json:"permissions,omitempty"`
