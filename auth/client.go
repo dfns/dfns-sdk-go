@@ -270,7 +270,7 @@ func (c *AuthClient) Logout(ctx context.Context, body LogoutRequest) (*LogoutRes
 	return &result, nil
 }
 
-// Registers the first credential for an OIDC-authenticated user, bootstrapping from the credential challenge issued by [OIDC Login](/api-reference/auth/oidc-login). Rejected if the user already has an active first-factor credential; use [Create Credential](/api-reference/auth/create-credential) in that case.
+// Registers the first credential for an OIDC-authenticated user, bootstrapping from the credential challenge issued by [Complete OIDC Login](/api-reference/auth/complete-oidc-login). Rejected if the user already has an active first-factor credential; use [Create Credential](/api-reference/auth/create-credential) in that case.
 func (c *AuthClient) OidcLoginCredentials(ctx context.Context, body OidcLoginCredentialsRequest) (*OidcLoginCredentialsResponse, error) {
 	path := "/auth/login/oidc/credentials"
 	var result OidcLoginCredentialsResponse
@@ -488,7 +488,9 @@ func (c *AuthClient) RecoverUser(ctx context.Context, body RecoverRequest) (*Rec
 	return c.Recover(ctx, body)
 }
 
-// Starts a user recovery session, returning a challenge that will be used to verify the user's identity.
+// Starts a user recovery session from the recovery code received by email. It returns a challenge that will be used to verify the user's identity.
+// 
+// <Note>This endpoint is for users that registered through the "Direct" registration flow. For users registered through the "Delegated" registration flow, the endpoint [Create Delegated Recovery Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-recovery-challenge) should be used.</Note>
 func (c *AuthClient) CreateRecoveryChallenge(ctx context.Context, body CreateRecoveryChallengeRequest) (*CreateRecoveryChallengeResponse, error) {
 	path := "/auth/recover/user/init"
 	var result CreateRecoveryChallengeResponse
@@ -500,6 +502,8 @@ func (c *AuthClient) CreateRecoveryChallenge(ctx context.Context, body CreateRec
 }
 
 // Send the user a recovery verification code. This code is used as a second factor to verify the user initiated the recovery request.
+//   
+//   <Note>This endpoint is for users that registered through the "Direct" registration flow. For users registered through the "Delegated" registration flow, the endpoint [Create Delegated Recovery Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-recovery-challenge) should be used.</Note>
 func (c *AuthClient) SendRecoveryCode(ctx context.Context, body SendRecoveryCodeRequest) (*SendRecoveryCodeResponse, error) {
 	path := "/auth/recover/user/code"
 	var result SendRecoveryCodeResponse
@@ -528,7 +532,9 @@ func (c *AuthClient) CreateDelegatedRegistrationChallenge(ctx context.Context, b
 	return &result, nil
 }
 
-// Starts a user registration session. It returns a challenge that will need to be signed by a passkey and used to perform the step [Complete User Registration](/api-reference/auth/complete-user-registration)
+// Starts a user registration session from the registration code received by email. It returns a challenge that will need to be signed by a passkey and used to perform the step [Complete User Registration](/api-reference/auth/complete-user-registration). Either `orgId` or `tenantId` needs to be specified.
+// 
+// <Note>
 func (c *AuthClient) CreateRegistrationChallenge(ctx context.Context, body CreateRegistrationChallengeRequest) (*CreateRegistrationChallengeResponse, error) {
 	path := "/auth/registration/init"
 	var result CreateRegistrationChallengeResponse
@@ -587,6 +593,8 @@ func (c *AuthClient) CompleteEndUserRegistrationWithWallets(ctx context.Context,
 }
 
 // Sends the user a new registration code. The previous registration code will be marked invalid. If the user has already completed their registration no action will be taken.
+// 
+// <Note>
 func (c *AuthClient) ResendRegistrationCode(ctx context.Context, body ResendRegistrationCodeRequest) (*ResendRegistrationCodeResponse, error) {
 	path := "/auth/registration/code"
 	var result ResendRegistrationCodeResponse
@@ -661,7 +669,7 @@ func (c *AuthClient) DeleteServiceAccount(ctx context.Context, serviceAccountID 
 	return &result, nil
 }
 
-// Activate a specific Service Account.
+// Re-activate a previously deactivated Service Account. New Service Accounts are active as soon as they are created, so this is only needed after a Service Account has been deactivated.
 func (c *AuthClient) ActivateServiceAccount(ctx context.Context, serviceAccountID string) (*ActivateServiceAccountResponse, error) {
 	path := "/auth/service-accounts/" + url.PathEscape(serviceAccountID) + "/activate"
 	var result ActivateServiceAccountResponse
@@ -717,10 +725,10 @@ func (c *AuthClient) ActivateUser(ctx context.Context, userID string) (*Activate
 }
 
 // Deactivate a specific User.
-func (c *AuthClient) DeactivateUser(ctx context.Context, userID string) (*DeactivateUserResponse, error) {
+func (c *AuthClient) DeactivateUser(ctx context.Context, userID string, body DeactivateUserRequest) (*DeactivateUserResponse, error) {
 	path := "/auth/users/" + url.PathEscape(userID) + "/deactivate"
 	var result DeactivateUserResponse
-	err := c.client.Do(ctx, "PUT", path, nil, &result, true)
+	err := c.client.Do(ctx, "PUT", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}
@@ -786,9 +794,9 @@ func (c *AuthClient) ListUsers(ctx context.Context, query *ListUsersQuery) (*Lis
 	return &result, nil
 }
 
-// Invite a new user in the caller's org. This will create the user and send a registration email to the created User's email, with a registration code, and pointing him to complete his registration on Dfns Dashboard. The user is created without any permissions.
-//   
-//   <Note>If you want the created User to not know about about Dfns, and don't want him to 
+// Creates a new user in the caller's org.
+// 
+// The registration flow this user will go through depends on the `registration` kind specified:
 func (c *AuthClient) CreateUser(ctx context.Context, body CreateUserRequest) (*CreateUserResponse, error) {
 	path := "/auth/users"
 	var result CreateUserResponse
@@ -804,6 +812,118 @@ func (c *AuthClient) InviteTenantUser(ctx context.Context, body InviteTenantUser
 	path := "/auth/users/invite"
 	var result InviteTenantUserResponse
 	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List the user groups in the caller's org.
+func (c *AuthClient) ListUserGroups(ctx context.Context, query *ListUserGroupsQuery) (*ListUserGroupsResponse, error) {
+	path := "/auth/user-groups"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListUserGroupsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Create a user group in the caller's org. A group holds permissions through the regular permission assignment endpoint, and its members hold those permissions in addition to their own.
+func (c *AuthClient) CreateUserGroup(ctx context.Context, body CreateUserGroupRequest) (*CreateUserGroupResponse, error) {
+	path := "/auth/user-groups"
+	var result CreateUserGroupResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Get a specific user group.
+func (c *AuthClient) GetUserGroup(ctx context.Context, userGroupID string) (*GetUserGroupResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	var result GetUserGroupResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Rename a user group or change its description. Fields left out keep their value. Its permissions and members are unaffected. Returns the group on success (200), or the pending user action if a policy requires approval (202).
+func (c *AuthClient) UpdateUserGroup(ctx context.Context, userGroupID string, body UpdateUserGroupRequest) (*UpdateUserGroupResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	var result UpdateUserGroupResponse
+	err := c.client.Do(ctx, "PUT", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Delete a user group. Its permission assignments are revoked and its members are removed. The name can be reused. Returns an empty body on success (200), or the pending user action if a policy requires approval (202).
+func (c *AuthClient) DeleteUserGroup(ctx context.Context, userGroupID string) (*DeleteUserGroupResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	var result DeleteUserGroupResponse
+	err := c.client.Do(ctx, "DELETE", path, nil, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List the members of a user group.
+func (c *AuthClient) ListUserGroupMembers(ctx context.Context, userGroupID string, query *ListUserGroupMembersQuery) (*ListUserGroupMembersResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListUserGroupMembersResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Add users to a user group. Each member gains every permission assigned to the group, in addition to their own. Returns an empty body on success (200), or the pending user action if a policy requires approval (202).
+func (c *AuthClient) AddUserGroupMembers(ctx context.Context, userGroupID string, body AddUserGroupMembersRequest) (*AddUserGroupMembersResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	var result AddUserGroupMembersResponse
+	err := c.client.Do(ctx, "POST", path, body, &result, true)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Remove users from a user group. Each removed user loses every permission they held only through this group. Returns an empty body on success (200), or the pending user action if a policy requires approval (202).
+func (c *AuthClient) RemoveUserGroupMembers(ctx context.Context, userGroupID string, body RemoveUserGroupMembersRequest) (*RemoveUserGroupMembersResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	var result RemoveUserGroupMembersResponse
+	err := c.client.Do(ctx, "DELETE", path, body, &result, true)
 	if err != nil {
 		return nil, err
 	}

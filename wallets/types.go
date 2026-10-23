@@ -15,6 +15,7 @@ type AbortTransactionResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -37,6 +38,7 @@ type AbortTransferResponse struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	DateRequested string `json:"dateRequested"`
@@ -62,6 +64,7 @@ type ActivateWalletResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -159,6 +162,7 @@ type SignAndBroadcastTransactionResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -180,6 +184,7 @@ type CancelTransactionResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -201,6 +206,7 @@ type CancelTransferResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -232,6 +238,7 @@ type SpeedUpTransactionResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -253,6 +260,7 @@ type SpeedUpTransferResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -318,6 +326,7 @@ type GetTransactionResponse struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -340,6 +349,7 @@ type GetTransferResponse struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	DateRequested string `json:"dateRequested"`
@@ -487,6 +497,7 @@ type TransferAssetResponse struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	DateRequested string `json:"dateRequested"`

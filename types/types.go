@@ -34,6 +34,8 @@ const (
 	AddressWatchNetworkFlareCCoston2 AddressWatchNetwork = "FlareCCoston2"
 	AddressWatchNetworkFlowEvm AddressWatchNetwork = "FlowEvm"
 	AddressWatchNetworkFlowEvmTestnet AddressWatchNetwork = "FlowEvmTestnet"
+	AddressWatchNetworkHyperEvm AddressWatchNetwork = "HyperEvm"
+	AddressWatchNetworkHyperEvmTestnet AddressWatchNetwork = "HyperEvmTestnet"
 	AddressWatchNetworkInk AddressWatchNetwork = "Ink"
 	AddressWatchNetworkInkSepolia AddressWatchNetwork = "InkSepolia"
 	AddressWatchNetworkMonad AddressWatchNetwork = "Monad"
@@ -135,6 +137,13 @@ const (
 	KindAddressWatchBlockchainEventTransferConfirmed Kind = "address_watch.blockchain_event.transfer.confirmed"
 	KindAddressWatchBlockchainEventMiscConfirmed Kind = "address_watch.blockchain_event.misc.confirmed"
 	KindPayoutActionRequired Kind = "payout.action.required"
+	KindAllocationActionCreated Kind = "allocation.action.created"
+	KindAllocationActionCompleted Kind = "allocation.action.completed"
+	KindAllocationActionFailed Kind = "allocation.action.failed"
+	KindSwapRequested Kind = "swap.requested"
+	KindSwapRejected Kind = "swap.rejected"
+	KindSwapCompleted Kind = "swap.completed"
+	KindSwapFailed Kind = "swap.failed"
 )
 
 // Network represents the network type.
@@ -189,6 +198,8 @@ const (
 	NetworkFlowEvmTestnet Network = "FlowEvmTestnet"
 	NetworkHedera Network = "Hedera"
 	NetworkHederaTestnet Network = "HederaTestnet"
+	NetworkHyperEvm Network = "HyperEvm"
+	NetworkHyperEvmTestnet Network = "HyperEvmTestnet"
 	NetworkInk Network = "Ink"
 	NetworkInkSepolia Network = "InkSepolia"
 	NetworkInternetComputer Network = "InternetComputer"
@@ -398,6 +409,14 @@ const (
 	KeyCurveStark KeyCurve = "stark"
 )
 
+// Registration represents the registration type.
+type Registration string
+
+const (
+	RegistrationDirect Registration = "Direct"
+	RegistrationDelegated Registration = "Delegated"
+)
+
 // Curve represents the curve type.
 type Curve string
 
@@ -580,6 +599,7 @@ type TransactionRequest struct {
 	RequestBody interface{} `json:"requestBody"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	ApprovalID *string `json:"approvalId,omitempty"`
@@ -669,6 +689,7 @@ type TransferRequest struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	DateRequested string `json:"dateRequested"`
@@ -718,6 +739,19 @@ type Vault struct {
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
 	Addresses []VaultAddress `json:"addresses,omitempty"`
+}
+
+// TenantUser represents the TenantUser type.
+type TenantUser struct {
+	ID string `json:"id"`
+	Kind string `json:"kind"`
+	Username string `json:"username"`
+	IsRegistered bool `json:"isRegistered"`
+	IsActive bool `json:"isActive"`
+	IsSSORequired bool `json:"isSSORequired"`
+	ExternalID *string `json:"externalId,omitempty"`
+	Permissions []map[string]interface{} `json:"permissions"`
+	Orgs []map[string]interface{} `json:"orgs"`
 }
 
 // SwapQuote represents the SwapQuote type.
@@ -866,6 +900,29 @@ type FeeSponsor struct {
 	AllowEndUser *bool `json:"allowEndUser,omitempty"`
 }
 
+// UserGroupMember represents the UserGroupMember type.
+type UserGroupMember struct {
+	UserID string `json:"userId"`
+	Username string `json:"username"`
+	Kind string `json:"kind"`
+	IsActive bool `json:"isActive"`
+	IsArchived bool `json:"isArchived"`
+	IsServiceAccount bool `json:"isServiceAccount"`
+	DateAdded string `json:"dateAdded"`
+}
+
+// UserGroup represents the UserGroup type.
+type UserGroup struct {
+	ID string `json:"id"`
+	OrgID *string `json:"orgId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
+	Name string `json:"name"`
+	Description *string `json:"description,omitempty"`
+	MemberCount int64 `json:"memberCount"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
 // User represents the User type.
 type User struct {
 	Username string `json:"username"`
@@ -963,6 +1020,7 @@ type AllocationAction struct {
 	Status string `json:"status"`
 	Requester Requester `json:"requester"`
 	RequestBody interface{} `json:"requestBody"`
+	FeeSponsorID *string `json:"feeSponsorId,omitempty"`
 	FailureReason *string `json:"failureReason,omitempty"`
 	DateCreated string `json:"dateCreated"`
 }
