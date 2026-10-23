@@ -766,6 +766,11 @@ type ActivateUserResponse struct {
 }
 
 // Deactivate User
+type DeactivateUserRequest struct {
+	Force *bool `json:"force,omitempty"`
+}
+
+// Deactivate User
 type DeactivateUserResponse struct {
 	Username string `json:"username"`
 	Name string `json:"name"`
@@ -859,9 +864,9 @@ type ListUsersQuery struct {
 type CreateUserRequest struct {
 	Email string `json:"email"`
 	Kind string `json:"kind"`
-	PublicKey *string `json:"publicKey,omitempty"`
 	ExternalID *string `json:"externalId,omitempty"`
 	IsSSORequired *bool `json:"isSSORequired,omitempty"`
+	Registration *string `json:"registration,omitempty"`
 }
 
 // Create User
@@ -890,4 +895,98 @@ type InviteTenantUserRequest struct {
 
 // Invite Tenant User
 type InviteTenantUserResponse struct {
+}
+
+// List User Groups
+type ListUserGroupsResponse struct {
+	Items []types.UserGroup `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListUserGroupsQuery represents query parameters.
+type ListUserGroupsQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+}
+
+// Create User Group
+type CreateUserGroupRequest struct {
+	Name string `json:"name"`
+	Description *string `json:"description,omitempty"`
+}
+
+// Create User Group
+type CreateUserGroupResponse struct {
+	ID string `json:"id"`
+	OrgID *string `json:"orgId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
+	Name string `json:"name"`
+	Description *string `json:"description,omitempty"`
+	MemberCount int64 `json:"memberCount"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
+// Get User Group
+type GetUserGroupResponse struct {
+	ID string `json:"id"`
+	OrgID *string `json:"orgId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
+	Name string `json:"name"`
+	Description *string `json:"description,omitempty"`
+	MemberCount int64 `json:"memberCount"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
+// Update User Group
+type UpdateUserGroupRequest struct {
+	Name *string `json:"name,omitempty"`
+	Description interface{} `json:"description,omitempty"`
+}
+
+// Update User Group
+type UpdateUserGroupResponse struct {
+	ID string `json:"id"`
+	OrgID *string `json:"orgId,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
+	Name string `json:"name"`
+	Description *string `json:"description,omitempty"`
+	MemberCount int64 `json:"memberCount"`
+	DateCreated string `json:"dateCreated"`
+	DateUpdated string `json:"dateUpdated"`
+}
+
+// Delete User Group
+type DeleteUserGroupResponse struct {
+}
+
+// List User Group Members
+type ListUserGroupMembersResponse struct {
+	Items []types.UserGroupMember `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+}
+
+// ListUserGroupMembersQuery represents query parameters.
+type ListUserGroupMembersQuery struct {
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+}
+
+// Add User Group Members
+type AddUserGroupMembersRequest struct {
+	UserIDs []string `json:"userIds"`
+}
+
+// Add User Group Members
+type AddUserGroupMembersResponse struct {
+}
+
+// Remove User Group Members
+type RemoveUserGroupMembersRequest struct {
+	UserIDs []string `json:"userIds"`
+}
+
+// Remove User Group Members
+type RemoveUserGroupMembersResponse struct {
 }

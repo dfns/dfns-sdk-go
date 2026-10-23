@@ -111,6 +111,7 @@ type CreateVaultTransferResponse struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	DateRequested string `json:"dateRequested"`
@@ -312,6 +313,7 @@ type TransferVaultLockResponse struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Status string `json:"status"`
 	Reason *string `json:"reason,omitempty"`
+	DebugTrace map[string]interface{} `json:"debugTrace,omitempty"`
 	TxHash *string `json:"txHash,omitempty"`
 	Fee *string `json:"fee,omitempty"`
 	DateRequested string `json:"dateRequested"`

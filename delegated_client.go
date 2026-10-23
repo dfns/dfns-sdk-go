@@ -19,6 +19,7 @@ import (
 	"github.com/dfns/dfns-sdk-go/v2/signers"
 	"github.com/dfns/dfns-sdk-go/v2/staking"
 	"github.com/dfns/dfns-sdk-go/v2/swaps"
+	"github.com/dfns/dfns-sdk-go/v2/tenant"
 	"github.com/dfns/dfns-sdk-go/v2/vaults"
 	"github.com/dfns/dfns-sdk-go/v2/wallets"
 	"github.com/dfns/dfns-sdk-go/v2/webhooks"
@@ -44,6 +45,7 @@ type DelegatedClient struct {
 	Signers *signers.DelegatedSignersClient
 	Staking *staking.DelegatedStakingClient
 	Swaps *swaps.DelegatedSwapsClient
+	Tenant *tenant.DelegatedTenantClient
 	Vaults *vaults.DelegatedVaultsClient
 	Wallets *wallets.DelegatedWalletsClient
 	Webhooks *webhooks.DelegatedWebhooksClient
@@ -74,6 +76,7 @@ func NewDelegatedClient(opts Options) (*DelegatedClient, error) {
 		Signers: signers.NewDelegatedSignersClient(c),
 		Staking: staking.NewDelegatedStakingClient(c),
 		Swaps: swaps.NewDelegatedSwapsClient(c),
+		Tenant: tenant.NewDelegatedTenantClient(c),
 		Vaults: vaults.NewDelegatedVaultsClient(c),
 		Wallets: wallets.NewDelegatedWalletsClient(c),
 		Webhooks: webhooks.NewDelegatedWebhooksClient(c),

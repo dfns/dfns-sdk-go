@@ -93,7 +93,7 @@ func (c *PermissionsClient) ListPermissionAssignments(ctx context.Context, permi
 	return c.ListAssignments(ctx, permissionID, query)
 }
 
-// Assigns a permission (role) to an identity (user, PAT or service account), granting it access to the operations defined in the permission. Returns the assignment on success (200), or a pending change request if approval is required (202).
+// Assigns a permission (role) to an identity (user, PAT, service account or user group), granting it access to the operations defined in the permission. Returns the assignment on success (200), or a pending change request if approval is required (202).
 func (c *PermissionsClient) AssignPermission(ctx context.Context, permissionID string, body AssignPermissionRequest) (*AssignPermissionResponse, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments"
 	var result AssignPermissionResponse

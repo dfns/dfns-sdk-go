@@ -346,7 +346,7 @@ func (c *DelegatedAuthClient) Logout(ctx context.Context, body LogoutRequest) (*
 	return &result, nil
 }
 
-// Registers the first credential for an OIDC-authenticated user, bootstrapping from the credential challenge issued by [OIDC Login](/api-reference/auth/oidc-login). Rejected if the user already has an active first-factor credential; use [Create Credential](/api-reference/auth/create-credential) in that case.
+// Registers the first credential for an OIDC-authenticated user, bootstrapping from the credential challenge issued by [Complete OIDC Login](/api-reference/auth/complete-oidc-login). Rejected if the user already has an active first-factor credential; use [Create Credential](/api-reference/auth/create-credential) in that case.
 func (c *DelegatedAuthClient) OidcLoginCredentials(ctx context.Context, body OidcLoginCredentialsRequest) (*OidcLoginCredentialsResponse, error) {
 	path := "/auth/login/oidc/credentials"
 	var result OidcLoginCredentialsResponse
@@ -640,7 +640,9 @@ func (c *DelegatedAuthClient) RecoverUser(ctx context.Context, body RecoverReque
 	return c.Recover(ctx, body)
 }
 
-// Starts a user recovery session, returning a challenge that will be used to verify the user's identity.
+// Starts a user recovery session from the recovery code received by email. It returns a challenge that will be used to verify the user's identity.
+// 
+// <Note>This endpoint is for users that registered through the "Direct" registration flow. For users registered through the "Delegated" registration flow, the endpoint [Create Delegated Recovery Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-recovery-challenge) should be used.</Note>
 func (c *DelegatedAuthClient) CreateRecoveryChallenge(ctx context.Context, body CreateRecoveryChallengeRequest) (*CreateRecoveryChallengeResponse, error) {
 	path := "/auth/recover/user/init"
 	var result CreateRecoveryChallengeResponse
@@ -652,6 +654,8 @@ func (c *DelegatedAuthClient) CreateRecoveryChallenge(ctx context.Context, body 
 }
 
 // Send the user a recovery verification code. This code is used as a second factor to verify the user initiated the recovery request.
+//   
+//   <Note>This endpoint is for users that registered through the "Direct" registration flow. For users registered through the "Delegated" registration flow, the endpoint [Create Delegated Recovery Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-recovery-challenge) should be used.</Note>
 func (c *DelegatedAuthClient) SendRecoveryCode(ctx context.Context, body SendRecoveryCodeRequest) (*SendRecoveryCodeResponse, error) {
 	path := "/auth/recover/user/code"
 	var result SendRecoveryCodeResponse
@@ -691,7 +695,9 @@ func (c *DelegatedAuthClient) CreateDelegatedRegistrationChallengeComplete(ctx c
 	return &result, nil
 }
 
-// Starts a user registration session. It returns a challenge that will need to be signed by a passkey and used to perform the step [Complete User Registration](/api-reference/auth/complete-user-registration)
+// Starts a user registration session from the registration code received by email. It returns a challenge that will need to be signed by a passkey and used to perform the step [Complete User Registration](/api-reference/auth/complete-user-registration). Either `orgId` or `tenantId` needs to be specified.
+// 
+// <Note>
 func (c *DelegatedAuthClient) CreateRegistrationChallenge(ctx context.Context, body CreateRegistrationChallengeRequest) (*CreateRegistrationChallengeResponse, error) {
 	path := "/auth/registration/init"
 	var result CreateRegistrationChallengeResponse
@@ -750,6 +756,8 @@ func (c *DelegatedAuthClient) CompleteEndUserRegistrationWithWallets(ctx context
 }
 
 // Sends the user a new registration code. The previous registration code will be marked invalid. If the user has already completed their registration no action will be taken.
+// 
+// <Note>
 func (c *DelegatedAuthClient) ResendRegistrationCode(ctx context.Context, body ResendRegistrationCodeRequest) (*ResendRegistrationCodeResponse, error) {
 	path := "/auth/registration/code"
 	var result ResendRegistrationCodeResponse
@@ -995,22 +1003,22 @@ func (c *DelegatedAuthClient) ActivateUserComplete(ctx context.Context, userID s
 // DeactivateUserInit starts delegated user action signing for the deactivateUser operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to DeactivateUserComplete
 // along with the same arguments given here.
-func (c *DelegatedAuthClient) DeactivateUserInit(ctx context.Context, userID string) (*signer.UserActionChallenge, error) {
+func (c *DelegatedAuthClient) DeactivateUserInit(ctx context.Context, userID string, body DeactivateUserRequest) (*signer.UserActionChallenge, error) {
 	path := "/auth/users/" + url.PathEscape(userID) + "/deactivate"
-	return c.client.CreateUserActionChallenge(ctx, "PUT", path, nil)
+	return c.client.CreateUserActionChallenge(ctx, "PUT", path, body)
 }
 
 // DeactivateUserComplete finishes delegated signing for the deactivateUser operation:
 // it submits the externally-signed challenge and issues the request. challengeID is the
 // ChallengeIdentifier from the DeactivateUserInit challenge.
-func (c *DelegatedAuthClient) DeactivateUserComplete(ctx context.Context, userID string, challengeID string, assertion *signer.CredentialAssertion) (*DeactivateUserResponse, error) {
+func (c *DelegatedAuthClient) DeactivateUserComplete(ctx context.Context, userID string, body DeactivateUserRequest, challengeID string, assertion *signer.CredentialAssertion) (*DeactivateUserResponse, error) {
 	path := "/auth/users/" + url.PathEscape(userID) + "/deactivate"
 	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
 	if err != nil {
 		return nil, err
 	}
 	var result DeactivateUserResponse
-	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, nil, &result, userAction); err != nil {
+	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil
@@ -1144,6 +1152,183 @@ func (c *DelegatedAuthClient) InviteTenantUserComplete(ctx context.Context, body
 	}
 	var result InviteTenantUserResponse
 	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List the user groups in the caller's org.
+func (c *DelegatedAuthClient) ListUserGroups(ctx context.Context, query *ListUserGroupsQuery) (*ListUserGroupsResponse, error) {
+	path := "/auth/user-groups"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListUserGroupsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// CreateUserGroupInit starts delegated user action signing for the createUserGroup operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to CreateUserGroupComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) CreateUserGroupInit(ctx context.Context, body CreateUserGroupRequest) (*signer.UserActionChallenge, error) {
+	path := "/auth/user-groups"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// CreateUserGroupComplete finishes delegated signing for the createUserGroup operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the CreateUserGroupInit challenge.
+func (c *DelegatedAuthClient) CreateUserGroupComplete(ctx context.Context, body CreateUserGroupRequest, challengeID string, assertion *signer.CredentialAssertion) (*CreateUserGroupResponse, error) {
+	path := "/auth/user-groups"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result CreateUserGroupResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Get a specific user group.
+func (c *DelegatedAuthClient) GetUserGroup(ctx context.Context, userGroupID string) (*GetUserGroupResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	var result GetUserGroupResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// UpdateUserGroupInit starts delegated user action signing for the updateUserGroup operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to UpdateUserGroupComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) UpdateUserGroupInit(ctx context.Context, userGroupID string, body UpdateUserGroupRequest) (*signer.UserActionChallenge, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	return c.client.CreateUserActionChallenge(ctx, "PUT", path, body)
+}
+
+// UpdateUserGroupComplete finishes delegated signing for the updateUserGroup operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the UpdateUserGroupInit challenge.
+func (c *DelegatedAuthClient) UpdateUserGroupComplete(ctx context.Context, userGroupID string, body UpdateUserGroupRequest, challengeID string, assertion *signer.CredentialAssertion) (*UpdateUserGroupResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result UpdateUserGroupResponse
+	if err := c.client.DoWithUserActionToken(ctx, "PUT", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// DeleteUserGroupInit starts delegated user action signing for the deleteUserGroup operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to DeleteUserGroupComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) DeleteUserGroupInit(ctx context.Context, userGroupID string) (*signer.UserActionChallenge, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, nil)
+}
+
+// DeleteUserGroupComplete finishes delegated signing for the deleteUserGroup operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the DeleteUserGroupInit challenge.
+func (c *DelegatedAuthClient) DeleteUserGroupComplete(ctx context.Context, userGroupID string, challengeID string, assertion *signer.CredentialAssertion) (*DeleteUserGroupResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID)
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result DeleteUserGroupResponse
+	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// List the members of a user group.
+func (c *DelegatedAuthClient) ListUserGroupMembers(ctx context.Context, userGroupID string, query *ListUserGroupMembersQuery) (*ListUserGroupMembersResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	if query != nil {
+		q := url.Values{}
+		if query.Limit != nil {
+			q.Set("limit", fmt.Sprintf("%v", *query.Limit))
+		}
+		if query.PaginationToken != nil {
+			q.Set("paginationToken", fmt.Sprintf("%v", *query.PaginationToken))
+		}
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
+	}
+	var result ListUserGroupMembersResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// AddUserGroupMembersInit starts delegated user action signing for the addUserGroupMembers operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to AddUserGroupMembersComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) AddUserGroupMembersInit(ctx context.Context, userGroupID string, body AddUserGroupMembersRequest) (*signer.UserActionChallenge, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	return c.client.CreateUserActionChallenge(ctx, "POST", path, body)
+}
+
+// AddUserGroupMembersComplete finishes delegated signing for the addUserGroupMembers operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the AddUserGroupMembersInit challenge.
+func (c *DelegatedAuthClient) AddUserGroupMembersComplete(ctx context.Context, userGroupID string, body AddUserGroupMembersRequest, challengeID string, assertion *signer.CredentialAssertion) (*AddUserGroupMembersResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result AddUserGroupMembersResponse
+	if err := c.client.DoWithUserActionToken(ctx, "POST", path, body, &result, userAction); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// RemoveUserGroupMembersInit starts delegated user action signing for the removeUserGroupMembers operation.
+// It returns the challenge to sign out-of-band; pass the signed assertion to RemoveUserGroupMembersComplete
+// along with the same arguments given here.
+func (c *DelegatedAuthClient) RemoveUserGroupMembersInit(ctx context.Context, userGroupID string, body RemoveUserGroupMembersRequest) (*signer.UserActionChallenge, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, body)
+}
+
+// RemoveUserGroupMembersComplete finishes delegated signing for the removeUserGroupMembers operation:
+// it submits the externally-signed challenge and issues the request. challengeID is the
+// ChallengeIdentifier from the RemoveUserGroupMembersInit challenge.
+func (c *DelegatedAuthClient) RemoveUserGroupMembersComplete(ctx context.Context, userGroupID string, body RemoveUserGroupMembersRequest, challengeID string, assertion *signer.CredentialAssertion) (*RemoveUserGroupMembersResponse, error) {
+	path := "/auth/user-groups/" + url.PathEscape(userGroupID) + "/members"
+	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	var result RemoveUserGroupMembersResponse
+	if err := c.client.DoWithUserActionToken(ctx, "DELETE", path, body, &result, userAction); err != nil {
 		return nil, err
 	}
 	return &result, nil

@@ -19,6 +19,7 @@ import (
 	"github.com/dfns/dfns-sdk-go/v2/signers"
 	"github.com/dfns/dfns-sdk-go/v2/staking"
 	"github.com/dfns/dfns-sdk-go/v2/swaps"
+	"github.com/dfns/dfns-sdk-go/v2/tenant"
 	"github.com/dfns/dfns-sdk-go/v2/vaults"
 	"github.com/dfns/dfns-sdk-go/v2/wallets"
 	"github.com/dfns/dfns-sdk-go/v2/webhooks"
@@ -50,6 +51,7 @@ type Client struct {
 	Signers *signers.SignersClient
 	Staking *staking.StakingClient
 	Swaps *swaps.SwapsClient
+	Tenant *tenant.TenantClient
 	Vaults *vaults.VaultsClient
 	Wallets *wallets.WalletsClient
 	Webhooks *webhooks.WebhooksClient
@@ -79,6 +81,7 @@ func NewClient(opts Options) (*Client, error) {
 		Signers: signers.NewSignersClient(c),
 		Staking: staking.NewStakingClient(c),
 		Swaps: swaps.NewSwapsClient(c),
+		Tenant: tenant.NewTenantClient(c),
 		Vaults: vaults.NewVaultsClient(c),
 		Wallets: wallets.NewWalletsClient(c),
 		Webhooks: webhooks.NewWebhooksClient(c),
