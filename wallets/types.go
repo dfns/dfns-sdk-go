@@ -92,7 +92,7 @@ type ListBulkWalletJobsQuery struct {
 
 // Bulk Create Wallets
 type BulkCreateWalletsRequest struct {
-	Network types.BulkWalletNetwork `json:"network"`
+	Networks []types.BulkWalletNetwork `json:"networks"`
 	Count int64 `json:"count"`
 	Name string `json:"name"`
 	Tags []string `json:"tags,omitempty"`
@@ -110,7 +110,7 @@ type GetBulkWalletJobResponse struct {
 	ID string `json:"id"`
 	OrgID string `json:"orgId"`
 	Status string `json:"status"`
-	Network types.Network `json:"network"`
+	Networks []types.Network `json:"networks"`
 	NamePrefix string `json:"namePrefix"`
 	Tags []string `json:"tags"`
 	TotalCount int64 `json:"totalCount"`

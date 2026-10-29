@@ -42,6 +42,17 @@ func (c *DelegatedAgreementsClient) GetLatestUnacceptedAgreement(ctx context.Con
 	return &result, nil
 }
 
+// Get the latest agreements
+func (c *DelegatedAgreementsClient) GetLatestAgreements(ctx context.Context) (*GetLatestAgreementsResponse, error) {
+	path := "/dashboard/agreements/latest"
+	var result GetLatestAgreementsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // RecordAgreementAcceptanceInit starts delegated user action signing for the recordAgreementAcceptance operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to RecordAgreementAcceptanceComplete
 // along with the same arguments given here.

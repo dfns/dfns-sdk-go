@@ -80,6 +80,16 @@ const (
 	StatusRejected Status = "Rejected"
 )
 
+// AgreementType represents the agreementtype type.
+type AgreementType string
+
+const (
+	AgreementTypePrivacyPolicy AgreementType = "PrivacyPolicy"
+	AgreementTypeTermsAndConditions AgreementType = "TermsAndConditions"
+	AgreementTypeUniswapTermsOfService AgreementType = "UniswapTermsOfService"
+	AgreementTypeUniswapPrivacyPolicy AgreementType = "UniswapPrivacyPolicy"
+)
+
 // Protocol represents the protocol type.
 type Protocol string
 
@@ -484,22 +494,56 @@ const (
 type BulkWalletNetwork string
 
 const (
+	BulkWalletNetworkAdi BulkWalletNetwork = "Adi"
+	BulkWalletNetworkArbitrumOne BulkWalletNetwork = "ArbitrumOne"
+	BulkWalletNetworkArc BulkWalletNetwork = "Arc"
+	BulkWalletNetworkAreum BulkWalletNetwork = "Areum"
+	BulkWalletNetworkAvalancheC BulkWalletNetwork = "AvalancheC"
+	BulkWalletNetworkBase BulkWalletNetwork = "Base"
+	BulkWalletNetworkBob BulkWalletNetwork = "Bob"
+	BulkWalletNetworkBsc BulkWalletNetwork = "Bsc"
+	BulkWalletNetworkBerachain BulkWalletNetwork = "Berachain"
+	BulkWalletNetworkBesu BulkWalletNetwork = "Besu"
+	BulkWalletNetworkBesu2 BulkWalletNetwork = "Besu2"
+	BulkWalletNetworkBesu3 BulkWalletNetwork = "Besu3"
+	BulkWalletNetworkBesu4 BulkWalletNetwork = "Besu4"
+	BulkWalletNetworkBesu5 BulkWalletNetwork = "Besu5"
+	BulkWalletNetworkBesu6 BulkWalletNetwork = "Besu6"
+	BulkWalletNetworkCelo BulkWalletNetwork = "Celo"
+	BulkWalletNetworkCodex BulkWalletNetwork = "Codex"
 	BulkWalletNetworkEthereum BulkWalletNetwork = "Ethereum"
+	BulkWalletNetworkEthereumClassic BulkWalletNetwork = "EthereumClassic"
+	BulkWalletNetworkFantomOpera BulkWalletNetwork = "FantomOpera"
+	BulkWalletNetworkFlareC BulkWalletNetwork = "FlareC"
+	BulkWalletNetworkFlowEvm BulkWalletNetwork = "FlowEvm"
+	BulkWalletNetworkHyperEvm BulkWalletNetwork = "HyperEvm"
+	BulkWalletNetworkInk BulkWalletNetwork = "Ink"
+	BulkWalletNetworkMonad BulkWalletNetwork = "Monad"
+	BulkWalletNetworkOptimism BulkWalletNetwork = "Optimism"
+	BulkWalletNetworkPlasma BulkWalletNetwork = "Plasma"
+	BulkWalletNetworkPlume BulkWalletNetwork = "Plume"
+	BulkWalletNetworkPolygon BulkWalletNetwork = "Polygon"
+	BulkWalletNetworkRace BulkWalletNetwork = "Race"
+	BulkWalletNetworkRayls BulkWalletNetwork = "Rayls"
+	BulkWalletNetworkRobinhood BulkWalletNetwork = "Robinhood"
+	BulkWalletNetworkSeiPacific1 BulkWalletNetwork = "SeiPacific1"
+	BulkWalletNetworkSonic BulkWalletNetwork = "Sonic"
+	BulkWalletNetworkTempo BulkWalletNetwork = "Tempo"
+	BulkWalletNetworkTsc BulkWalletNetwork = "Tsc"
+	BulkWalletNetworkXdc BulkWalletNetwork = "Xdc"
+	BulkWalletNetworkXLayer BulkWalletNetwork = "XLayer"
 	BulkWalletNetworkEthereumSepolia BulkWalletNetwork = "EthereumSepolia"
 	BulkWalletNetworkEthereumHolesky BulkWalletNetwork = "EthereumHolesky"
 	BulkWalletNetworkEthereumHoodi BulkWalletNetwork = "EthereumHoodi"
-	BulkWalletNetworkBsc BulkWalletNetwork = "Bsc"
 	BulkWalletNetworkBscTestnet BulkWalletNetwork = "BscTestnet"
-	BulkWalletNetworkBase BulkWalletNetwork = "Base"
 	BulkWalletNetworkBaseSepolia BulkWalletNetwork = "BaseSepolia"
-	BulkWalletNetworkArbitrumOne BulkWalletNetwork = "ArbitrumOne"
 	BulkWalletNetworkArbitrumSepolia BulkWalletNetwork = "ArbitrumSepolia"
-	BulkWalletNetworkOptimism BulkWalletNetwork = "Optimism"
 	BulkWalletNetworkOptimismSepolia BulkWalletNetwork = "OptimismSepolia"
 	BulkWalletNetworkTron BulkWalletNetwork = "Tron"
 	BulkWalletNetworkTronNile BulkWalletNetwork = "TronNile"
 	BulkWalletNetworkSolana BulkWalletNetwork = "Solana"
 	BulkWalletNetworkSolanaDevnet BulkWalletNetwork = "SolanaDevnet"
+	BulkWalletNetworkBitcoin BulkWalletNetwork = "Bitcoin"
 )
 
 // RequestMethod represents the requestmethod type.
@@ -575,7 +619,7 @@ type BulkWalletCreationJob struct {
 	ID string `json:"id"`
 	OrgID string `json:"orgId"`
 	Status string `json:"status"`
-	Network Network `json:"network"`
+	Networks []Network `json:"networks"`
 	NamePrefix string `json:"namePrefix"`
 	Tags []string `json:"tags"`
 	TotalCount int64 `json:"totalCount"`

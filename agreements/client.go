@@ -38,6 +38,17 @@ func (c *AgreementsClient) GetLatestUnacceptedAgreement(ctx context.Context, que
 	return &result, nil
 }
 
+// Get the latest agreements
+func (c *AgreementsClient) GetLatestAgreements(ctx context.Context) (*GetLatestAgreementsResponse, error) {
+	path := "/dashboard/agreements/latest"
+	var result GetLatestAgreementsResponse
+	err := c.client.Do(ctx, "GET", path, nil, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 // Record the acceptance of a specific agreement by its ID
 func (c *AgreementsClient) RecordAgreementAcceptance(ctx context.Context, agreementID string) (*RecordAgreementAcceptanceResponse, error) {
 	path := "/agreements/" + url.PathEscape(agreementID) + "/accept"

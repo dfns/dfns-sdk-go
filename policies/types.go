@@ -87,3 +87,9 @@ type ListApprovalsQuery struct {
 	InitiatorID *string `json:"initiatorId,omitempty"`
 	ApproverID *string `json:"approverId,omitempty"`
 }
+
+// Look up the Sumsub Travel Rule VASP of a wallet address
+type LookupSumsubTravelRuleVaspRequest struct {
+	Network types.Network `json:"network"`
+	WalletAddress string `json:"walletAddress"`
+}

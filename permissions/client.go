@@ -139,16 +139,7 @@ func (c *PermissionsClient) CreatePermission(ctx context.Context, body CreatePer
 }
 
 // Revokes a permission (role) assignment, removing the identity's access to the operations granted by the permission.
-func (c *PermissionsClient) RevokePermission(ctx context.Context, permissionID string, assignmentID string, query *RevokePermissionQuery) error {
+func (c *PermissionsClient) RevokePermission(ctx context.Context, permissionID string, assignmentID string, body RevokePermissionRequest) error {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments/" + url.PathEscape(assignmentID)
-	if query != nil {
-		q := url.Values{}
-		if query.Force != nil {
-			q.Set("force", fmt.Sprintf("%v", *query.Force))
-		}
-		if len(q) > 0 {
-			path += "?" + q.Encode()
-		}
-	}
-	return c.client.Do(ctx, "DELETE", path, nil, nil, true)
+	return c.client.Do(ctx, "DELETE", path, body, nil, true)
 }
