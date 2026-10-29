@@ -12,6 +12,11 @@ type GetLatestUnacceptedAgreementQuery struct {
 	AgreementType string `json:"agreementType"`
 }
 
+// Get Latest Agreements
+type GetLatestAgreementsResponse struct {
+	LatestAgreements []map[string]interface{} `json:"latestAgreements"`
+}
+
 // Record Agreement Acceptance
 type RecordAgreementAcceptanceResponse struct {
 	AgreementID string `json:"agreementId"`

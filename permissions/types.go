@@ -117,7 +117,7 @@ type CreatePermissionResponse struct {
 	DateUpdated string `json:"dateUpdated"`
 }
 
-// RevokePermissionQuery represents query parameters.
-type RevokePermissionQuery struct {
-	Force *interface{} `json:"force,omitempty"`
+// Revoke Permission
+type RevokePermissionRequest struct {
+	Force *bool `json:"force,omitempty"`
 }

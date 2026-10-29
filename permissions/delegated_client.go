@@ -209,37 +209,19 @@ func (c *DelegatedPermissionsClient) CreatePermissionComplete(ctx context.Contex
 // RevokePermissionInit starts delegated user action signing for the revokePermission operation.
 // It returns the challenge to sign out-of-band; pass the signed assertion to RevokePermissionComplete
 // along with the same arguments given here.
-func (c *DelegatedPermissionsClient) RevokePermissionInit(ctx context.Context, permissionID string, assignmentID string, query *RevokePermissionQuery) (*signer.UserActionChallenge, error) {
+func (c *DelegatedPermissionsClient) RevokePermissionInit(ctx context.Context, permissionID string, assignmentID string, body RevokePermissionRequest) (*signer.UserActionChallenge, error) {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments/" + url.PathEscape(assignmentID)
-	if query != nil {
-		q := url.Values{}
-		if query.Force != nil {
-			q.Set("force", fmt.Sprintf("%v", *query.Force))
-		}
-		if len(q) > 0 {
-			path += "?" + q.Encode()
-		}
-	}
-	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, nil)
+	return c.client.CreateUserActionChallenge(ctx, "DELETE", path, body)
 }
 
 // RevokePermissionComplete finishes delegated signing for the revokePermission operation:
 // it submits the externally-signed challenge and issues the request. challengeID is the
 // ChallengeIdentifier from the RevokePermissionInit challenge.
-func (c *DelegatedPermissionsClient) RevokePermissionComplete(ctx context.Context, permissionID string, assignmentID string, query *RevokePermissionQuery, challengeID string, assertion *signer.CredentialAssertion) error {
+func (c *DelegatedPermissionsClient) RevokePermissionComplete(ctx context.Context, permissionID string, assignmentID string, body RevokePermissionRequest, challengeID string, assertion *signer.CredentialAssertion) error {
 	path := "/permissions/" + url.PathEscape(permissionID) + "/assignments/" + url.PathEscape(assignmentID)
-	if query != nil {
-		q := url.Values{}
-		if query.Force != nil {
-			q.Set("force", fmt.Sprintf("%v", *query.Force))
-		}
-		if len(q) > 0 {
-			path += "?" + q.Encode()
-		}
-	}
 	userAction, err := c.client.CompleteUserActionSigning(ctx, challengeID, assertion)
 	if err != nil {
 		return err
 	}
-	return c.client.DoWithUserActionToken(ctx, "DELETE", path, nil, nil, userAction)
+	return c.client.DoWithUserActionToken(ctx, "DELETE", path, body, nil, userAction)
 }

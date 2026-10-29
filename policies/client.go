@@ -156,3 +156,14 @@ func (c *PoliciesClient) ListApprovals(ctx context.Context, query *ListApprovals
 	}
 	return &result, nil
 }
+
+// Ask the org's Sumsub Travel Rule integration which VASP controls a counterparty wallet address on a network. Use the returned `vaspId` as `travelRule.beneficiaryVaspId` on a transfer screened by a Sumsub Travel Rule policy. `found: false` means Sumsub could not attribute the address (it may still be hosted). Read-only, so no user action signature is required. Requires Travel Rule to be enabled for the tenant, an activated Sumsub integration on the org, and wallet attribution enabled on the org's Sumsub account.
+func (c *PoliciesClient) LookupSumsubTravelRuleVasp(ctx context.Context, body LookupSumsubTravelRuleVaspRequest) (interface{}, error) {
+	path := "/v2/policies/travel-rule/sumsub/vasp-lookup"
+	var result interface{}
+	err := c.client.Do(ctx, "POST", path, body, &result, false)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
