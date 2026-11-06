@@ -80,16 +80,6 @@ const (
 	StatusRejected Status = "Rejected"
 )
 
-// AgreementType represents the agreementtype type.
-type AgreementType string
-
-const (
-	AgreementTypePrivacyPolicy AgreementType = "PrivacyPolicy"
-	AgreementTypeTermsAndConditions AgreementType = "TermsAndConditions"
-	AgreementTypeUniswapTermsOfService AgreementType = "UniswapTermsOfService"
-	AgreementTypeUniswapPrivacyPolicy AgreementType = "UniswapPrivacyPolicy"
-)
-
 // Protocol represents the protocol type.
 type Protocol string
 

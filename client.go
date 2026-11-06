@@ -5,7 +5,6 @@ package dfns
 import (
 	"github.com/dfns/dfns-sdk-go/v2/internal/client"
 	"github.com/dfns/dfns-sdk-go/v2/addresswatches"
-	"github.com/dfns/dfns-sdk-go/v2/agreements"
 	"github.com/dfns/dfns-sdk-go/v2/allocations"
 	"github.com/dfns/dfns-sdk-go/v2/auth"
 	"github.com/dfns/dfns-sdk-go/v2/exchanges"
@@ -37,7 +36,6 @@ type APIError = client.APIError
 type Client struct {
 	baseClient *client.Client
 	AddressWatches *addresswatches.AddressWatchesClient
-	Agreements *agreements.AgreementsClient
 	Allocations *allocations.AllocationsClient
 	Auth *auth.AuthClient
 	Exchanges *exchanges.ExchangesClient
@@ -67,7 +65,6 @@ func NewClient(opts Options) (*Client, error) {
 	return &Client{
 		baseClient: c,
 		AddressWatches: addresswatches.NewAddressWatchesClient(c),
-		Agreements: agreements.NewAgreementsClient(c),
 		Allocations: allocations.NewAllocationsClient(c),
 		Auth: auth.NewAuthClient(c),
 		Exchanges: exchanges.NewExchangesClient(c),
