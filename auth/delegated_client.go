@@ -374,6 +374,8 @@ func (c *DelegatedAuthClient) CompleteOidcLogin(ctx context.Context, body OidcLo
 }
 
 // Initialize the OIDC login process by returning the identity provider authorization URL to redirect the user to.
+// 
+// This is SSO where your identity provider also manages users, available on request: DFNS enables it for your organization or tenant. Users are created on their first sign-in, and their roles and group memberships follow your identity provider's role claims at each login. For standard SSO configured in the dashboard, use [Initiate SSO Login](https://docs.dfns.co/api-reference/auth/initiate-sso-login). Pass exactly one of `orgId` or `tenantId`.
 func (c *DelegatedAuthClient) OidcLoginInit(ctx context.Context, body OidcLoginInitRequest) (*OidcLoginInitResponse, error) {
 	path := "/auth/login/oidc/init"
 	var result OidcLoginInitResponse
@@ -402,7 +404,9 @@ func (c *DelegatedAuthClient) SendLoginCode(ctx context.Context, body SendLoginC
 	return &result, nil
 }
 
-// Logs a user in with a JWT id token issued by a social login provider and provides the authenticated user with their authentication token.
+// Logs an end user in with a Google ID token and returns their authentication token.
+// 
+// Only ID tokens issued by Google are accepted (issuer `accounts.google.com`). Tokens from any other identity provider are rejected with `401` "ID Token issued by unsupported issuer". To use your own identity provider for end users, authenticate them in your application and use [Delegated Login](https://docs.dfns.co/api-reference/auth/delegated-login) instead.
 func (c *DelegatedAuthClient) SocialLogin(ctx context.Context, body SocialLoginRequest) (*SocialLoginResponse, error) {
 	path := "/auth/login/social"
 	var result SocialLoginResponse
@@ -430,6 +434,8 @@ func (c *DelegatedAuthClient) CompleteSsoLogin(ctx context.Context, body SsoLogi
 }
 
 // Initialize the login process with SSO by returning the IdP URL to call.
+// 
+// SSO is for employees (`CustomerEmployee`) of an organization that configured SSO in the dashboard (**Integrations** > **OpenID**). The user must already exist in the organization and have `isSSORequired` set. See [Set up SSO](https://docs.dfns.co/guides/set-up-sso).
 func (c *DelegatedAuthClient) SsoLoginInit(ctx context.Context, body SsoLoginInitRequest) (*SsoLoginInitResponse, error) {
 	path := "/auth/login/sso/init"
 	var result SsoLoginInitResponse
@@ -708,7 +714,9 @@ func (c *DelegatedAuthClient) CreateRegistrationChallenge(ctx context.Context, b
 	return &result, nil
 }
 
-// Starts an end-user registration session by passing a JWT obtained by an IdP. It returns a challenge that will need to be signed by a passkey and used to perform [Complete End User Registration with Wallets](/api-reference/auth/complete-end-user-registration-with-wallets).
+// Starts an end-user registration session by passing a Google ID token. It creates the end user (`EndUser`) if needed and returns a challenge that will need to be signed by a passkey and used to perform [Complete End User Registration with Wallets](/api-reference/auth/complete-end-user-registration-with-wallets).
+// 
+// Only ID tokens issued by Google are accepted, and their audience must be one of the Google OAuth client IDs set in your organization's social login settings. Tokens from any other identity provider are rejected with `401` "ID Token issued by unsupported issuer". To register end users authenticated by your own identity provider, use [Create Delegated Registration Challenge](https://docs.dfns.co/api-reference/auth/create-delegated-registration-challenge).
 func (c *DelegatedAuthClient) CreateSocialRegistrationChallenge(ctx context.Context, body CreateSocialRegistrationChallengeRequest) (*CreateSocialRegistrationChallengeResponse, error) {
 	path := "/auth/registration/social"
 	var result CreateSocialRegistrationChallengeResponse
