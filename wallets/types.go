@@ -511,6 +511,24 @@ type TransferAssetResponse struct {
 	Details map[string]interface{} `json:"details,omitempty"`
 }
 
+// Search Wallets
+type SearchWalletsRequest struct {
+	Q *string `json:"q,omitempty"`
+	Sort *map[string]interface{} `json:"sort,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
+	PaginationToken *string `json:"paginationToken,omitempty"`
+	IncludeAssets *string `json:"includeAssets,omitempty"`
+	Matching *string `json:"matching,omitempty"`
+	Filters *map[string]interface{} `json:"filters,omitempty"`
+}
+
+// Search Wallets
+type SearchWalletsResponse struct {
+	Items []map[string]interface{} `json:"items"`
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+	Partial *string `json:"partial,omitempty"`
+}
+
 // Tag Wallet
 type TagWalletRequest struct {
 	Tags []string `json:"tags"`

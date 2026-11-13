@@ -129,6 +129,7 @@ const (
 	KindWalletOfferAccepted Kind = "wallet.offer.accepted"
 	KindWalletOfferRejected Kind = "wallet.offer.rejected"
 	KindWalletOfferWithdrawn Kind = "wallet.offer.withdrawn"
+	KindWalletOfferExpired Kind = "wallet.offer.expired"
 	KindWalletTagsModified Kind = "wallet.tags.modified"
 	KindVaultCreated Kind = "vault.created"
 	KindVaultUpdated Kind = "vault.updated"
@@ -542,6 +543,71 @@ type RequestMethod string
 const (
 	RequestMethodGET RequestMethod = "GET"
 	RequestMethodPOST RequestMethod = "POST"
+)
+
+// Field represents the field type.
+type Field string
+
+const (
+	FieldName Field = "name"
+	FieldDateCreated Field = "dateCreated"
+	FieldAssetBalance Field = "assetBalance"
+)
+
+// Direction represents the direction type.
+type Direction string
+
+const (
+	DirectionAsc Direction = "asc"
+	DirectionDesc Direction = "desc"
+)
+
+// IncludeAssets represents the includeassets type.
+type IncludeAssets string
+
+const (
+	IncludeAssetsNative IncludeAssets = "native"
+	IncludeAssetsVerified IncludeAssets = "verified"
+)
+
+// Matching represents the matching type.
+type Matching string
+
+const (
+	MatchingPrecise Matching = "precise"
+	MatchingBroad Matching = "broad"
+)
+
+// StatusesItem represents the statusesitem type.
+type StatusesItem string
+
+const (
+	StatusesItemActive StatusesItem = "Active"
+	StatusesItemInactive StatusesItem = "Inactive"
+	StatusesItemArchived StatusesItem = "Archived"
+)
+
+// VaultWallets represents the vaultwallets type.
+type VaultWallets string
+
+const (
+	VaultWalletsExclude VaultWallets = "exclude"
+	VaultWalletsInclude VaultWallets = "include"
+)
+
+// Scope represents the scope type.
+type Scope string
+
+const (
+	ScopeVerified Scope = "verified"
+	ScopeAll Scope = "all"
+)
+
+// Partial represents the partial type.
+type Partial string
+
+const (
+	PartialCapped Partial = "capped"
 )
 
 // WebhookEvent represents the WebhookEvent type.
